@@ -29,6 +29,7 @@ import {
   executeClawnchTool,
   isClawnchTool,
 } from "@/lib/skills/clawnch-tools";
+import { deductForAgentCall } from "@/lib/credits/engine";
 
 const optionalNonEmptyString = z.preprocess((value) => {
   if (typeof value !== "string") return value;
@@ -624,6 +625,27 @@ export async function POST(req: NextRequest) {
             { status: 403 }
           );
         }
+
+        // ── CREDIT DEDUCTION ──────────────────────────────────────────────────────
+        // Charge for the initial orchestrator call (lead agent)
+        const deduction = await deductForAgentCall(
+          auth.userId,
+          model,
+          `Chat: ${message.substring(0, 50)}${message.length > 50 ? "..." : ""}`,
+          sessionId
+        );
+
+        if (!deduction.success) {
+          return NextResponse.json(
+            {
+              error: deduction.error || "Insufficient credits.",
+              code: "INSUFFICIENT_FUNDS",
+              requiredCredits: deduction.cost,
+            },
+            { status: 402 }
+          );
+        }
+        // ──────────────────────────────────────────────────────────────────────────
       }
     }
 

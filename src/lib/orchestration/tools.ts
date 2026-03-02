@@ -2,6 +2,7 @@ import { prisma } from "@/lib/db/prisma";
 import { openrouter, createChatCompletion } from "@/lib/openrouter/client";
 import { getAgentToolsFromConfig, executeOpenAIToolCall } from "@/lib/composio/client";
 import { SkillManager } from "@/lib/skills/manager";
+import { deductForAgentCall } from "@/lib/credits/engine";
 import type OpenAI from "openai";
 
 type ChatMessageParam = OpenAI.Chat.Completions.ChatCompletionMessageParam;
@@ -136,6 +137,22 @@ export async function executeOrchestrationToolCall(
                 console.warn(`Failed to fetch tools for specialist ${specialistSlug}`, err);
             }
         }
+
+        // ── CREDIT DEDUCTION ──────────────────────────────────────────────────────
+        // Charge for the specialist model call
+        const deduction = await deductForAgentCall(
+            userId,
+            agent.defaultModel,
+            `Delegated: ${specialistSlug} - ${subQuery.substring(0, 50)}${subQuery.length > 50 ? "..." : ""}`,
+            sessionId
+        );
+
+        if (!deduction.success) {
+            return JSON.stringify({
+                error: `Insufficient credits to call specialist '${specialistSlug}'. Required: ${deduction.cost} $RANDI.`
+            });
+        }
+        // ──────────────────────────────────────────────────────────────────────────
 
         const messages: ChatMessageParam[] = [
             { role: "system", content: agent.systemPrompt },

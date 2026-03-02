@@ -9,7 +9,7 @@ import { useTokenPrice } from "@/hooks/useTokenPrice";
 const mainNavItems = [
   { href: "/dashboard", label: "Dashboard", icon: "grid" },
   { href: "/chat", label: "Ask Randi", icon: "message" },
-  { href: "/agents", label: "Capabilities", icon: "cpu" },
+  { href: "/agents", label: "Agent Skills", icon: "cpu" },
   { href: "/integrations", label: "Integrations", icon: "link" },
   { href: "/credits", label: "Tokens", icon: "coins" },
 ];

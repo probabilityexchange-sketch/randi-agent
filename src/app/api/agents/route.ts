@@ -10,8 +10,18 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Too many requests" }, { status: 429 });
   }
 
+  const { searchParams } = new URL(request.url);
+  const includeAll = searchParams.get("all") === "true";
+
+  const specialists = ["research-assistant", "code-assistant", "productivity-agent"];
+
+  const where: any = { active: true };
+  if (!includeAll) {
+    where.slug = { notIn: specialists };
+  }
+
   const agents = await prisma.agentConfig.findMany({
-    where: { active: true },
+    where,
     select: {
       id: true,
       slug: true,
@@ -20,6 +30,8 @@ export async function GET(request: NextRequest) {
       tokensPerHour: true,
       requiredTier: true,
       active: true,
+      image: true,
+      internalPort: true,
     },
     orderBy: { name: "asc" },
   });

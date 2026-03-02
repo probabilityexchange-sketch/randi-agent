@@ -51,14 +51,57 @@ export async function createChatCompletion(options: OpenAI.Chat.ChatCompletionCr
 
     for (let i = 0; i < 3; i++) {
         try {
-            return await openrouter.chat.completions.create(requestOptions);
-        } catch (error: any) {
-            lastError = error;
-            console.error(`[AI] Completion attempt ${i + 1} failed:`, error.message || error);
-            if (error.response?.data) {
-                console.error(`[AI] Error details:`, JSON.stringify(error.response.data));
+            const response = await openrouter.chat.completions.create(requestOptions);
+
+            // --- MINIMAX TOOL CALL PARSER ---
+            // Minimax sometimes returns tool calls as raw XML in the content rather than native tool_calls
+            const msg = response.choices?.[0]?.message;
+            if (msg && typeof msg.content === 'string' && msg.content.includes('<invoke name=')) {
+                console.log("[AI] Detected Minimax XML tool call in content, parsing...");
+
+                const invokeRegex = /<invoke name="([^"]+)">([\s\S]*?)<\/invoke>/g;
+                const paramRegex = /<parameter name="([^"]+)">([\s\S]*?)<\/parameter>/g;
+
+                let match;
+                const tool_calls = [];
+                let newContent = msg.content;
+
+                while ((match = invokeRegex.exec(msg.content)) !== null) {
+                    const toolName = match[1];
+                    const paramsBlock = match[2];
+
+                    const args: Record<string, any> = {};
+                    let paramMatch;
+                    while ((paramMatch = paramRegex.exec(paramsBlock)) !== null) {
+                        try {
+                            // Try parsing as JSON in case it's a nested object string, otherwise take raw string
+                            args[paramMatch[1]] = JSON.parse(paramMatch[2]);
+                        } catch {
+                            args[paramMatch[1]] = paramMatch[2].trim();
+                        }
+                    }
+
+                    tool_calls.push({
+                        id: `call_${Math.random().toString(36).substring(2, 9)}`,
+                        type: 'function' as const,
+                        function: {
+                            name: toolName,
+                            arguments: JSON.stringify(args)
+                        }
+                    });
+
+                    // Remove the XML block from the content
+                    newContent = newContent.replace(match[0], '').trim();
+                }
+
+                if (tool_calls.length > 0) {
+                    msg.tool_calls = msg.tool_calls ? [...msg.tool_calls, ...tool_calls] : tool_calls;
+                    msg.content = newContent === '' ? null : newContent;
+                }
             }
-            // Retry on 503, 429, 502, 504
+
+            return response;
+        } catch (error: any) {
             const status = error.status || error.statusCode;
             if (status === 503 || status === 429 || status === 502 || status === 504) {
                 const wait = Math.pow(2, i) * 1000;
