@@ -9,10 +9,20 @@ const PRIVY_RATE_LIMIT_RETRY_MS = 15000;
 const FINALIZE_TIMEOUT_MS = 12000;
 const MAX_SYNC_ATTEMPTS = 3;
 
+// Module-level deduplication — prevents multiple hook instances from firing
+// concurrent requests. But we also maintain React state so re-renders fire
+// when the state changes.
 let sharedSessionSynced = false;
 let sharedSyncPromise: Promise<void> | null = null;
 let sharedNextRetryAt = 0;
 let sharedSyncAttempts = 0;
+
+// Subscribers that need to be notified when sharedSessionSynced flips to true
+const syncedListeners = new Set<() => void>();
+
+function notifySynced() {
+  syncedListeners.forEach((fn) => fn());
+}
 
 function resetSharedState() {
   sharedSessionSynced = false;
@@ -43,32 +53,35 @@ function parseRetryAfterMs(headerValue: string | null): number | null {
 }
 
 function normalizeSyncError(error: unknown): SessionSyncError {
-  if (error instanceof SessionSyncError) {
-    return error;
-  }
-
-  if (error instanceof Error) {
-    return new SessionSyncError(error.message);
-  }
-
+  if (error instanceof SessionSyncError) return error;
+  if (error instanceof Error) return new SessionSyncError(error.message);
   return new SessionSyncError("Failed to establish server session");
 }
 
 export function useAuth() {
   const [isClient, setIsClient] = useState(false);
-  useEffect(() => {
-    setIsClient(true);
-  }, []);
+  useEffect(() => { setIsClient(true); }, []);
 
   const privy = usePrivy();
   const { ready, authenticated, user, login, logout, getAccessToken } = privy;
 
   const [syncRetryTick, setSyncRetryTick] = useState(0);
   const [sessionError, setSessionError] = useState<string | null>(null);
+  // Reactive mirror of sharedSessionSynced so components re-render on change
+  const [sessionSynced, setSessionSynced] = useState(sharedSessionSynced);
   const retryTimerRef = useRef<number | null>(null);
   const finalizeTimerRef = useRef<number | null>(null);
 
-  // Use linked accounts to find the primary Solana wallet instead of the problematic hook
+  // Subscribe this hook instance to synced notifications
+  useEffect(() => {
+    const listener = () => setSessionSynced(true);
+    syncedListeners.add(listener);
+    // If already synced by the time we mount, apply immediately
+    if (sharedSessionSynced) setSessionSynced(true);
+    return () => { syncedListeners.delete(listener); };
+  }, []);
+
+  // Use linked accounts to find the primary Solana wallet
   const primaryWallet = useMemo(() => {
     if (!user) return null;
     if (user.wallet && (user.wallet as { chainType?: string }).chainType === "solana") {
@@ -81,9 +94,7 @@ export function useAuth() {
 
   const syncSession = useCallback(async () => {
     const accessToken = await getAccessToken();
-    if (!accessToken) {
-      throw new Error("Missing Privy access token");
-    }
+    if (!accessToken) throw new Error("Missing Privy access token");
 
     const response = await fetchApi("/api/auth/privy-session", {
       method: "POST",
@@ -136,13 +147,13 @@ export function useAuth() {
       sharedSessionSynced = true;
       sharedNextRetryAt = 0;
       sharedSyncAttempts = 0;
+      notifySynced(); // triggers re-render in all hook instances
       return;
     }
 
     // Guard against infinite retries
     sharedSyncAttempts += 1;
     if (sharedSyncAttempts > MAX_SYNC_ATTEMPTS) {
-      // If we've hit max attempts, clear everything and allow one last manual retry
       resetSharedState();
       throw new SessionSyncError(
         "Unable to establish session. Please sign out and try again.",
@@ -151,11 +162,6 @@ export function useAuth() {
       );
     }
 
-    // syncSession performs the POST to issue the cookie.
-    // Once this completes successfully (HTTP 200), we trust that the server 
-    // has issued the Set-Cookie header. We mark the session as synced 
-    // immediately to allow the UI to proceed to /dashboard.
-    // The browser will include the cookie in the next request (e.g. the redirect).
     await syncSession();
 
     // Small settle time to ensure browser state is stable
@@ -164,11 +170,13 @@ export function useAuth() {
     sharedSessionSynced = true;
     sharedNextRetryAt = 0;
     sharedSyncAttempts = 0;
+    // Notify all hook instances — this triggers re-render via setSessionSynced
+    notifySynced();
   }, [hasServerSession, syncSession]);
 
   // Finalization timeout — auto-surface retry after FINALIZE_TIMEOUT_MS
   useEffect(() => {
-    if (!ready || !authenticated || sharedSessionSynced) {
+    if (!ready || !authenticated || sessionSynced) {
       if (finalizeTimerRef.current) {
         window.clearTimeout(finalizeTimerRef.current);
         finalizeTimerRef.current = null;
@@ -188,21 +196,17 @@ export function useAuth() {
         finalizeTimerRef.current = null;
       }
     };
-  }, [ready, authenticated, syncRetryTick]);
+  }, [ready, authenticated, sessionSynced, syncRetryTick]);
 
   useEffect(() => {
-    if (!ready || !authenticated || sharedSessionSynced) {
-      return;
-    }
+    if (!ready || !authenticated || sessionSynced) return;
 
     let cancelled = false;
     const now = Date.now();
     if (now < sharedNextRetryAt) {
       const waitMs = Math.max(250, sharedNextRetryAt - now);
       retryTimerRef.current = window.setTimeout(() => {
-        if (!cancelled) {
-          setSyncRetryTick((value) => value + 1);
-        }
+        if (!cancelled) setSyncRetryTick((v) => v + 1);
       }, waitMs);
 
       return () => {
@@ -222,26 +226,18 @@ export function useAuth() {
           sharedNextRetryAt = Date.now() + (normalized.retryAfterMs ?? DEFAULT_RETRY_DELAY_MS);
           throw normalized;
         })
-        .finally(() => {
-          sharedSyncPromise = null;
-        });
+        .finally(() => { sharedSyncPromise = null; });
     }
 
     sharedSyncPromise
-      .then(() => {
-        if (!cancelled) {
-          setSessionError(null);
-        }
-      })
+      .then(() => { if (!cancelled) setSessionError(null); })
       .catch((error) => {
         if (cancelled) return;
         const normalized = normalizeSyncError(error);
         setSessionError(normalized.message);
-
-        // Only schedule automatic retry if we haven't exceeded max attempts
         if (sharedSyncAttempts < MAX_SYNC_ATTEMPTS) {
           retryTimerRef.current = window.setTimeout(() => {
-            setSyncRetryTick((value) => value + 1);
+            setSyncRetryTick((v) => v + 1);
           }, Math.max(250, sharedNextRetryAt - Date.now()));
         }
         console.error("Failed to sync session", normalized);
@@ -254,11 +250,12 @@ export function useAuth() {
         retryTimerRef.current = null;
       }
     };
-  }, [ready, authenticated, ensureServerSession, syncRetryTick]);
+  }, [ready, authenticated, ensureServerSession, syncRetryTick, sessionSynced]);
 
   useEffect(() => {
     if (!authenticated) {
       resetSharedState();
+      setSessionSynced(false);
     }
   }, [authenticated]);
 
@@ -266,24 +263,24 @@ export function useAuth() {
     sharedNextRetryAt = 0;
     sharedSyncAttempts = 0;
     setSessionError(null);
-    setSyncRetryTick((value) => value + 1);
+    setSyncRetryTick((v) => v + 1);
   }, []);
 
-  const sessionReady = !authenticated || sharedSessionSynced;
+  // sessionReady is now driven by reactive sessionSynced state, not the bare module bool
+  const sessionReady = !authenticated || sessionSynced;
 
   const signIn = useCallback(async () => {
     if (authenticated) {
-      // Only re-trigger sync if we don't already have a valid session
-      if (!sharedSessionSynced) {
+      if (!sessionSynced) {
         sharedNextRetryAt = 0;
         sharedSyncAttempts = 0;
         setSessionError(null);
-        setSyncRetryTick((value) => value + 1);
+        setSyncRetryTick((v) => v + 1);
       }
       return;
     }
     await login();
-  }, [authenticated, login]);
+  }, [authenticated, sessionSynced, login]);
 
   return {
     user: user
@@ -308,10 +305,10 @@ export function useAuth() {
     signOut: async () => {
       // Clear shared state BEFORE Privy logout to prevent race
       resetSharedState();
+      setSessionSynced(false);
       setSessionError(null);
       await fetchApi("/api/auth/logout", { method: "POST" }).catch(() => { });
       await logout();
     },
   };
 }
-
