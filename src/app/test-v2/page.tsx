@@ -1,28 +1,45 @@
 "use client";
 
-import { useChat } from "@ai-sdk/react";
-import { useState, useRef } from "react";
+import { useChat, Chat } from "@ai-sdk/react";
+import { DefaultChatTransport } from "ai";
+import { useState, useMemo } from "react";
 
 export default function TestChatV2() {
     const [model, setModel] = useState("meta-llama/llama-3.3-70b-instruct:free");
     const [inputValue, setInputValue] = useState("");
-    const inputRef = useRef<HTMLInputElement>(null);
 
-    const { messages, sendMessage, status } = useChat({
-        api: "/api/chat/v2",
-        body: {
-            model,
-            agentSlug: "randi-lead",
-        },
-    });
+    // Build a Chat instance with the transport pointing to our v2 route
+    const chat = useMemo(() => new Chat({
+        transport: new DefaultChatTransport({
+            api: "/api/chat/v2",
+            body: {
+                model,
+                agentSlug: "randi-lead",
+            },
+        }),
+    }), [model]);
+
+    const { messages, sendMessage, status } = useChat({ chat });
 
     const isLoading = status === "streaming" || status === "submitted";
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (!inputValue.trim() || isLoading) return;
-        sendMessage({ role: "user", content: inputValue });
+        // In SDK v6, sendMessage takes message parts
+        sendMessage({
+            role: "user",
+            parts: [{ type: "text", text: inputValue }],
+        });
         setInputValue("");
+    };
+
+    // Helper to extract text from parts
+    const getMessageText = (m: (typeof messages)[number]) => {
+        return m.parts
+            .filter(p => p.type === "text")
+            .map(p => (p as { type: "text"; text: string }).text)
+            .join("");
     };
 
     return (
@@ -42,7 +59,7 @@ export default function TestChatV2() {
                 {messages.map(m => (
                     <div key={m.id} className="whitespace-pre-wrap">
                         <span className="font-bold">{m.role === 'user' ? 'User: ' : 'AI: '}</span>
-                        {m.content}
+                        {getMessageText(m)}
                     </div>
                 ))}
                 {isLoading && <div className="text-gray-400 italic">Thinking...</div>}
@@ -50,7 +67,6 @@ export default function TestChatV2() {
 
             <form onSubmit={handleSubmit}>
                 <input
-                    ref={inputRef}
                     className="fixed bottom-0 w-full max-w-md p-4 mb-8 border border-gray-300 rounded shadow-xl bg-black text-white"
                     value={inputValue}
                     placeholder="Say something..."
