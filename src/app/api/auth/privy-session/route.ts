@@ -179,9 +179,10 @@ export async function POST(request: NextRequest) {
       },
     });
 
+    const isProd = process.env.NODE_ENV === "production";
     const cookieOptions: any = {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production",
+      secure: isProd,
       sameSite: "lax",
       maxAge: 24 * 60 * 60,
       path: "/",

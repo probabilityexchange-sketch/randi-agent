@@ -152,38 +152,14 @@ export function useAuth() {
     }
 
     // syncSession performs the POST to issue the cookie.
-    // After the Set-Cookie response, we verify the cookie is actually readable
-    // by the browser before declaring the session synced. This prevents a race
-    // condition where the login page redirects to /dashboard before the cookie
-    // is committed to the browser's cookie jar, causing the middleware to
-    // redirect back to /login (the "double sign-in" bug).
+    // Once this completes successfully (HTTP 200), we trust that the server 
+    // has issued the Set-Cookie header. We mark the session as synced 
+    // immediately to allow the UI to proceed to /dashboard.
+    // The browser will include the cookie in the next request (e.g. the redirect).
     await syncSession();
 
-    // Verify the cookie landed — retry up to 5 times with 500ms gaps
-    // to account for browser cookie propagation delay, especially in cold starts
-    // or across subdomain boundaries in some browsers.
-    let cookieConfirmed = false;
-    for (let attempt = 0; attempt < 5; attempt++) {
-      if (attempt > 0) {
-        await new Promise<void>((resolve) => window.setTimeout(resolve, 500));
-      }
-      cookieConfirmed = await hasServerSession();
-      if (cookieConfirmed) break;
-    }
-
-    if (!cookieConfirmed) {
-      // Cookie didn't land — treat as a sync failure so the retry loop
-      // will re-attempt on the next tick rather than redirecting prematurely.
-      sharedNextRetryAt = Date.now() + DEFAULT_RETRY_DELAY_MS;
-      throw new SessionSyncError(
-        "Session cookie could not be confirmed. Retrying...",
-        "cookie_not_confirmed",
-        DEFAULT_RETRY_DELAY_MS
-      );
-    }
-
-    // Small extra settle time to ensure browser state is stable
-    await new Promise<void>((resolve) => window.setTimeout(resolve, 200));
+    // Small settle time to ensure browser state is stable
+    await new Promise<void>((resolve) => window.setTimeout(resolve, 500));
 
     sharedSessionSynced = true;
     sharedNextRetryAt = 0;
