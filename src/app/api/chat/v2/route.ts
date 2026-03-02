@@ -120,8 +120,16 @@ export async function POST(req: NextRequest) {
 
             // Wrap them for Vercel AI SDK
             const vercelProvider = new VercelProvider();
+            const rawTools = (Array.isArray(composioTools) ? composioTools : [composioTools]).map((t: any) => ({
+                ...t,
+                slug: t.slug || (t.function?.name) || t.name,
+                name: t.name || (t.function?.name) || t.slug,
+                description: t.description || t.function?.description,
+                inputParameters: t.inputParameters || t.function?.parameters
+            }));
+
             const wrappedComposioTools = vercelProvider.wrapTools(
-                Array.isArray(composioTools) ? composioTools : [composioTools],
+                rawTools as any,
                 async (toolSlug, args) => {
                     // We reuse the existing execution logic which handles runtimeUrl!
                     // But we need to convert it to the format executeOpenAIToolCall expects
@@ -142,10 +150,10 @@ export async function POST(req: NextRequest) {
         // Add Orchestration Tools
         ORCHESTRATION_TOOLS.forEach(ot => {
             if (ot.type !== 'function') return;
-            tools[ot.function.name] = tool({
+            (tools as any)[ot.function.name] = tool({
                 description: ot.function.description,
                 inputSchema: z.any(), // Since we already have the definitions in orchestration/tools.ts
-                execute: async (args) => {
+                execute: async (args: any) => {
                     return await executeOrchestrationToolCall(auth.userId, ot.function.name, args, sessionId || "v2-session");
                 }
             });
@@ -154,10 +162,10 @@ export async function POST(req: NextRequest) {
         // Add Clawnch Tools
         CLAWNCH_TOOLS.forEach(ct => {
             if (ct.type !== 'function') return;
-            tools[ct.function.name] = tool({
+            (tools as any)[ct.function.name] = tool({
                 description: ct.function.description,
                 inputSchema: z.any(),
-                execute: async (args) => {
+                execute: async (args: any) => {
                     return await executeClawnchTool(ct.function.name, args);
                 }
             });
@@ -237,7 +245,7 @@ export async function POST(req: NextRequest) {
             }
         });
 
-        return result.toDataStreamResponse();
+        return result.toTextStreamResponse();
 
     } catch (error) {
         console.error("Chat V2 Error:", error);
