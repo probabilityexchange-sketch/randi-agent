@@ -131,8 +131,8 @@ export async function POST(req: NextRequest) {
             const wrappedComposioTools = vercelProvider.wrapTools(
                 rawTools as any,
                 async (toolSlug, args) => {
-                    // We reuse the existing execution logic which handles runtimeUrl!
-                    // But we need to convert it to the format executeOpenAIToolCall expects
+                    // executeOpenAIToolCall returns a JSON string; Composio's ExecuteToolFn
+                    // expects { data, error, successful } so we parse and reshape it.
                     const toolCall = {
                         id: `v2_${Math.random().toString(36).substr(2, 9)}`,
                         type: 'function' as const,
@@ -141,7 +141,15 @@ export async function POST(req: NextRequest) {
                             arguments: JSON.stringify(args)
                         }
                     };
-                    return await executeOpenAIToolCall(auth.userId, toolCall, activeRuntime?.url ?? undefined);
+                    const resultStr = await executeOpenAIToolCall(auth.userId, toolCall, activeRuntime?.url ?? undefined);
+                    let parsed: Record<string, unknown>;
+                    try { parsed = JSON.parse(resultStr); } catch { parsed = { result: resultStr }; }
+                    const isError = parsed && typeof parsed === 'object' && 'error' in parsed;
+                    return {
+                        data: isError ? {} as Record<string, unknown> : parsed as Record<string, unknown>,
+                        error: isError ? String(parsed.error) : null,
+                        successful: !isError,
+                    };
                 }
             );
             Object.assign(tools, wrappedComposioTools);
