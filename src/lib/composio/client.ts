@@ -34,7 +34,7 @@ export async function getComposioClient(): Promise<ComposioClient | null> {
 type OpenAITool = OpenAI.Chat.Completions.ChatCompletionTool;
 type OpenAIToolCall = OpenAI.Chat.Completions.ChatCompletionMessageToolCall;
 
-const MAX_TOOL_DEFINITIONS = 20;
+const MAX_TOOL_DEFINITIONS = 50;
 const TOOL_SLUG_PATTERN = /^[A-Z0-9_]+$/;
 const TOOLKIT_SLUG_PATTERN = /^[a-z0-9][a-z0-9_-]*$/;
 
@@ -189,9 +189,7 @@ async function fetchToolsByQuery(
       });
     return toOpenAITools(tools);
   } catch (error) {
-    if (process.env.NODE_ENV !== "production") {
-      console.warn("Composio tool query failed", error);
-    }
+    console.warn("[Composio] Tool query failed:", query, error);
     return [];
   }
 }

@@ -157,7 +157,12 @@ export async function POST(req: NextRequest) {
 
     // Composio Tools Integration
     if (agent.tools) {
+      console.log(`[Chat] Agent tools config: ${agent.tools?.substring(0, 200)}`);
       const composioTools = await getAgentToolsFromConfig(agent.tools, auth.userId);
+      console.log(`[Chat] Composio returned ${composioTools.length} tools`);
+      if (composioTools.length > 0) {
+        console.log(`[Chat] Tool names: ${composioTools.map((t: any) => t.function?.name).join(', ')}`);
+      }
       const activeRuntime = await prisma.container.findFirst({
         where: { userId: auth.userId, agentId: agent.id, expiresAt: { gt: new Date() } },
         select: { url: true }
@@ -179,9 +184,6 @@ export async function POST(req: NextRequest) {
 
           // Approval Gate Check
           if (requiresApproval(toolSlug)) {
-            // In v3 architecture, we trigger the approval flow.
-            // For the initial migration, we throw an error to signal the need for approval
-            // until Phase 4 (HITL Support) is fully implemented in the SDK pattern.
             throw new Error(`APPROVAL_REQUIRED:${toolSlug}:${JSON.stringify(args)}`);
           }
 
@@ -201,6 +203,7 @@ export async function POST(req: NextRequest) {
           };
         }
       );
+      console.log(`[Chat] Wrapped Composio tools: ${Object.keys(wrappedComposioTools).length} -> ${Object.keys(wrappedComposioTools).join(', ')}`);
       Object.assign(tools, wrappedComposioTools);
     }
 
@@ -271,6 +274,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 5. Run Stream Text
+    console.log(`[Chat] FINAL tool count: ${Object.keys(tools).length} -> ${Object.keys(tools).join(', ')}`);
     let finalSystemPrompt = agent.systemPrompt + "\n\n" + skillsContext + (tools ? "\n\n" + TOOL_USAGE_SYSTEM_INSTRUCTION : "");
 
     // Minimax-specific model hardening:
