@@ -18,18 +18,28 @@ export default function LandingPage() {
         <div className="mb-6 flex justify-center animate-in fade-in zoom-in duration-500">
           <RandiLogo size="xl" variant="icon-only" className="drop-shadow-2xl" />
         </div>
-        <p className="text-sm text-muted-foreground mb-6">
-          Powered by{" "}
-          <a
-            href={composioToolsUrl}
-            target="_blank"
-            rel="noreferrer"
-            className="text-primary hover:underline font-medium"
-          >
-            Composio
-          </a>{" "}
-          tools
-        </p>
+        <div className="flex items-center justify-center gap-2 mb-6 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
+          <p className="text-sm text-muted-foreground">
+            Powered by{" "}
+            <a
+              href={composioToolsUrl}
+              target="_blank"
+              rel="noreferrer"
+              className="text-primary hover:underline font-bold"
+            >
+              Composio
+            </a>{" "}
+            &{" "}
+            <a
+              href="https://kilo.ai"
+              target="_blank"
+              rel="noreferrer"
+              className="text-primary hover:underline font-bold"
+            >
+              Kilo Code
+            </a>
+          </p>
+        </div>
         <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-r from-foreground to-foreground/70">
           Intelligent AI Agents
           <br />
@@ -95,7 +105,7 @@ export default function LandingPage() {
             <h3 className="font-semibold mb-2">Integrated Chat</h3>
             <p className="text-sm text-muted-foreground">
               Chat directly with agents specialized in research, coding, and productivity.
-              Powered by OpenRouter for the best LLMs.
+              Powered by Kilo Code for the best AI models.
             </p>
           </div>
 
