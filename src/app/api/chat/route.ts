@@ -270,11 +270,18 @@ export async function POST(req: NextRequest) {
     }
 
     // 5. Run Stream Text
-    const systemPrompt = agent.systemPrompt + "\n\n" + skillsContext + (tools ? "\n\n" + TOOL_USAGE_SYSTEM_INSTRUCTION : "");
+    let finalSystemPrompt = agent.systemPrompt + "\n\n" + skillsContext + (tools ? "\n\n" + TOOL_USAGE_SYSTEM_INSTRUCTION : "");
+
+    // Minimax-specific model hardening:
+    // Some gateways/models like minimax-m2.5 default to XML for tool calls, 
+    // which streamText does NOT yet handle automatically. We inject a forceful instruction.
+    if (resolvedModel.toLowerCase().includes("minimax")) {
+      finalSystemPrompt += "\n\nCRITICAL: You are a Minimax model. Use ONLY standard 'tool_calls' JSON format. DO NOT use XML <invoke> or <parameter> tags. If you use XML, your tools will fail.";
+    }
 
     const result = streamText({
-      model: aiOpenRouter(model),
-      system: systemPrompt,
+      model: aiOpenRouter(resolvedModel),
+      system: finalSystemPrompt,
       messages: [
         ...history,
         { role: 'user', content: message }

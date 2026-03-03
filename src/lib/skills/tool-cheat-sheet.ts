@@ -30,8 +30,27 @@ main().catch(console.error)
 
 # Composio Toolkits Usage
 When a user asks you to perform an action (e.g., "Create a GitHub issue"), follow this workflow:
-1. Search Tools: Call \`COMPOSIO_SEARCH_TOOLS\` to find the relevant tool (e.g., \`GITHUB_CREATE_ISSUE\`). It will return the connection status and input schema.
-2. Authenticate (if needed): If the connection status is "not connected", call \`COMPOSIO_MANAGE_CONNECTIONS\` to prompt the user to authenticate. Wait for them to complete it.
-3. Execute: Call \`COMPOSIO_MULTI_EXECUTE_TOOL\` to run the action.
-4. Large Results: If the user needs to process many items (e.g., "label 100 emails"), use \`COMPOSIO_REMOTE_WORKBENCH\` (persistent Python sandbox) or \`COMPOSIO_REMOTE_BASH_TOOL\`.
+1. Identify Tool: Look through your available functions to find the matching tool (e.g., \`googlecalendar_list_events\`, \`gmail_list_messages\`).
+2. Call Directly: Use the standard 'tool_calls' mechanism to execute the specific tool directly. DO NOT use XML tags like <invoke>.
+3. Handle Results: Use the data returned to answer the user's request.
+
+# Minimax Format Requirement
+If you are a Minimax model (m1.5, m2.5), you MUST output tool calls in the native 'tool_calls' JSON format. 
+DO NOT use <invoke> or <parameter> XML tags.
+The system ONLY supports the standard function-calling structure.
+\`\`\`json
+{
+  "tool_calls": [
+    {
+      "id": "call_123",
+      "type": "function",
+      "function": {
+        "name": "googlecalendar_list_events",
+        "arguments": "{\"calendar_id\": \"primary\"}"
+      }
+    }
+  ]
+}
+\`\`\`
+If you output XML, your request will FAIL.
 `;

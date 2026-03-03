@@ -196,9 +196,16 @@ export async function POST(req: NextRequest) {
         }
 
         // 5. Run streamText
+        let finalSystemPrompt = agent.systemPrompt || "";
+
+        // Minimax-specific model hardening
+        if (model.toLowerCase().includes("minimax")) {
+            finalSystemPrompt += "\n\nCRITICAL: You are a Minimax model. Use ONLY standard 'tool_calls' JSON format. DO NOT use XML <invoke> or <parameter> tags. If you use XML, your tools will fail.";
+        }
+
         const result = streamText({
             model: aiOpenRouter(model),
-            system: agent.systemPrompt,
+            system: finalSystemPrompt,
             messages: [
                 ...history,
                 { role: 'user', content: message }
