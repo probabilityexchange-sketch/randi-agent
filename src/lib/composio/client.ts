@@ -38,6 +38,72 @@ const MAX_TOOL_DEFINITIONS = 50;
 const TOOL_SLUG_PATTERN = /^[A-Z0-9_]+$/;
 const TOOLKIT_SLUG_PATTERN = /^[a-z0-9][a-z0-9_-]*$/;
 
+// Curated allowlists: only the most useful tools per toolkit.
+// Toolkits NOT in this map get all tools (capped at 15).
+const CURATED_TOOLKIT_TOOLS: Record<string, string[]> = {
+  gmail: [
+    "GMAIL_FETCH_EMAILS",
+    "GMAIL_FETCH_MESSAGE_BY_MESSAGE_ID",
+    "GMAIL_FETCH_MESSAGE_BY_THREAD_ID",
+    "GMAIL_CREATE_EMAIL_DRAFT",
+    "GMAIL_SEND_EMAIL",
+    "GMAIL_REPLY_TO_THREAD",
+    "GMAIL_FORWARD_MESSAGE",
+    "GMAIL_GET_PROFILE",
+    "GMAIL_ADD_LABEL_TO_EMAIL",
+    "GMAIL_GET_ATTACHMENT",
+  ],
+  googlecalendar: [
+    "GOOGLECALENDAR_FIND_EVENT",
+    "GOOGLECALENDAR_LIST_CALENDARS",
+    "GOOGLECALENDAR_GET_CALENDAR",
+    "GOOGLECALENDAR_CREATE_EVENT",
+    "GOOGLECALENDAR_UPDATE_EVENT",
+    "GOOGLECALENDAR_DELETE_EVENT",
+    "GOOGLECALENDAR_FIND_FREE_SLOTS",
+    "GOOGLECALENDAR_QUICK_ADD_EVENT",
+  ],
+  github: [
+    "GITHUB_LIST_PULL_REQUESTS",
+    "GITHUB_GET_A_PULL_REQUEST",
+    "GITHUB_CREATE_A_PULL_REQUEST",
+    "GITHUB_LIST_REPOSITORIES_FOR_THE_AUTHENTICATED_USER",
+    "GITHUB_GET_A_REPOSITORY",
+    "GITHUB_CREATE_AN_ISSUE",
+    "GITHUB_LIST_REPOSITORY_ISSUES",
+    "GITHUB_GET_AN_ISSUE",
+    "GITHUB_CREATE_AN_ISSUE_COMMENT",
+    "GITHUB_SEARCH_CODE",
+    "GITHUB_SEARCH_ISSUES_AND_PULL_REQUESTS",
+    "GITHUB_LIST_COMMITS",
+    "GITHUB_GET_A_BRANCH",
+    "GITHUB_LIST_BRANCHES",
+    "GITHUB_CREATE_A_FORK",
+  ],
+  slack: [
+    "SLACK_SENDS_A_MESSAGE_TO_A_SLACK_CHANNEL",
+    "SLACK_LIST_ALL_CHANNELS",
+    "SLACK_LIST_ALL_USERS",
+    "SLACK_FIND_CHANNELS",
+    "SLACK_FIND_USERS",
+    "SLACK_OPEN_DM",
+    "SLACK_LIST_CONVERSATIONS",
+    "SLACK_LIST_STARRED_ITEMS",
+    "SLACK_ADD_REACTION",
+    "SLACK_SEARCH_FOR_MESSAGES",
+  ],
+  notion: [
+    "NOTION_SEARCH_NOTION_PAGE",
+    "NOTION_CREATE_NOTION_PAGE",
+    "NOTION_RETRIEVE_PAGE",
+    "NOTION_UPDATE_PAGE",
+    "NOTION_QUERY_DATABASE",
+    "NOTION_INSERT_ROW_DATABASE",
+    "NOTION_FETCH_ALL_BLOCK_CONTENTS",
+    "NOTION_ADD_PAGE_CONTENT",
+  ],
+};
+
 const LEGACY_TOOLKIT_ALIASES: Record<string, string> = {
   github_api: "github",
   slack_api: "slack",
@@ -237,17 +303,30 @@ export async function getAgentToolsFromConfig(
   }
 
   if (parsed.toolkitHints.length > 0) {
-    // Fetch each toolkit SEPARATELY to prevent large toolkits (GitHub=40+)
-    // from crowding out smaller ones (Gmail=5, Calendar=5)
-    const PER_TOOLKIT_LIMIT = 10;
+    // Fetch each toolkit SEPARATELY to prevent large toolkits (GitHub=100+)
+    // from crowding out smaller ones (Gmail, Calendar)
+    const FALLBACK_LIMIT = 15;
     const toolkitResults = await Promise.all(
       parsed.toolkitHints.map(toolkit =>
         fetchToolsByQuery(composioClient, resolvedUserId, {
           kind: "toolkits",
           toolkits: [toolkit],
         }).then(tools => {
-          console.log(`[Composio] Toolkit "${toolkit}" returned ${tools.length} tools`);
-          return tools.slice(0, PER_TOOLKIT_LIMIT);
+          const allowlist = CURATED_TOOLKIT_TOOLS[toolkit];
+          let filtered: OpenAITool[];
+          if (allowlist) {
+            // Only keep tools in the curated allowlist
+            const allowSet = new Set(allowlist);
+            filtered = tools.filter((t: any) => {
+              const name = t.function?.name || t.name || '';
+              return allowSet.has(name);
+            });
+            console.log(`[Composio] Toolkit "${toolkit}": ${tools.length} total, ${filtered.length} curated (allowlist: ${allowlist.length})`);
+          } else {
+            filtered = tools.slice(0, FALLBACK_LIMIT);
+            console.log(`[Composio] Toolkit "${toolkit}": ${tools.length} total, capped to ${filtered.length}`);
+          }
+          return filtered;
         })
       )
     );
