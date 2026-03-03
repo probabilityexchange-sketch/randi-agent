@@ -269,7 +269,7 @@ export async function POST(req: NextRequest) {
             }
         });
 
-        return result.toTextStreamResponse();
+        return result.toUIMessageStreamResponse();
 
     } catch (error) {
         console.error("Chat V2 Error:", error);

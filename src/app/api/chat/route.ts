@@ -322,7 +322,7 @@ export async function POST(req: NextRequest) {
 
     // Custom stream wrapper to handle HITL and special events if needed.
     // For now, we return the standard Text stream.
-    return result.toTextStreamResponse();
+    return result.toUIMessageStreamResponse();
 
   } catch (error: any) {
     console.error("Main Chat Route Error:", error);

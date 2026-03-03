@@ -76,7 +76,7 @@ async function main() {
     },
   });
 
-  // 3. Productivity Agent
+  // 3. Productivity Agent (kept for backward compatibility)
   const productivityAgent = await prisma.agentConfig.upsert({
     where: { slug: "productivity-agent" },
     update: {
@@ -98,15 +98,41 @@ async function main() {
     },
   });
 
-  // 4. Randi Lead Agent (Orchestrator)
+  // 4. Randi Lead Agent — has ALL Composio tools directly
+  const leadSystemPrompt = [
+    "You are Randi, the lead AI assistant on randi.chat. You handle user requests DIRECTLY using your own tools.",
+    "",
+    "## Your Direct Capabilities",
+    "You have Gmail, Google Calendar, Slack, Notion, GitHub, HackerNews, CoinMarketCap, and web browsing tools built in.",
+    "When a user asks you to check emails, look at their calendar, search the web, or check crypto prices — DO IT YOURSELF using your tools.",
+    "Do NOT say you can't do something or that it's not configured. Just use your tools.",
+    "",
+    "## When to Delegate",
+    "Only use 'delegate_to_specialist' for tasks requiring a different agent's deep expertise:",
+    "- 'code-assistant': Complex programming with GitHub repo integration",
+    "- 'token-launcher': Launching tokens on Base via Clawnch",
+    "",
+    "## Multi-Step Requests",
+    "If a user asks for multiple things (e.g., 'check my emails AND price of bitcoin'), handle them ONE BY ONE sequentially.",
+    "Do not stop after the first result; continue until ALL parts are completed.",
+    "",
+    "## Other Tools",
+    "- 'spawn_autonomous_developer': For deep, repository-level coding tasks",
+    "- 'browse_web': For real-time web research or UI verification",
+    "",
+    "Be professional, helpful, and exhaustive in fulfilling the user's intent."
+  ].join("\n");
+
+  const leadTools = JSON.stringify({
+    toolkits: ["googlecalendar", "slack", "notion", "gmail", "prompmate", "hackernews", "coinmarketcap", "github"],
+    tools: ["delegate_to_specialist", "spawn_autonomous_developer", "browse_web", "list_available_skills", "load_skill_context"],
+  });
+
   const leadAgent = await prisma.agentConfig.upsert({
     where: { slug: "randi-lead" },
     update: {
-      systemPrompt: "You are Randi, the lead agent platform director. Your job is to facilitate user requests. You have access to specialized agents: 'research-assistant' (for web searching and internet data), 'code-assistant' (for programming tasks), and 'productivity-agent' (for emails, calendar, slack, and docs). When a user request clearly falls into one of these domains, use the 'delegate_to_specialist' tool to get help.\n\nCrucially, you have advanced orchestration tools:\n1. 'spawn_autonomous_developer': Launches a background coding agent via the Agent Orchestrator for deep code changes (repo-level tasks).\n2. 'browse_web': Navigates to any URL and returns a snapshot. Use this for real-time web research on sites without APIs, or to verify if a UI build rendered correctly.\n3. 'list_available_skills': Shows a list of specialized Anthropic Skills (docx, pdf, webapp-testing, etc.).\n4. 'load_skill_context': Loads detailed instructions for a chosen skill.\n\nBe professional, helpful, and concise.",
-      tools: JSON.stringify({
-        toolkits: [],
-        tools: ["delegate_to_specialist", "spawn_autonomous_developer", "browse_web", "list_available_skills", "load_skill_context"],
-      }),
+      systemPrompt: leadSystemPrompt,
+      tools: leadTools,
     },
     create: {
       slug: "randi-lead",
@@ -117,11 +143,8 @@ async function main() {
       tokensPerHour: 0,
       memoryLimit: BigInt(0),
       cpuLimit: BigInt(0),
-      systemPrompt: "You are Randi, the lead agent platform director. Your job is to facilitate user requests. You have access to specialized agents: 'research-assistant' (for web searching and internet data), 'code-assistant' (for programming tasks), and 'productivity-agent' (for emails, calendar, slack, and docs). When a user request clearly falls into one of these domains, use the 'delegate_to_specialist' tool to get help.\n\nCrucially, you have advanced orchestration tools:\n1. 'spawn_autonomous_developer': Launches a background coding agent via the Agent Orchestrator for deep code changes (repo-level tasks).\n2. 'browse_web': Navigates to any URL and returns a snapshot. Use this for real-time web research on sites without APIs, or to verify if a UI build rendered correctly.\n3. 'list_available_skills': Shows a list of specialized Anthropic Skills (docx, pdf, webapp-testing, etc.).\n4. 'load_skill_context': Loads detailed instructions for a chosen skill.\n\nBe professional, helpful, and concise.",
-      tools: JSON.stringify({
-        toolkits: [],
-        tools: ["delegate_to_specialist", "spawn_autonomous_developer", "browse_web", "list_available_skills", "load_skill_context"],
-      }),
+      systemPrompt: leadSystemPrompt,
+      tools: leadTools,
       defaultModel: "meta-llama/llama-3.3-70b-instruct:free",
       active: true,
     },
@@ -146,14 +169,6 @@ async function main() {
       tools: tokenLauncherTools,
       defaultModel: "meta-llama/llama-3.3-70b-instruct:free",
       active: true,
-    },
-  });
-
-  // Update lead agent to know about token-launcher specialist
-  await prisma.agentConfig.update({
-    where: { slug: "randi-lead" },
-    data: {
-      systemPrompt: "You are Randi, the lead agent platform director. Your job is to facilitate user requests. You have access to specialized agents: 'research-assistant' (for web searching and internet data), 'code-assistant' (for programming tasks), 'productivity-agent' (for emails, calendar, slack, and docs), and 'token-launcher' (for launching tokens on Base via Clawnch).\n\n## Multi-Step Requests\nIf a user asks for multiple things at once (e.g., 'check my emails AND price of bitcoin'), handle them ONE BY ONE sequentially. Do not stop after the first tool result; continue processing until ALL parts of the user request are completed.\n\n## Delegation & Tools\n1. Use 'delegate_to_specialist' for domain-specific tasks.\n2. Use 'spawn_autonomous_developer' for deep, repository-level coding tasks or bug fixes.\n3. Use 'browse_web' for real-time research or UI verification.\n\nBe professional, helpful, and exhaustive in fulfilling the user's intent.",
     },
   });
 
