@@ -170,6 +170,11 @@ export async function POST(req: NextRequest) {
 
       const vercelProvider = new VercelProvider();
 
+      // Log tool schemas for debugging
+      for (const t of composioTools) {
+        console.log(`[Chat] Tool ${t.slug} inputParams: ${JSON.stringify(t.inputParameters)}`);
+      }
+
       const wrappedComposioTools = vercelProvider.wrapTools(
         composioTools,
         async (toolSlug, args) => {
