@@ -237,12 +237,23 @@ export async function getAgentToolsFromConfig(
   }
 
   if (parsed.toolkitHints.length > 0) {
-    collectedTools.push(
-      ...(await fetchToolsByQuery(composioClient, resolvedUserId, {
-        kind: "toolkits",
-        toolkits: parsed.toolkitHints,
-      }))
+    // Fetch each toolkit SEPARATELY to prevent large toolkits (GitHub=40+)
+    // from crowding out smaller ones (Gmail=5, Calendar=5)
+    const PER_TOOLKIT_LIMIT = 10;
+    const toolkitResults = await Promise.all(
+      parsed.toolkitHints.map(toolkit =>
+        fetchToolsByQuery(composioClient, resolvedUserId, {
+          kind: "toolkits",
+          toolkits: [toolkit],
+        }).then(tools => {
+          console.log(`[Composio] Toolkit "${toolkit}" returned ${tools.length} tools`);
+          return tools.slice(0, PER_TOOLKIT_LIMIT);
+        })
+      )
     );
+    for (const tools of toolkitResults) {
+      collectedTools.push(...tools);
+    }
   }
 
   if (collectedTools.length === 0) {
