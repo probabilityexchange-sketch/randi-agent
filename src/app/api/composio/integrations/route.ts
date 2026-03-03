@@ -102,7 +102,23 @@ export async function GET() {
     );
     const authConfigMap = new Map(authConfigsPerToolkit.map(e => [e.toolkit, e.selected]));
 
-    const integrations = allToolkits.map((toolkit: any) => {
+    interface Integration {
+      slug: string;
+      label: string;
+      category: string;
+      icon: string;
+      description: string;
+      logo: string | null;
+      hasAuthConfig: boolean;
+      authConfigId: string | null;
+      connectedAccountId: string | null;
+      connectedStatus: string;
+      connectedStatusReason: string | null;
+      connectedAccountCount: number;
+      connected: boolean;
+    }
+
+    const integrations: Integration[] = allToolkits.map((toolkit: any) => {
       const curated = curatedMap.get(toolkit.slug);
       const accounts = accountsByToolkit.get(toolkit.slug) ?? [];
       const preferredAccount = pickPreferredAccount(accounts);
@@ -131,7 +147,7 @@ export async function GET() {
     });
 
     // Sort: Connected first, then curated apps, then rest by usage/alphabetical
-    integrations.sort((a, b) => {
+    integrations.sort((a: Integration, b: Integration) => {
       if (a.connected !== b.connected) return a.connected ? -1 : 1;
       const aCurated = curatedMap.has(a.slug);
       const bCurated = curatedMap.has(b.slug);
