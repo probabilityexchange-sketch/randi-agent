@@ -72,8 +72,9 @@ export async function POST(req: NextRequest) {
     const { agentId, sessionId, message, model, resumeApprovalId } = parsed.data;
 
     // 1. Billing & Access Checks
+    const resolvedModel = model || DEFAULT_MODEL;
     const kiloKey = process.env.KILO_API_KEY;
-    if (!isUnmeteredModel(model) && !kiloKey) {
+    if (!isUnmeteredModel(resolvedModel) && !kiloKey) {
       const user = await prisma.user.findUnique({
         where: { id: auth.userId },
         select: { subscriptionStatus: true, subscriptionExpiresAt: true, stakingLevel: true },
@@ -85,9 +86,9 @@ export async function POST(req: NextRequest) {
         user.subscriptionExpiresAt > new Date();
 
       if (!isSubscribed) {
-        if (isPremiumModel(model)) {
+        if (isPremiumModel(resolvedModel)) {
           const userStakingLevel = (user?.stakingLevel || "NONE") as StakingLevel;
-          const accessCheck = validateModelAccess(model, userStakingLevel);
+          const accessCheck = validateModelAccess(resolvedModel, userStakingLevel);
           if (!accessCheck.allowed) {
             return NextResponse.json({ error: accessCheck.reason, code: "STAKING_REQUIRED" }, { status: 403 });
           }
@@ -96,7 +97,7 @@ export async function POST(req: NextRequest) {
         }
       }
 
-      const deduction = await deductForAgentCall(auth.userId, model, `Chat: ${message.substring(0, 50)}`, sessionId);
+      const deduction = await deductForAgentCall(auth.userId, resolvedModel, `Chat: ${message.substring(0, 50)}`, sessionId);
       if (!deduction.success) {
         return NextResponse.json({ error: deduction.error || "Insufficient credits.", code: "INSUFFICIENT_FUNDS" }, { status: 402 });
       }
@@ -114,11 +115,14 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    const resolvedAgentId = existingSession?.agentId || agentId;
-    if (!resolvedAgentId) return NextResponse.json({ error: "No agent or session specified" }, { status: 400 });
-
-    const agent = await prisma.agentConfig.findUnique({
-      where: { id: resolvedAgentId },
+    const resolvedAgentSelector = existingSession?.agentId || agentId || "randi-lead";
+    const agent = await prisma.agentConfig.findFirst({
+      where: {
+        OR: [
+          { id: resolvedAgentSelector },
+          { slug: resolvedAgentSelector }
+        ]
+      },
       select: { id: true, systemPrompt: true, active: true, tools: true },
     });
 

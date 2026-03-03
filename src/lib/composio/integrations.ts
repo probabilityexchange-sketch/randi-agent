@@ -385,7 +385,7 @@ export const SUPPORTED_COMPOSIO_TOOLKITS: readonly ComposioToolkitDef[] = [
     envKey: "COMPOSIO_AUTH_CONFIG_AWS",
   },
   {
-    slug: "googledrive",
+    slug: "dropbox",
     label: "Dropbox",
     category: "Cloud & Infra",
     icon: "📦",
