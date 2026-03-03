@@ -155,6 +155,7 @@ export async function GET() {
       };
     });
 
+    console.log(`[Integrations] Returning ${integrations.length} toolkits for user ${composioUserId}`);
     return NextResponse.json({
       composioUserId,
       sharedEntityMode: Boolean(getComposioSharedEntityOverride()),
