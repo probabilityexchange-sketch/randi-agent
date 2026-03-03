@@ -1,5 +1,6 @@
 import { aiOpenRouter } from "@/lib/ai/openrouter";
 import { streamText, tool, stepCountIs, type ToolSet, type ModelMessage } from "ai";
+import { handleNonStandardChat } from "@/lib/ai/resilience";
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import { requireAuth, handleAuthError } from "@/lib/auth/middleware";
@@ -274,9 +275,17 @@ export async function POST(req: NextRequest) {
 
     // Minimax-specific model hardening:
     // Some gateways/models like minimax-m2.5 default to XML for tool calls, 
-    // which streamText does NOT yet handle automatically. We inject a forceful instruction.
+    // which streamText does NOT yet handle automatically. We use our Resilience Loop.
     if (resolvedModel.toLowerCase().includes("minimax")) {
-      finalSystemPrompt += "\n\nCRITICAL: You are a Minimax model. Use ONLY standard 'tool_calls' JSON format. DO NOT use XML <invoke> or <parameter> tags. If you use XML, your tools will fail.";
+      return handleNonStandardChat({
+        auth,
+        model: resolvedModel,
+        agent,
+        message,
+        history,
+        tools,
+        sessionId,
+      });
     }
 
     const result = streamText({
