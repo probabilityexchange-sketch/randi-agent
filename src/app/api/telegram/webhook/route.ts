@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import { createChatCompletion } from "@/lib/openrouter/client";
 import { executeOrchestrationToolCall, ORCHESTRATION_TOOLS } from "@/lib/orchestration/tools";
-import { getAgentToolsFromConfig, composioToolsToOpenAI } from "@/lib/composio/client";
+import { getAgentToolsFromConfig, composioToolsToOpenAI, executeOpenAIToolCall } from "@/lib/composio/client";
 import type OpenAI from "openai";
 
 type ChatTool = OpenAI.Chat.Completions.ChatCompletionTool;
@@ -28,6 +28,12 @@ export async function POST(req: NextRequest) {
         const chatId = message.chat.id;
         const text = message.text;
         const telegramUserId = message.from.id.toString();
+
+        if (text === "/start") {
+            const greeting = "✨ *Welcome to Randi Control Center!* ✨\n\nI'm securely connected to your Randi Platform account. You can now command me right from your phone!\n\nTry asking me to:\n📬 Fetch your latest emails\n📅 Check your Google Calendar\n💰 Get live crypto prices from CoinMarketCap\n🐙 Check issue statuses on GitHub\n\nWhat can I help you with today?";
+            await sendMessage(chatId, greeting, token);
+            return NextResponse.json({ ok: true });
+        }
 
         // 1. Find user by their bot token
         const user = await prisma.user.findUnique({
@@ -121,32 +127,68 @@ async function processWithRandi(userId: string, agent: any, query: string, token
             currentMessages.push(assistantMessage as any);
             lastContent = assistantMessage.content || lastContent;
 
-            if (assistantMessage.tool_calls && assistantMessage.tool_calls.length > 0) {
+            let toolCalls = assistantMessage.tool_calls || [];
+
+            // --- LLM Resilience: Capture raw JSON tool calls from content ---
+            if (toolCalls.length === 0 && assistantMessage.content && assistantMessage.content.trim().startsWith('{')) {
+                try {
+                    const parsed = JSON.parse(assistantMessage.content);
+                    const parsedName = parsed.name || parsed.tool_name || parsed.function;
+                    const parsedArgs = parsed.parameters || parsed.arguments || parsed.args || {};
+                    if (typeof parsedName === 'string') {
+                        toolCalls = [{
+                            id: `call_${Math.random().toString(36).substring(2, 9)}`,
+                            type: 'function',
+                            function: {
+                                name: parsedName.replace(/\./g, '_'),
+                                arguments: typeof parsedArgs === 'string' ? parsedArgs : JSON.stringify(parsedArgs)
+                            }
+                        }];
+                        // We caught a tool call hidden in the text. Don't show the user the raw JSON text.
+                        lastContent = "Processing your request...";
+                        assistantMessage.tool_calls = toolCalls; // Mutate for history
+                    }
+                } catch {
+                    // Not valid JSON, ignore
+                }
+            }
+
+            if (toolCalls && toolCalls.length > 0) {
                 const toolResults = await Promise.all(
-                    assistantMessage.tool_calls.map(async (tc) => {
+                    toolCalls.map(async (tc) => {
                         let result = "Unsupported tool type.";
 
                         // Type-safe check for 'function' tool calls
                         if (tc.type === 'function' && tc.function) {
-                            const functionName = tc.function.name;
+                            const rawFunctionName = (tc.function.name || "").replace(/\./g, '_');
+                            tc.function.name = rawFunctionName;
+
                             const isOrch = ORCHESTRATION_TOOLS.some((t: any) =>
-                                t.type === 'function' && t.function?.name === functionName
+                                t.type === 'function' && t.function?.name === rawFunctionName
                             );
 
                             if (isOrch) {
-                                result = await executeOrchestrationToolCall(
-                                    userId,
-                                    functionName,
-                                    JSON.parse(tc.function.arguments),
-                                    "telegram-session"
-                                );
+                                try {
+                                    result = await executeOrchestrationToolCall(
+                                        userId,
+                                        rawFunctionName,
+                                        JSON.parse(tc.function.arguments),
+                                        "telegram-session"
+                                    );
+                                } catch (err: any) {
+                                    result = `Execution failed: ${err.message}`;
+                                }
                             } else {
-                                // Native tools (Gmail, etc.)
-                                result = "Tool execution via Telegram is currently limited to orchestration.";
+                                // Native tools (Gmail, etc.) via Composio/OpenAI wrapper
+                                try {
+                                    result = await executeOpenAIToolCall(userId, tc as any);
+                                } catch (err: any) {
+                                    result = `Execution failed: ${err.message}`;
+                                }
                             }
                         }
 
-                        return { role: "tool" as const, tool_call_id: tc.id, content: result };
+                        return { role: "tool" as const, tool_call_id: tc.id, content: typeof result === 'string' ? result : JSON.stringify(result) };
                     })
                 );
                 currentMessages.push(...toolResults);
