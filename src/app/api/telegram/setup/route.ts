@@ -22,8 +22,8 @@ export async function POST(req: NextRequest) {
 
         const botUsername = getMeData.result.username;
 
-        // 2. Set the webhook
-        const appUrl = process.env.NEXT_PUBLIC_APP_URL || `https://${process.env.NEXT_PUBLIC_DOMAIN}`;
+        // 2. Set the webhook - Use exact incoming request origin to avoid Telegram failing on Vercel 308 redirects
+        const appUrl = req.nextUrl.origin;
         const webhookUrl = `${appUrl}/api/telegram/webhook?token=${token}`;
 
         const setWebhookUrl = `https://api.telegram.org/bot${token}/setWebhook?url=${encodeURIComponent(webhookUrl)}`;
@@ -31,7 +31,8 @@ export async function POST(req: NextRequest) {
         const setWebhookData = await setWebhookRes.json();
 
         if (!setWebhookData.ok) {
-            return NextResponse.json({ error: "Failed to set Telegram webhook" }, { status: 500 });
+            console.error("Telegram setWebhook failed:", setWebhookData);
+            return NextResponse.json({ error: `Failed to set Telegram webhook: ${setWebhookData.description || 'Unknown error'}` }, { status: 500 });
         }
 
         // 3. Save to database
