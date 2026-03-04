@@ -186,12 +186,20 @@ export async function getTokenUsdPrice(mint: string): Promise<{
   }
 }
 
+export const SOL_MINT = "So11111111111111111111111111111111111111112";
+
+export async function getSolUsdPrice(): Promise<string> {
+  try {
+    const fetched = await fetchDexScreenerPriceUsd(SOL_MINT);
+    return fetched.priceUsd;
+  } catch (err) {
+    console.warn("[Pricing] Failed to fetch SOL price:", err);
+    return "100.00"; // Fallback
+  }
+}
+
 /**
  * Split a gross token amount into burn and treasury portions.
- * Uses BURN_BPS from tokenomics.ts as the authoritative source.
- * The burnBps parameter is kept for backward compatibility (e.g., reading
- * the rate from a memo on an existing transaction) but defaults to the
- * canonical BURN_BPS value.
  */
 export function splitTokenAmountsByBurn(
   grossTokenAmount: bigint,
@@ -204,12 +212,9 @@ export function splitTokenAmountsByBurn(
   const burnTokenAmount = (grossTokenAmount * BigInt(burnBps)) / BigInt(10_000);
   const treasuryTokenAmount = grossTokenAmount - burnTokenAmount;
 
-  if (treasuryTokenAmount <= BigInt(0)) {
-    throw new Error("Invalid burn settings: treasury amount becomes zero");
-  }
-
   return { burnBps, burnTokenAmount, treasuryTokenAmount };
 }
+
 
 export async function quoteTokenAmountForUsd(params: {
   usdAmount: string;

@@ -9,8 +9,8 @@ import { CreditPack } from "@/lib/tokenomics";
 type Step = "plan" | "paying" | "verifying" | "done" | "error";
 
 export function PurchaseForm() {
-  const { verifyPurchase, isSubscribed, subscription } = useCredits();
-  const { priceUsd, formatRandi, loading: priceLoading } = useTokenPrice();
+  const { verifyPurchase } = useCredits();
+  const { priceUsd, loading: priceLoading } = useTokenPrice();
   const { transfer, sending: walletBusy } = useSPLTransfer();
 
   const [step, setStep] = useState<Step>("plan");
@@ -35,14 +35,6 @@ export function PurchaseForm() {
   }, []);
 
   const selectedItem = availablePackages.find(p => p.id === selectedItemId);
-
-  const tokenAmount = selectedItem ? selectedItem.creditAmount : 0;
-  const bonusTokens = selectedItem ? Math.floor(tokenAmount * (selectedItem.bonusPercent / 100)) : 0;
-  const totalTokens = tokenAmount + bonusTokens;
-  const isSubscription = selectedItem?.type === "subscription";
-
-  // Burn calculation (70% on use, but here we show protocol-wide burn for transparency)
-  const estimatedBurn = Math.floor(totalTokens * 0.7);
 
   const handlePurchase = async () => {
     if (!selectedItem) return;
@@ -76,7 +68,6 @@ export function PurchaseForm() {
       });
 
       setStep("verifying");
-
       await verifyPurchase(txSignature, intent.memo, intent.transactionId);
       setStep("done");
     } catch (err) {
@@ -95,7 +86,13 @@ export function PurchaseForm() {
           </svg>
         </div>
         <h3 className="text-xl font-bold mb-2">Deposit Successful!</h3>
-        <p className="text-muted-foreground">Your $RANDI balance has been updated. Happy agenting!</p>
+        <p className="text-muted-foreground">Your credits have been updated. Happy agenting!</p>
+        <button
+          onClick={() => setStep("plan")}
+          className="mt-6 text-sm text-primary hover:underline"
+        >
+          Buy more credits
+        </button>
       </div>
     );
   }
@@ -103,57 +100,52 @@ export function PurchaseForm() {
   return (
     <div className="bg-card border border-border rounded-xl overflow-hidden">
       <div className="p-6">
-        <h3 className="text-xl font-bold mb-4">Deposit $RANDI</h3>
+        <h3 className="text-xl font-bold mb-4">Top Up Credits</h3>
         <p className="text-sm text-muted-foreground mb-6">
-          Fund your account to use AI agents. 70% of every deposit is burned 🔥
+          Fund your account to use AI agents. 70% of every payment is burned 🔥
         </p>
 
         {loadingPackages ? (
           <div className="py-8 text-center text-muted-foreground animate-pulse">
-            Loading token packs...
+            Loading credit packs...
           </div>
         ) : (
           <div className="space-y-3 mb-6">
-            <div className="grid grid-cols-1 gap-3">
-              {availablePackages.map((pkg) => (
-                <button
-                  key={pkg.id}
-                  onClick={() => setSelectedItemId(pkg.id)}
-                  className={`p-4 rounded-xl border text-left transition-all ${selectedItemId === pkg.id
-                    ? "border-primary bg-primary/5 ring-1 ring-primary"
-                    : "border-border bg-muted/30 hover:bg-muted/50"
-                    }`}
-                >
-                  <div className="flex justify-between items-center">
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <h4 className="font-bold">{pkg.name}</h4>
-                        {pkg.bonusPercent > 0 && (
-                          <span className="bg-success/20 text-success text-[10px] px-2 py-0.5 rounded-full font-bold">
-                            +{pkg.bonusPercent}% BONUS
-                          </span>
-                        )}
-                      </div>
-                      <p className="text-xs text-muted-foreground">
-                        ~{pkg.estimatedStandardCalls} Standard / ~{pkg.estimatedPremiumCalls} Premium calls
-                      </p>
-                    </div>
-                    <div className="text-right">
-                      <div className="font-bold text-primary">{pkg.creditAmount.toLocaleString()} Credits</div>
-                      {priceUsd && !isSubscription && ( // Show price if pay-as-you-go, or $20 if subscription
-                        <div className="text-[10px] text-muted-foreground text-opacity-60">
-                          {pkg.type === "subscription" ? "$20.00 / mo" : `≈ $${(pkg.creditAmount * priceUsd).toFixed(2)}`}
-                        </div>
+            {availablePackages.map((pkg) => (
+              <button
+                key={pkg.id}
+                onClick={() => setSelectedItemId(pkg.id)}
+                className={`w-full p-4 rounded-xl border text-left transition-all ${selectedItemId === pkg.id
+                  ? "border-primary bg-primary/5 ring-1 ring-primary"
+                  : "border-border bg-muted/30 hover:bg-muted/50"
+                  }`}
+              >
+                <div className="flex justify-between items-center">
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <h4 className="font-bold">{pkg.name}</h4>
+                      {pkg.bonusPercent > 0 && (
+                        <span className="bg-success/20 text-success text-[10px] px-2 py-0.5 rounded-full font-bold">
+                          +{pkg.bonusPercent}% BONUS
+                        </span>
                       )}
                     </div>
+                    <p className="text-xs text-muted-foreground">
+                      ~{pkg.estimatedStandardCalls} Standard / ~{pkg.estimatedPremiumCalls} Premium calls
+                    </p>
                   </div>
-                </button>
-              ))}
-            </div>
+                  <div className="text-right">
+                    <div className="font-bold text-primary">{pkg.creditAmount.toLocaleString()} Credits</div>
+                    <div className="text-[10px] text-muted-foreground">
+                      ${pkg.usdPrice} USD
+                    </div>
+                  </div>
+                </div>
+              </button>
+            ))}
           </div>
         )}
 
-        {/* Burn Transparency */}
         {selectedItem && (
           <div className="rounded-lg bg-orange-500/5 border border-orange-500/20 p-4 mb-6">
             <div className="flex items-center gap-2 mb-2 text-orange-400">
@@ -163,9 +155,7 @@ export function PurchaseForm() {
               <span className="text-xs font-bold uppercase tracking-wider">Burn Flywheel</span>
             </div>
             <p className="text-[11px] text-muted-foreground mb-2">
-              By depositing, you're fueling the $RANDI deflationary cycle. This deposit will automatically burn
-              <span className="text-orange-400 font-bold mx-1">{estimatedBurn.toLocaleString()} $RANDI</span>
-              permanently.
+              Every credit purchase triggers a deflationary burn. 70% of your payment is permanently removed from supply.
             </p>
             <div className="w-full bg-white/5 h-1.5 rounded-full overflow-hidden">
               <div className="bg-orange-500 h-full w-[70%]" />
@@ -178,7 +168,6 @@ export function PurchaseForm() {
         )}
       </div>
 
-      {/* Action */}
       <div className="p-4 border-t border-border bg-background/30">
         {error && (
           <div className="mb-3 rounded-lg border border-red-500/20 bg-red-500/10 px-3 py-2 text-xs text-red-300">
@@ -195,7 +184,7 @@ export function PurchaseForm() {
             ? "Confirm in wallet..."
             : step === "verifying"
               ? "Verifying on-chain..."
-              : isSubscription ? `Subscribe for $20 (or equivalent $RANDI)` : `Deposit ${totalTokens.toLocaleString()} $RANDI`}
+              : `Purchase Credits ($${selectedItem?.usdPrice})`}
         </button>
       </div>
     </div>

@@ -17,7 +17,7 @@ interface ChatSession {
 function DashboardContent() {
   const { user } = useAuth();
   const searchParams = useSearchParams();
-  const { isSubscribed, subscription } = useCredits();
+  const { isSubscribed, subscription, balance } = useCredits();
   const { priceUsd, marketCap, burnPercent, formatUsdCompact } = useTokenPrice();
   const [recentSessions, setRecentSessions] = useState<ChatSession[]>([]);
   const [loading, setLoading] = useState(true);
@@ -141,44 +141,31 @@ function DashboardContent() {
       </div>
 
       <div className="grid md:grid-cols-3 gap-6 mb-12">
-        {/* Subscription Status */}
+        {/* Credit Balance */}
         <div className="glass-card rounded-3xl p-8 relative overflow-hidden group transition-all hover:scale-[1.02]">
           <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 rounded-full -mr-16 -mt-16 group-hover:bg-primary/10 transition-colors"></div>
-          <p className="text-xs text-muted-foreground uppercase tracking-[0.2em] font-bold mb-4">Membership</p>
-          {isSubscribed ? (
-            <>
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-success/20 rounded-2xl flex items-center justify-center">
-                  <span className="text-2xl">✨</span>
-                </div>
-                <div>
-                  <h3 className="text-2xl font-black text-white italic">PRO</h3>
-                  <p className="text-xs text-success font-bold mt-0.5">
-                    {daysLeft !== null ? `${daysLeft} days left` : "Active"}
-                  </p>
-                </div>
-              </div>
-              <p className="text-xs text-muted-foreground mt-6 leading-relaxed">
-                You have prioritized access to all premium models and tools.
+          <p className="text-xs text-muted-foreground uppercase tracking-[0.2em] font-bold mb-4">Credit Balance</p>
+          <div className="flex items-center gap-3">
+            <div className="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center">
+              <span className="text-2xl">🔋</span>
+            </div>
+            <div>
+              <h3 className="text-3xl font-black text-white italic">
+                {(balance || 0).toLocaleString()}
+              </h3>
+              <p className="text-[10px] text-muted-foreground font-bold mt-0.5 uppercase tracking-widest">
+                Available Credits
               </p>
-            </>
-          ) : (
-            <>
-              <div className="flex items-center gap-3">
-                <div className="w-12 h-12 bg-muted rounded-2xl flex items-center justify-center">
-                  <span className="text-2xl">⚡️</span>
-                </div>
-                <div>
-                  <h3 className="text-2xl font-black text-muted-foreground">FREE</h3>
-                  <p className="text-xs text-muted-foreground/60 font-bold mt-0.5">Metered Access</p>
-                </div>
-              </div>
-              <Link href="/credits" className="mt-8 block w-full text-center py-3 bg-white text-black hover:bg-white/90 rounded-2xl text-sm font-black transition-all transform hover:-translate-y-1">
-                UPGRADE TO PRO
-              </Link>
-            </>
-          )}
+            </div>
+          </div>
+          <p className="text-xs text-muted-foreground mt-6 leading-relaxed">
+            Credits fuel your agents. Each call reduces supply by burning tokens.
+          </p>
+          <Link href="/credits" className="mt-8 block w-full text-center py-3 bg-white text-black hover:bg-white/90 rounded-2xl text-xs font-black transition-all transform hover:-translate-y-1">
+            TOP UP CREDITS
+          </Link>
         </div>
+
 
         {/* Model Access */}
         <div className="glass-card rounded-3xl p-8 transition-all hover:scale-[1.02] flex flex-col">

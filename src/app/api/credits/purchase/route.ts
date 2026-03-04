@@ -8,20 +8,12 @@ import {
   resolvePaymentAsset,
   resolveSolBurnWallet,
   splitTokenAmountsByBurn,
+  getSolUsdPrice,
 } from "@/lib/payments/token-pricing";
 
 const schema = z.object({
   packageId: z.string(),
 });
-
-const DEFAULT_PURCHASE_INTENT_TTL_MS = 15 * 60 * 1000;
-const MAX_PURCHASE_INTENT_TTL_MS = 24 * 60 * 60 * 1000;
-
-function resolvePurchaseIntentTtlMs(): number {
-  const raw = Number(process.env.PURCHASE_INTENT_TTL_MS || DEFAULT_PURCHASE_INTENT_TTL_MS);
-  if (!Number.isFinite(raw) || raw <= 0) return DEFAULT_PURCHASE_INTENT_TTL_MS;
-  return Math.min(Math.trunc(raw), MAX_PURCHASE_INTENT_TTL_MS);
-}
 
 export async function POST(request: NextRequest) {
   try {
@@ -46,7 +38,6 @@ export async function POST(request: NextRequest) {
 
     const { packageId } = parsed.data;
 
-    // 1. Find the pack
     const packs = getCreditPacks();
     const pkg = packs.find(p => p.id === packageId);
 
@@ -54,34 +45,46 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Invalid package ID" }, { status: 400 });
     }
 
-    // 2. Resolve token amount
-    const tokenAmountToTransfer = pkg.creditAmount; // whole tokens
-    const decimals = Number(process.env.TOKEN_DECIMALS || process.env.NEXT_PUBLIC_TOKEN_DECIMALS || "6");
-    const tokenAmountBaseUnits = BigInt(tokenAmountToTransfer) * BigInt(10 ** decimals);
+    const paymentAsset = resolvePaymentAsset(); // "sol" or "spl"
+    const isSubscription = pkg.type === "subscription";
 
-    const paymentAsset = "spl"; // Force SPL for $RANDI
-    const tokenMint = process.env.TOKEN_MINT || process.env.NEXT_PUBLIC_TOKEN_MINT;
-    if (!tokenMint) {
-      throw new Error("CRITICAL: TOKEN_MINT environment variable is not set.");
+    let tokenAmountBaseUnits: bigint;
+    let decimals: number;
+    let tokenMint: string | null = null;
+    let burnAmountBaseUnits: bigint = BigInt(0);
+    let treasuryAmountBaseUnits: bigint;
+
+    if (paymentAsset === "sol") {
+      // Calculate SOL amount for pkg.usdPrice
+      const solPriceUsd = await getSolUsdPrice();
+      const solAmount = pkg.usdPrice / Number(solPriceUsd);
+      decimals = 9; // SOL
+      tokenAmountBaseUnits = BigInt(Math.floor(solAmount * 1_000_000_000));
+
+      // For SOL, we burn 70% by sending it to incinerator
+      const split = splitTokenAmountsByBurn(tokenAmountBaseUnits, BURN_BPS);
+      burnAmountBaseUnits = split.burnTokenAmount;
+      treasuryAmountBaseUnits = split.treasuryTokenAmount;
+    } else {
+      // Existing SPL logic
+      decimals = 6;
+      tokenMint = process.env.TOKEN_MINT || process.env.NEXT_PUBLIC_TOKEN_MINT || "";
+      // In SPL mode, we assume user is paying pkg.creditAmount tokens directly?
+      // No, let's keep it consistent: $X USD worth of $RANDI
+      // Actually, if they pay in $RANDI, we can just use fixed token amounts from the pack.
+      tokenAmountBaseUnits = BigInt(pkg.creditAmount) * BigInt(1_000_000);
+      const split = splitTokenAmountsByBurn(tokenAmountBaseUnits, BURN_BPS);
+      burnAmountBaseUnits = split.burnTokenAmount;
+      treasuryAmountBaseUnits = split.treasuryTokenAmount;
     }
 
-    // FIX (CRITICAL): All payments use the canonical BURN_BPS from tokenomics.ts.
-    // Previously, deposits used 0% burn while subscriptions used 7000 (70%).
-    // Now all payment types consistently apply the current phase burn rate.
-    const isSubscription = (pkg as any).type === "subscription";
-    const effectiveBurnBps = BURN_BPS; // Always use the canonical rate
-    const split = splitTokenAmountsByBurn(tokenAmountBaseUnits, effectiveBurnBps);
-
-    // FIX (HIGH): Removed hardcoded treasury wallet fallback.
-    // The application must fail loudly if TREASURY_WALLET is not configured.
     const treasuryWallet = process.env.TREASURY_WALLET;
     if (!treasuryWallet) {
-      throw new Error("CRITICAL: TREASURY_WALLET environment variable is not set.");
+      throw new Error("TREASURY_WALLET not set");
     }
 
     const typePrefix = isSubscription ? "subscribe" : "deposit";
-    const memo = `ap:${typePrefix}:${Date.now()}:${auth.userId.slice(-6)}:b${effectiveBurnBps}`;
-    const intentExpiresAt = new Date(Date.now() + resolvePurchaseIntentTtlMs());
+    const memo = `ap:${typePrefix}:${Date.now()}:${auth.userId.slice(-6)}:b${BURN_BPS}`;
 
     const tx = await prisma.tokenTransaction.create({
       data: {
@@ -91,9 +94,7 @@ export async function POST(request: NextRequest) {
         amount: pkg.creditAmount,
         tokenAmount: tokenAmountBaseUnits,
         memo,
-        description: isSubscription
-          ? `Subscribe to Randi Pro (${pkg.creditAmount.toLocaleString()} Credits)`
-          : `Deposit ${pkg.creditAmount.toLocaleString()} $RANDI (${pkg.name})`,
+        description: `${pkg.name} (${pkg.creditAmount.toLocaleString()} Credits) via ${paymentAsset.toUpperCase()}`,
       },
     });
 
@@ -102,29 +103,20 @@ export async function POST(request: NextRequest) {
       paymentAsset,
       tokenMint,
       treasuryWallet,
-      burnWallet: null,
-      tokenAmount: split.treasuryTokenAmount.toString(),
-      burnAmount: split.burnTokenAmount.toString(),
+      burnWallet: paymentAsset === "sol" ? resolveSolBurnWallet() : null,
+      tokenAmount: treasuryAmountBaseUnits.toString(),
+      burnAmount: burnAmountBaseUnits.toString(),
       grossTokenAmount: tokenAmountBaseUnits.toString(),
       memo,
       decimals,
       quote: {
-        itemUsd: "0",
+        itemUsd: pkg.usdPrice.toString(),
         itemName: pkg.name,
-        tokenUsdPrice: "0",
         tokenAmountDisplay: pkg.creditAmount.toLocaleString(),
-        source: "fixed",
-        burnBps: effectiveBurnBps,
+        burnBps: BURN_BPS,
       },
-      intentExpiresAt: intentExpiresAt.toISOString(),
     });
   } catch (error) {
-    if (error instanceof AuthError) {
-      return handleAuthError(error);
-    }
-    if (error instanceof Error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
-    }
-    return handleAuthError(error);
+    return NextResponse.json({ error: error instanceof Error ? error.message : "Internal error" }, { status: 500 });
   }
 }
