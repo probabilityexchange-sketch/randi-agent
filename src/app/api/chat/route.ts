@@ -146,7 +146,7 @@ export async function POST(req: NextRequest) {
           { slug: resolvedAgentSelector }
         ]
       },
-      select: { id: true, systemPrompt: true, active: true, tools: true },
+      select: { id: true, slug: true, systemPrompt: true, active: true, tools: true },
     });
 
     if (!agent || !agent.active) return NextResponse.json({ error: "Agent not found" }, { status: 404 });
