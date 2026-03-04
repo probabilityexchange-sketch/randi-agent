@@ -292,8 +292,26 @@ export async function POST(req: NextRequest) {
 
     // 5. Run Stream Text
     const randiContext = await getRandiContext();
+
+    // Fetch User-specific agent preferences
+    const userPreference = await prisma.userAgentPreference.findUnique({
+      where: {
+        userId_agentSlug: {
+          userId: auth.userId,
+          agentSlug: agent.slug,
+        },
+      },
+    }).catch(() => null);
+
+    let userCustomContext = "";
+    if (userPreference) {
+      if (userPreference.personality) userCustomContext += `\n\n# USER CUSTOM PERSONALITY\n${userPreference.personality}\n`;
+      if (userPreference.rules) userCustomContext += `\n\n# USER CUSTOM RULES\n${userPreference.rules}\n`;
+      if (userPreference.skills) userCustomContext += `\n\n# USER CUSTOM SKILLS\n${userPreference.skills}\n`;
+    }
+
     console.log(`[Chat] FINAL tool count: ${Object.keys(tools).length} -> ${Object.keys(tools).join(', ')}`);
-    let finalSystemPrompt = agent.systemPrompt + "\n\n" + randiContext + "\n\n" + skillsContext + (tools ? "\n\n" + TOOL_USAGE_SYSTEM_INSTRUCTION : "");
+    let finalSystemPrompt = agent.systemPrompt + "\n\n" + randiContext + userCustomContext + "\n\n" + skillsContext + (tools ? "\n\n" + TOOL_USAGE_SYSTEM_INSTRUCTION : "");
 
     // Minimax-specific model hardening:
     // Some gateways/models like minimax-m2.5 default to XML for tool calls, 

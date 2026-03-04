@@ -5,6 +5,7 @@ import { useParams, useSearchParams, useRouter } from "next/navigation";
 import { ChatWindow, type Message } from "@/components/chat/ChatWindow";
 import { RuntimeBadge } from "@/components/chat/RuntimeBadge";
 import { ModelSelector } from "@/components/chat/ModelSelector";
+import { CustomizeAgentDrawer } from "@/components/chat/CustomizeAgentDrawer";
 
 export default function ChatSessionPage() {
     const params = useParams();
@@ -20,6 +21,7 @@ export default function ChatSessionPage() {
     const [currentAgentId, setCurrentAgentId] = useState<string | null>(agentIdFromUrl);
     const [sessionId, setSessionId] = useState<string | undefined>(sessionIdFromParams);
     const [selectedModel, setSelectedModel] = useState("meta-llama/llama-3.3-70b-instruct:free");
+    const [isCustomizeOpen, setIsCustomizeOpen] = useState(false);
 
     // Persist model selection
     useEffect(() => {
@@ -125,6 +127,15 @@ export default function ChatSessionPage() {
                 </div>
 
                 <div className="flex items-center gap-3">
+                    <button
+                        onClick={() => setIsCustomizeOpen(true)}
+                        className="flex items-center gap-2 px-3 py-1.5 bg-muted/50 hover:bg-muted border border-border rounded-lg text-sm font-medium transition-colors"
+                    >
+                        <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+                        </svg>
+                        <span>Customize</span>
+                    </button>
                     <ModelSelector
                         selectedModel={selectedModel}
                         onChange={setSelectedModel}
@@ -160,6 +171,14 @@ export default function ChatSessionPage() {
                     }}
                 />
             </div>
+
+            {currentAgentId && (
+                <CustomizeAgentDrawer
+                    agentId={currentAgentId}
+                    isOpen={isCustomizeOpen}
+                    onClose={() => setIsCustomizeOpen(false)}
+                />
+            )}
         </div>
     );
 }
