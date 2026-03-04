@@ -44,28 +44,6 @@ export async function POST(req: NextRequest) {
 
         // 1. Billing & Access Checks
         if (!isUnmeteredModel(model)) {
-            const user = await prisma.user.findUnique({
-                where: { id: auth.userId },
-                select: { subscriptionStatus: true, subscriptionExpiresAt: true, stakingLevel: true },
-            });
-
-            const isSubscribed =
-                user?.subscriptionStatus === "active" &&
-                user.subscriptionExpiresAt &&
-                user.subscriptionExpiresAt > new Date();
-
-            if (!isSubscribed) {
-                if (isPremiumModel(model)) {
-                    const userStakingLevel = (user?.stakingLevel || "NONE") as StakingLevel;
-                    const accessCheck = validateModelAccess(model, userStakingLevel);
-                    if (!accessCheck.allowed) {
-                        return NextResponse.json({ error: accessCheck.reason, code: "STAKING_REQUIRED" }, { status: 403 });
-                    }
-                } else {
-                    return NextResponse.json({ error: "Premium models require a Randi Pro subscription.", code: "SUBSCRIPTION_REQUIRED" }, { status: 403 });
-                }
-            }
-
             const deduction = await deductForAgentCall(auth.userId, model, `Chat V2: ${message.substring(0, 50)}`, sessionId);
             if (!deduction.success) {
                 return NextResponse.json({ error: deduction.error || "Insufficient credits.", code: "INSUFFICIENT_FUNDS" }, { status: 402 });

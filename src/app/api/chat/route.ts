@@ -96,30 +96,7 @@ export async function POST(req: NextRequest) {
 
     // 1. Billing & Access Checks
     const resolvedModel = model || DEFAULT_MODEL;
-    const kiloKey = process.env.KILO_API_KEY;
-    if (!isUnmeteredModel(resolvedModel) && !kiloKey) {
-      const user = await prisma.user.findUnique({
-        where: { id: auth.userId },
-        select: { subscriptionStatus: true, subscriptionExpiresAt: true, stakingLevel: true },
-      });
-
-      const isSubscribed =
-        user?.subscriptionStatus === "active" &&
-        user.subscriptionExpiresAt &&
-        user.subscriptionExpiresAt > new Date();
-
-      if (!isSubscribed) {
-        if (isPremiumModel(resolvedModel)) {
-          const userStakingLevel = (user?.stakingLevel || "NONE") as StakingLevel;
-          const accessCheck = validateModelAccess(resolvedModel, userStakingLevel);
-          if (!accessCheck.allowed) {
-            return NextResponse.json({ error: accessCheck.reason, code: "STAKING_REQUIRED" }, { status: 403 });
-          }
-        } else {
-          return NextResponse.json({ error: "Premium models require a Randi Pro subscription.", code: "SUBSCRIPTION_REQUIRED" }, { status: 403 });
-        }
-      }
-
+    if (!isUnmeteredModel(resolvedModel)) {
       const deduction = await deductForAgentCall(auth.userId, resolvedModel, `Chat: ${message.substring(0, 50)}`, sessionId);
       if (!deduction.success) {
         return NextResponse.json({ error: deduction.error || "Insufficient credits.", code: "INSUFFICIENT_FUNDS" }, { status: 402 });
@@ -185,12 +162,12 @@ export async function POST(req: NextRequest) {
           }, activeRuntime?.url || undefined);
 
           let parsed: any;
-          try { 
-            parsed = JSON.parse(resultStr); 
-          } catch { 
-            parsed = { data: { result: resultStr }, successful: true, error: null }; 
+          try {
+            parsed = JSON.parse(resultStr);
+          } catch {
+            parsed = { data: { result: resultStr }, successful: true, error: null };
           }
-          
+
           // Optimization: Clean up verbose Gmail/Calendar results to save tokens
           if (parsed.data && typeof parsed.data === 'object') {
             const data = parsed.data;
@@ -256,9 +233,9 @@ export async function POST(req: NextRequest) {
           content:
             approval.status === "APPROVED"
               ? await executeOpenAIToolCall(auth.userId, {
-                  name: approval.toolName,
-                  arguments: approval.toolArgs,
-                })
+                name: approval.toolName,
+                arguments: approval.toolArgs,
+              })
               : JSON.stringify({
                 error:
                   "User REJECTED this tool call. Do NOT attempt it again. Ask the user for alternative instructions.",
@@ -279,10 +256,10 @@ export async function POST(req: NextRequest) {
         if (m.role === 'tool' && m.toolCalls) {
           history.push({ role: 'tool', content: m.content, toolCallId: m.toolCalls } as any);
         } else if (m.role === 'assistant') {
-          history.push({ 
-            role: 'assistant', 
-            content: m.content, 
-            toolCalls: m.toolCalls ? JSON.parse(m.toolCalls) : undefined 
+          history.push({
+            role: 'assistant',
+            content: m.content,
+            toolCalls: m.toolCalls ? JSON.parse(m.toolCalls) : undefined
           } as any);
         } else if (m.role === 'user' || m.role === 'system') {
           history.push({ role: m.role as any, content: m.content });
@@ -370,7 +347,7 @@ export async function POST(req: NextRequest) {
     // Handle specialized Approval Signal
     if (error.message?.startsWith("APPROVAL_REQUIRED|")) {
       const [_, toolName, argsJson] = error.message.split("|");
-      
+
       return NextResponse.json({
         error: "Approval required",
         code: "APPROVAL_REQUIRED",
