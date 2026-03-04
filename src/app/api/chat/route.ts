@@ -207,7 +207,31 @@ export async function POST(req: NextRequest) {
 
           let parsed: Record<string, unknown>;
           try { parsed = JSON.parse(resultStr); } catch { parsed = { result: resultStr }; }
-          console.log(`[Chat] Tool ${toolSlug} parsed result: ${JSON.stringify(parsed).substring(0, 1000)}`);
+          
+          // Optimization: Clean up verbose Gmail/Calendar results to save tokens
+          if (parsed.data && typeof parsed.data === 'object') {
+            const data = parsed.data as any;
+            if (Array.isArray(data.messages)) {
+              data.messages = data.messages.map((msg: any) => ({
+                id: msg.messageId || msg.id,
+                from: msg.from || (msg.payload?.headers?.find((h: any) => h.name === 'From')?.value),
+                subject: msg.subject || (msg.payload?.headers?.find((h: any) => h.name === 'Subject')?.value),
+                date: msg.messageTimestamp || msg.date,
+                snippet: msg.snippet || msg.messageText?.substring(0, 200),
+              }));
+            }
+            if (Array.isArray(data.items)) { // Calendar items
+              data.items = data.items.map((item: any) => ({
+                id: item.id,
+                summary: item.summary,
+                start: item.start,
+                end: item.end,
+                location: item.location,
+              }));
+            }
+          }
+
+          console.log(`[Chat] Tool ${toolSlug} parsed result: ${JSON.stringify(parsed).substring(0, 500)}`);
           
           const isError = parsed && typeof parsed === 'object' && ('error' in parsed || 'errorMessage' in parsed);
           return {
