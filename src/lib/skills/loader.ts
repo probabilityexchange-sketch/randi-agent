@@ -45,6 +45,7 @@ export const KNOWLEDGE_SKILLS = [
   "hummingbot-heartbeat",
   "lp-agent",
   "slides-generator",
+  "polymarket",
 ];
 
 const SKILLS_DIR = path.join(process.cwd(), "skills");

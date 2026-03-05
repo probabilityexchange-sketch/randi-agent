@@ -117,7 +117,7 @@ export const PaymentExplainer = () => {
                                 <div>
                                     <h4 className="font-bold text-sm mb-1 uppercase tracking-wider text-primary">Trading Core (New)</h4>
                                     <p className="text-xs text-muted-foreground leading-relaxed">
-                                        Equipped with <b>Hummingbot Skills</b>. Randi now understands cross-exchange arbitrage, market making, and liquidity provision across 100+ exchanges.
+                                        Equipped with <b>Hummingbot</b> and <b>Polymarket</b>. Randi now understands cross-exchange arbitrage, prediction markets, and automated liquidity provision across 100+ platforms.
                                     </p>
                                 </div>
                             </div>
