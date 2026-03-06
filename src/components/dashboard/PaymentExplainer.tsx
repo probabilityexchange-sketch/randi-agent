@@ -1,6 +1,33 @@
 "use client";
 
-import React from "react";
+import Link from "next/link";
+
+const featuredSkills = [
+    {
+        slug: "hummingbot",
+        name: "Hummingbot Core",
+        description: "Automated trading across 100+ exchanges. Market making, arbitrage, and portfolio management.",
+        icon: "🤖"
+    },
+    {
+        slug: "polymarket",
+        name: "Polymarket",
+        description: "Real-time prediction market analysis and execution. Bet on world events via the CLI.",
+        icon: "🗳️"
+    },
+    {
+        slug: "clawnch",
+        name: "Clawnch",
+        description: "The autonomous launchpad. Deploy tokens, manage liquidity, and coordinate launches.",
+        icon: "🚀"
+    },
+    {
+        slug: "react-expert",
+        name: "React & UX",
+        description: "Deep domain knowledge in modern web builds, design systems, and component architecture.",
+        icon: "🎨"
+    }
+];
 
 export const PaymentExplainer = () => {
     return (
@@ -12,7 +39,7 @@ export const PaymentExplainer = () => {
                     </div>
                     <div>
                         <h2 className="text-2xl font-black italic tracking-tighter uppercase">The Three-Tier Economy</h2>
-                        <p className="text-muted-foreground text-sm font-medium">How Randi interacts with value across the physical and digital web.</p>
+                        <p className="text-muted-foreground text-sm font-medium">How Randi routes value across internal credits, machine payments, and traditional rails.</p>
                     </div>
                 </div>
 
@@ -86,7 +113,7 @@ export const PaymentExplainer = () => {
                 <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 rounded-full -mr-32 -mt-32"></div>
                 <div className="relative z-10 grid md:grid-cols-2 gap-12 items-center">
                     <div>
-                        <h2 className="text-3xl font-black italic tracking-tighter uppercase mb-6">The "Skill" Engine</h2>
+                        <h2 className="text-3xl font-black italic tracking-tighter uppercase mb-6">How Skills Plug In</h2>
                         <div className="space-y-6">
                             <div className="flex gap-4">
                                 <div className="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center shrink-0">
@@ -95,7 +122,7 @@ export const PaymentExplainer = () => {
                                 <div>
                                     <h4 className="font-bold text-sm mb-1 uppercase tracking-wider">Knowledge Transfer</h4>
                                     <p className="text-xs text-muted-foreground leading-relaxed">
-                                        Skills like <b>React Expert</b> or <b>UX Design</b> are injected directly into Randi's reasoning core. The agent "studies" these docs before every chat.
+                                        Knowledge skills such as <b>React Expert</b> and <b>UX Design</b> shape planning quality. Randi reads these docs before execution.
                                     </p>
                                 </div>
                             </div>
@@ -106,7 +133,7 @@ export const PaymentExplainer = () => {
                                 <div>
                                     <h4 className="font-bold text-sm mb-1 uppercase tracking-wider">Autonomous Tools</h4>
                                     <p className="text-xs text-muted-foreground leading-relaxed">
-                                        Action skills like <b>Clawnch</b> give Randi hands. The agent can trigger real code, deploy contracts, or post to Telegram without human intervention.
+                                        Action skills such as <b>Clawnch</b> provide tool access. Randi can run scripts, deploy contracts, and execute workflows from chat.
                                     </p>
                                 </div>
                             </div>
@@ -115,9 +142,9 @@ export const PaymentExplainer = () => {
                                     <span className="text-xs text-primary font-black">3</span>
                                 </div>
                                 <div>
-                                    <h4 className="font-bold text-sm mb-1 uppercase tracking-wider text-primary">Trading Core (New)</h4>
+                                    <h4 className="font-bold text-sm mb-1 uppercase tracking-wider text-primary">Trading Core</h4>
                                     <p className="text-xs text-muted-foreground leading-relaxed">
-                                        Equipped with <b>Hummingbot</b> and <b>Polymarket</b>. Randi now understands cross-exchange arbitrage, prediction markets, and automated liquidity provision across 100+ platforms.
+                                        With <b>Hummingbot</b> and <b>Polymarket</b>, Randi can reason about cross-exchange opportunities, prediction markets, and liquidity operations.
                                     </p>
                                 </div>
                             </div>
@@ -134,11 +161,11 @@ export const PaymentExplainer = () => {
                                 <span className="text-success">[OK]</span>
                             </div>
                             <div className="flex justify-between border-b border-white/5 pb-2">
-                                <span className="text-muted-foreground">FIND: arbitrage-opps</span>
+                                <span className="text-muted-foreground">SCAN: cross-exchange-opps</span>
                                 <span className="text-primary font-bold">SCANNING</span>
                             </div>
                             <div className="flex justify-between border-b border-white/5 pb-2">
-                                <span className="text-muted-foreground">ACTION: clawnch_get_stats</span>
+                                <span className="text-muted-foreground">ACTION: clawnch_launch_validate</span>
                                 <span className="text-success">[OK]</span>
                             </div>
                             <div className="flex justify-between">
@@ -147,6 +174,28 @@ export const PaymentExplainer = () => {
                             </div>
                         </div>
                     </div>
+                </div>
+            </section>
+
+            <section>
+                <div className="flex items-center justify-between mb-8">
+                    <h2 className="text-2xl font-black italic tracking-tighter uppercase">Featured Skills</h2>
+                    <Link href="/skills" className="inline-flex items-center gap-1 rounded-full border border-primary/30 bg-primary/5 px-4 py-1.5 text-[10px] font-black text-primary tracking-widest uppercase transition-colors hover:bg-primary/10">
+                        Browse All
+                        <svg className="h-3 w-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                    </Link>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {featuredSkills.map(skill => (
+                        <Link key={skill.slug} href={`/skills/${skill.slug}`} className="glass-card p-6 rounded-3xl border border-white/5 hover:border-primary/20 transition-all group">
+                            <div className="text-3xl mb-4 group-hover:scale-110 transition-transform">{skill.icon}</div>
+                            <h4 className="font-bold text-sm mb-2 uppercase tracking-wider">{skill.name}</h4>
+                            <p className="text-[10px] text-muted-foreground leading-relaxed mb-4">{skill.description}</p>
+                            <div className="text-[9px] font-black text-primary uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">Open Skill Guide →</div>
+                        </Link>
+                    ))}
                 </div>
             </section>
 
@@ -160,8 +209,8 @@ export const PaymentExplainer = () => {
                 <div className="flex-1 glass-card p-8 rounded-3xl border border-white/5 text-center flex flex-col items-center justify-center">
                     <p className="text-xs text-muted-foreground font-medium mb-4 italic">Ready to see it in action?</p>
                     <div className="flex gap-4">
-                        <a href="/chat" className="px-6 py-2.5 bg-primary text-white text-xs font-black rounded-xl hover:translate-x-1 transition-transform">ASK RANDI</a>
-                        <a href="/credits" className="px-6 py-2.5 bg-white text-black text-xs font-black rounded-xl hover:-translate-y-1 transition-transform">TOP UP</a>
+                        <Link href="/chat" className="px-6 py-2.5 bg-primary text-white text-xs font-black rounded-xl hover:translate-x-1 transition-transform">ASK RANDI</Link>
+                        <Link href="/credits" className="px-6 py-2.5 bg-white text-black text-xs font-black rounded-xl hover:-translate-y-1 transition-transform">TOP UP</Link>
                     </div>
                 </div>
             </div>

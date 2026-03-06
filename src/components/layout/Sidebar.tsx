@@ -10,7 +10,7 @@ const mainNavItems = [
   { href: "/dashboard", label: "Dashboard", icon: "grid" },
   { href: "/chat", label: "Ask Randi", icon: "message" },
   { href: "/how-it-works", label: "How it Works", icon: "help" },
-  { href: "/agents", label: "Agent Skills", icon: "cpu" },
+  { href: "/skills", label: "Skills Library", icon: "cpu" },
   { href: "/integrations", label: "Integrations", icon: "link" },
   { href: "/credits", label: "Tokens", icon: "coins" },
 ];

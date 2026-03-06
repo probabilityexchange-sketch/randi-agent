@@ -10,7 +10,7 @@ export async function getRandiContext() {
     const dirPath = path.join(baseDir, section);
     if (!fs.existsSync(dirPath)) continue;
 
-    const files = fs.readdirSync(dirPath).filter(f => f.endsWith('.md'));
+    const files = fs.readdirSync(dirPath).filter(f => f.endsWith('.md')).sort();
     if (files.length === 0) continue;
 
     combinedContext += `\n\n# ${section.toUpperCase()}\n`;
