@@ -3,7 +3,7 @@
 **Work Package**: WP8 - Usage Accounting and Pricing  
 **Phase**: Discovery / Spec Pass  
 **Date**: 2026-03-06  
-**Status**: Draft for Implementation
+**Status**: Accepted and Implemented
 
 ---
 
@@ -24,7 +24,7 @@ This spec defines the minimal implementation path to satisfy WP8 requirements: *
 | Token balance | `User.tokenBalance` (int) | ✅ Tracks user credits |
 | Deduction engine | `src/lib/credits/engine.ts` | ✅ Core `deductForAgentCall()` |
 | Pricing model | `src/lib/tokenomics.ts` | ✅ Tiers: STANDARD/PREMIUM/ULTRA |
-| Burn mechanism | 70% burn / 30% treasury | ✅ Implemented |
+| Burn mechanism | 70% burn / 30% treasury split with optional batch on-chain execution | ✅ Implemented |
 | Transaction log | `TokenTransaction` table | ✅ PURCHASE, USAGE, REFUND, SUBSCRIBE |
 | Chat session tracking | `ChatSession.tokensUsed` | ✅ Cumulative per session |
 | Container tracking | `Container.tokensUsed` | ✅ Pre-reserved + trackable |
@@ -95,7 +95,7 @@ Treasury: 30% → platform运营
 - `User.tokenBalance` = credit balance (same unit)
 - No separate "credits" currency exists
 - `TokenTransaction.type=USAGE` logs every deduction
-- Burn happens at deduction time via `splitTokenAmountsByBurn()`
+- Burn accounting is determined at deduction time; on-chain burn execution happens later via the burn service when cron and treasury signing are configured
 
 **Recommendation**: No accounting model changes needed. Current design is sound.
 

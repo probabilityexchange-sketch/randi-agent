@@ -38,15 +38,16 @@ export default async function RoadmapPage() {
 
 This roadmap outlines the strategic phases for evolving the Randi Agent Platform from a functional MVP to a high-scale, distributed AI ecosystem.
 
-## 📍 Phase 1: Launch Foundations (Current Focus)
-**Objective**: Stabilize the user experience and secure the primary domain.
+## 📍 Phase 1: Launch Foundations (Accepted)
+**Objective**: Stabilize the user experience, secure the primary domain, and ship the first truthful workflow wedge.
 - [x] **Universal Auth**: Social + Wallet login via Privy.
 - [x] **Web Performance**: Next.js 16 + Turbopack optimization.
 - [x] **Transparency Hub**: Real-time token burn and platform stats dashboard.
 - [x] **Vercel/Supabase Migration**: Cloud-native hosting with localized Ohio latency tuning.
 - [x] **Custom Domain**: Launch \`randi.chat\` with Cloudflare SSL.
 - [x] **Credits 1.0**: Finalize internal credit purchasing and balance tracking.
-- [ ] **UX & Runtime Resilience**: Decouple chat from provisioning to ensure zero-block user experience. (Current Focus)
+- [x] **UX & Runtime Resilience**: Decouple chat from provisioning to ensure zero-block user experience.
+- [x] **Workflow Platform v1**: Compile, save, review, and run workflows from chat and dashboard surfaces.
 
 ## 🏗️ Phase 2: The "Body" (Compute Layer)
 **Objective**: Connect the Vercel "Brain" to the AWS "Body" for code execution.
@@ -61,15 +62,19 @@ This roadmap outlines the strategic phases for evolving the Randi Agent Platform
 **Objective**: Integrate the $RANDI token deeply into the platform's DNA.
 - [x] **On-Chain Verification**: Robust Solana transaction scanning for credit top-ups.
 - [x] **x402 Protocol Integration**: Initial implementation of the x402 payment standard for premium AI model access.
-- [x] **Automated Burn Mechanics**: Real-time $RANDI burning on credit deposits (70% burn).
+- [x] **Automated Burn Accounting**: 70/30 burn and treasury split is tracked for purchases and usage, with optional batch on-chain burn execution when cron and treasury signing are configured.
 - [x] **Passive Staking Yield**: Stakers earn up to 200,000 daily platform credits.
 - [x] **Credit Subscriptions**: Monthly $RANDI credit subscriptions for power users.
+- [x] **Usage Accounting v1**: Workflow estimates and truthful attributed-usage reporting are shipped.
 - [ ] **Referral System**: Token-based incentives for user growth. (Planned for Phase 2 Growth)
 
 ## 🧠 Phase 4: Advanced Intelligence & UI
 **Objective**: Transform from simple chat to complex agentic workflows.
 - [x] **Composio Expansion**: Add 50+ specialized toolkits (GitHub, Google Workspace, Financial APIs).
 - [x] **Randi Orchestration**: "Lead Agent" pattern implemented—specialist subagents are hidden from the UI and called in the background via delegation.
+- [x] **Workflow Policy & Guardrails**: Approval gates, policy decisions, crypto caps, allowlists, and audit logs are live.
+- [x] **Tool Recommendation Layer**: Workflow plans surface deterministic tool-path suggestions without auto-execution.
+- [x] **GitHub Actions Scheduling**: Recurring workflow execution prefers GitHub Actions with truthful app-state vs sync-state UX.
 - [x] **Telegram Connectivity**: Inbound/Outbound bot routing live. Users can control Randi via their own personal Telegram bots.
 - [x] **Bot Onboarding**: Integrated tutorial in the dashboard for linking bots via BotFather.
 - [x] **Cross-Model Compatibility**: Custom XML parser for Minimax and other non-standard LLM tool outputs.

@@ -18,8 +18,11 @@ export async function GET() {
                 type: { in: ["PURCHASE", "USAGE", "SUBSCRIBE"] },
             },
             select: {
+                type: true,
                 tokenAmount: true,
                 memo: true,
+                txSignature: true,
+                burnTxSignature: true,
                 createdAt: true,
             },
         });
@@ -41,11 +44,22 @@ export async function GET() {
                 tokenAmount: tokenAmount.toString(),
                 burnAmount: burnAmount.toString(),
                 burnBps,
+                status:
+                    (tx.type === "PURCHASE" || tx.type === "SUBSCRIBE") && tx.txSignature
+                        ? "on_chain"
+                        : tx.burnTxSignature
+                            ? "on_chain"
+                            : "accounted",
+                explorerSignature:
+                    (tx.type === "PURCHASE" || tx.type === "SUBSCRIBE")
+                        ? tx.txSignature
+                        : tx.burnTxSignature,
             };
         });
 
         // 2. Fetch Global Chain Burn for the Sidebar Counter (Live Proof)
         let chainBurned = BigInt(0);
+        let totalBurnedSource: "on_chain" | "accounted_fallback" = "accounted_fallback";
         try {
             const connection = new Connection(
                 process.env.NEXT_PUBLIC_SOLANA_RPC_URL || "https://api.mainnet-beta.solana.com",
@@ -57,9 +71,7 @@ export async function GET() {
             const burnATA = await getAssociatedTokenAddress(mintKey, burnKey, true);
             const account = await getAccount(connection, burnATA);
             chainBurned = account.amount;
-            if (chainBurned === BigInt(0)) {
-                chainBurned = platformBurned;
-            }
+            totalBurnedSource = "on_chain";
         } catch (e) {
             console.warn("Solana burn fetch failed, using DB stats as fallback:", e);
             chainBurned = platformBurned;
@@ -69,6 +81,7 @@ export async function GET() {
         // as it reflects the true deflationary impact.
         return NextResponse.json({
             totalBurned: chainBurned.toString(),
+            totalBurnedSource,
             platformBurned: platformBurned.toString(),
             totalVolume: totalVolume.toString(),
             history: burnHistory.slice(-20).reverse(),

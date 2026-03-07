@@ -4,6 +4,17 @@ import { useCredits } from "@/hooks/useCredits";
 import { PurchaseForm } from "@/components/credits/PurchaseForm";
 import { useTokenPrice } from "@/hooks/useTokenPrice";
 
+const solanaNetwork = (process.env.NEXT_PUBLIC_SOLANA_NETWORK || "mainnet-beta").toLowerCase();
+
+function getSolscanTxUrl(signature: string): string {
+  const cluster =
+    solanaNetwork === "mainnet" || solanaNetwork === "mainnet-beta"
+      ? ""
+      : `?cluster=${encodeURIComponent(solanaNetwork)}`;
+
+  return `https://solscan.io/tx/${signature}${cluster}`;
+}
+
 export default function CreditsPage() {
   const { subscription, isSubscribed, transactions, loading, error } = useCredits();
   const { priceUsd } = useTokenPrice();
@@ -94,9 +105,14 @@ export default function CreditsPage() {
                     {tx.status}
                   </span>
                   {tx.txSignature && (
-                    <p className="text-[9px] text-muted-foreground/40 mt-1 font-mono">
+                    <a
+                      href={getSolscanTxUrl(tx.txSignature)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="mt-1 inline-flex text-[9px] font-mono text-muted-foreground/60 transition-colors hover:text-primary"
+                    >
                       {tx.txSignature.slice(0, 12)}...
-                    </p>
+                    </a>
                   )}
                 </div>
               </div>

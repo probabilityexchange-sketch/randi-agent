@@ -8,13 +8,27 @@ interface BurnStat {
     tokenAmount: string;
     burnAmount: string;
     burnBps: number;
+    status: "on_chain" | "accounted";
+    explorerSignature: string | null;
 }
 
 interface BurnData {
     totalBurned: string; // Global chain-wide
+    totalBurnedSource: "on_chain" | "accounted_fallback";
     platformBurned: string; // Internal system-specific
     totalVolume: string;
     history: BurnStat[];
+}
+
+const solanaNetwork = (process.env.NEXT_PUBLIC_SOLANA_NETWORK || "mainnet-beta").toLowerCase();
+
+function getSolscanTxUrl(signature: string): string {
+    const cluster =
+        solanaNetwork === "mainnet" || solanaNetwork === "mainnet-beta"
+            ? ""
+            : `?cluster=${encodeURIComponent(solanaNetwork)}`;
+
+    return `https://solscan.io/tx/${signature}${cluster}`;
 }
 
 export default function TransparencyPage() {
@@ -73,13 +87,20 @@ export default function TransparencyPage() {
                             <path d="M12 2C12 2 12 7 9 7C6 7 6 10 6 12C6 15.31 8.69 18 12 18C15.31 18 18 15.31 18 12C18 7 12 2 12 2ZM14 15C13.45 15.55 12.74 15.86 12 15.89V14.5C12.44 14.47 12.83 14.28 13.12 14C12.8 13.79 12.42 13.66 12 13.66V12.16C12.74 12.19 13.45 12.5 14 13.06C14.56 13.62 14.87 14.33 14.87 15.07C14.87 15.05 14.87 15.02 14.87 15C14.87 15.37 14.79 15.72 14.65 16.04L14 15Z" />
                         </svg>
                     </div>
-                    <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">Total Burned 🔥</p>
+                    <p className="text-xs uppercase tracking-widest text-muted-foreground mb-1">
+                        {loading || data?.totalBurnedSource === "on_chain" ? "On-Chain Burned 🔥" : "Accounted Burn Estimate"}
+                    </p>
                     <h3 className="text-2xl font-mono font-bold text-orange-400">
                         {loading ? "..." : formatTokens(data?.totalBurned)}
                     </h3>
                     <p className="text-sm text-muted-foreground mt-1">
                         {loading ? "Calculating..." : formatUsd(data?.totalBurned)}
                     </p>
+                    {!loading && data?.totalBurnedSource === "accounted_fallback" && (
+                        <p className="mt-2 text-[10px] text-amber-400 uppercase tracking-wider">
+                            Using ledger fallback until an on-chain burn balance is available.
+                        </p>
+                    )}
                 </div>
 
                 {/* Platform Revenue */}
@@ -166,9 +187,25 @@ export default function TransparencyPage() {
                                             {formatTokens(item.burnAmount)}
                                         </td>
                                         <td className="px-6 py-4 text-right">
-                                            <span className="px-2 py-0.5 bg-success/10 text-success rounded-full text-[10px] font-bold">
-                                                ON-CHAIN
-                                            </span>
+                                            <div className="flex flex-col items-end gap-1">
+                                                <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold ${
+                                                    item.status === "on_chain"
+                                                        ? "bg-success/10 text-success"
+                                                        : "bg-amber-500/10 text-amber-400"
+                                                }`}>
+                                                    {item.status === "on_chain" ? "ON-CHAIN" : "ACCOUNTED"}
+                                                </span>
+                                                {item.explorerSignature && (
+                                                    <a
+                                                        href={getSolscanTxUrl(item.explorerSignature)}
+                                                        target="_blank"
+                                                        rel="noopener noreferrer"
+                                                        className="text-[10px] text-primary hover:underline"
+                                                    >
+                                                        View on Solscan
+                                                    </a>
+                                                )}
+                                            </div>
                                         </td>
                                     </tr>
                                 ))
@@ -180,8 +217,8 @@ export default function TransparencyPage() {
 
             <div className="mt-8 p-6 bg-muted/20 rounded-xl border border-dashed border-border text-center">
                 <p className="text-sm text-muted-foreground">
-                    All subscription payments are split instantly: <span className="text-orange-400 font-bold">70%</span> is sent to the burn address and <span className="text-primary font-bold">30%</span> to the protocol treasury.
-                    This creates a deflationary pressure on $RANDI as the platform grows.
+                    Purchase and subscription flows can prove burn on-chain immediately. Usage fees are always accounted in the ledger,
+                    and move on-chain once the batch burn service runs with a configured treasury signer.
                 </p>
             </div>
         </div>

@@ -149,11 +149,27 @@ Add these to your Vercel project:
 - `DATABASE_URL`: Your Supabase transaction pooler URL.
 - `DIRECT_URL`: Your Supabase direct connection URL.
 - `NEXT_PUBLIC_PRIVY_APP_ID`: From Privy Dashboard.
+- `PRIVY_APP_ID`: Server-side Privy app ID fallback.
 - `PRIVY_APP_SECRET`: From Privy Dashboard.
-- `OPENROUTER_API_KEY`: For AI responses.
-- `COMPOSIO_API_KEY`: For tool integrations.
 - `JWT_SECRET`: A long random string (at least 32 chars).
 - `NEXT_PUBLIC_APP_URL`: Your Vercel deployment URL.
+- `NEXT_PUBLIC_SOLANA_NETWORK`: Usually `mainnet-beta` in production.
+- `NEXT_PUBLIC_SOLANA_RPC_URL`: Public Solana RPC URL for client surfaces.
+- `SOLANA_RPC_URL`: Server-side Solana RPC URL.
+- `TOKEN_MINT`: Production $RANDI mint.
+- `NEXT_PUBLIC_TOKEN_MINT`: Public copy of the same mint.
+- `TREASURY_WALLET`: Protocol treasury wallet for purchase verification.
+- `PAYMENT_ASSET`: `spl` or `sol`.
+- One of:
+  - `KILO_API_KEY`
+  - `OPENROUTER_API_KEY`
+- `COMPOSIO_API_KEY`: Required for Gmail, Calendar, GitHub, and other tool integrations.
+
+Recommended production-only additions:
+- `TREASURY_SECRET_KEY`: Required if you want the protocol batch burn job to execute on-chain.
+- `CRON_SECRET`: Required to authorize `/api/cron/scan` in production.
+- `COMPOSIO_AUTH_CONFIG_GMAIL`: Shared Gmail auth config if you are not using per-user auth.
+- `COMPOSIO_AUTH_CONFIG_GOOGLECALENDAR`: Shared Google Calendar auth config if you are not using per-user auth.
 
 ### 3. Deploy
 - Connect your GitHub repo to Vercel.
