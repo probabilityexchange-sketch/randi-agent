@@ -7,6 +7,8 @@ import { fetchApi } from "@/lib/utils/api";
 const DEFAULT_RETRY_DELAY_MS = 3000;
 const PRIVY_RATE_LIMIT_RETRY_MS = 15000;
 const FINALIZE_TIMEOUT_MS = 12000;
+const SESSION_CONFIRM_TIMEOUT_MS = 5000;
+const SESSION_CONFIRM_POLL_MS = 150;
 const MAX_SYNC_ATTEMPTS = 3;
 
 // Module-level deduplication — protects against multiple hook instances
@@ -140,9 +142,19 @@ export function useAuth() {
 
     sharedSyncAttempts += 1;
     await syncSession();
-    
-    // Small delay to ensure DB/Cookie consistency
-    await new Promise<void>((resolve) => window.setTimeout(resolve, 500));
+
+    const confirmDeadline = Date.now() + SESSION_CONFIRM_TIMEOUT_MS;
+    while (!(await hasServerSession())) {
+      if (Date.now() >= confirmDeadline) {
+        throw new SessionSyncError(
+          "Session was created but not yet visible to protected requests. Please retry.",
+          "session_confirmation_timeout",
+          DEFAULT_RETRY_DELAY_MS,
+        );
+      }
+
+      await new Promise<void>((resolve) => window.setTimeout(resolve, SESSION_CONFIRM_POLL_MS));
+    }
 
     sharedSessionSynced = true;
     sharedNextRetryAt = 0;
@@ -241,7 +253,7 @@ export function useAuth() {
       isLoggingOutGlobal = false;
       setLocalIsLoggingOut(false);
     }
-  }, [logout]);
+  }, [logout, localIsLoggingOut]);
 
   return {
     user: user ? { id: user.id, walletAddress: user.wallet?.address || primaryWallet?.address } : null,
