@@ -2,10 +2,17 @@
 
 import { useRef, useEffect, useCallback, useMemo, useState } from "react";
 import { useChat, Chat } from "@ai-sdk/react";
-import { DefaultChatTransport, UIMessage } from "ai";
+import { DefaultChatTransport } from "ai";
 import { MessageBubble } from "./MessageBubble";
 import { ChatInput } from "./ChatInput";
 import type { ApprovalDecision } from "./ApprovalCard";
+
+const STARTER_PROMPTS = [
+    "Summarize this link and tell me what matters.",
+    "Draft a reply from these notes.",
+    "Turn this into a checklist with next steps.",
+    "Help me plan this task before taking action.",
+];
 
 export interface Message {
     id: string;
@@ -34,7 +41,6 @@ export function ChatWindow({
     sessionId,
     model,
     initialMessages = [],
-    onSessionCreated,
 }: ChatWindowProps) {
     const scrollRef = useRef<HTMLDivElement>(null);
     const [localError, setLocalError] = useState<string | null>(null);
@@ -140,6 +146,10 @@ export function ChatWindow({
         <div className="flex flex-col h-full bg-card/30 rounded-xl border border-border overflow-hidden">
             <div
                 ref={scrollRef}
+                role="log"
+                aria-label="Chat conversation"
+                aria-live="polite"
+                aria-busy={isLoading}
                 className="flex-1 overflow-y-auto p-4 space-y-4 scroll-smooth"
             >
                 {messages.length === 0 && (
@@ -149,10 +159,30 @@ export function ChatWindow({
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 10h.01M12 10h.01M16 10h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
                             </svg>
                         </div>
-                        <h3 className="text-xl font-semibold mb-2">Start a conversation</h3>
-                        <p className="text-muted-foreground max-w-xs">
-                            Send a message to begin interacting with the agent.
+                        <p className="text-sm font-semibold uppercase tracking-[0.2em] text-primary">Start here</p>
+                        <h3 className="mt-2 text-2xl font-semibold">Bring one concrete task</h3>
+                        <p className="mt-2 text-muted-foreground max-w-xl leading-relaxed">
+                            Ask Randi to research, summarize, draft, plan, or help you take an action. Paste notes or a link if you have them. If a connected tool is needed, you can review the request before anything sensitive runs.
                         </p>
+                        <div className="mt-6 grid w-full max-w-3xl gap-3 sm:grid-cols-2">
+                            {STARTER_PROMPTS.map((prompt) => (
+                                <button
+                                    key={prompt}
+                                    type="button"
+                                    onClick={() => void handleSendMessage(prompt)}
+                                    disabled={isLoading}
+                                    className="rounded-2xl border border-border bg-card/50 px-4 py-4 text-left text-sm font-medium text-foreground/90 transition-all hover:border-primary/40 hover:bg-card disabled:cursor-not-allowed disabled:opacity-60"
+                                >
+                                    {prompt}
+                                </button>
+                            ))}
+                        </div>
+                        <div className="mt-6 max-w-xl rounded-2xl border border-border/60 bg-background/40 p-4 text-left">
+                            <p className="text-sm font-semibold text-foreground">How approvals work</p>
+                            <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
+                                Randi only pauses when a tool request needs review. You will see the app, requested action, likely effect, and technical details before choosing whether to continue.
+                            </p>
+                        </div>
                     </div>
                 )}
 
@@ -189,12 +219,26 @@ export function ChatWindow({
                         <p className="text-sm text-rose-400">{(chatError as any)?.message || localError || "An error occurred"}</p>
                         <button
                             onClick={() => regenerate()}
-                            className="text-xs bg-red-500/20 hover:bg-red-500/30 text-red-200 px-2 py-1 rounded transition-colors whitespace-nowrap"
+                            className="text-sm bg-red-500/20 hover:bg-red-500/30 text-red-200 px-3 py-1.5 rounded transition-colors whitespace-nowrap"
                         >
-                            Retry
+                            Try again
                         </button>
                     </div>
                 )}
+                <div className="mb-3 grid gap-3 rounded-2xl border border-border/60 bg-background/40 px-4 py-3 sm:grid-cols-2">
+                    <div>
+                        <p className="text-sm font-semibold text-foreground">Best results start with context</p>
+                        <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
+                            Say what you want back, paste the source material, and mention any constraints or tone you care about.
+                        </p>
+                    </div>
+                    <div>
+                        <p className="text-sm font-semibold text-foreground">Approvals stay in chat</p>
+                        <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
+                            Planning and drafting can happen immediately. Sensitive tool actions pause here so you can approve or decline them.
+                        </p>
+                    </div>
+                </div>
                 <ChatInput
                     onSend={handleSendMessage}
                     disabled={isLoading}
