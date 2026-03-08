@@ -144,6 +144,8 @@ export async function GET() {
       connectedStatusReason: string | null;
       connectedAccountCount: number;
       connected: boolean;
+      capabilities: string[];
+      suggestedPrompt: string | null;
     }
 
     const integrations: Integration[] = allToolkits.map((toolkit: any) => {
@@ -171,6 +173,8 @@ export async function GET() {
         connectedStatusReason: preferredAccount?.statusReason ?? null,
         connectedAccountCount: accounts.length,
         connected: preferredAccount?.status === "ACTIVE",
+        capabilities: curated?.capabilities || [],
+        suggestedPrompt: curated?.suggestedPrompt || null,
       };
     });
 
