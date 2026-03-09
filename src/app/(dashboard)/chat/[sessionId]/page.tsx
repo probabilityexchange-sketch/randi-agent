@@ -14,10 +14,14 @@ interface IntegrationSummary {
   connected: boolean;
 }
 
-interface AgentSummary {
+interface SessionPayload {
   id: string;
-  slug: string;
-  name: string;
+  agentId: string;
+  agent?: {
+    id?: string;
+    name?: string;
+    slug?: string;
+  };
 }
 
 const CHAT_GUIDANCE = [
@@ -33,17 +37,20 @@ export default function ChatSessionPage() {
 
   const sessionIdFromParams = params.sessionId === "new" ? undefined : (params.sessionId as string);
   const agentIdFromUrl = searchParams.get("agentId");
+  const initialPrompt = searchParams.get("prompt")?.trim() || "";
+  const defaultAgentId = sessionIdFromParams ? agentIdFromUrl : (agentIdFromUrl || "randi-lead");
 
-  const [loading, setLoading] = useState(sessionIdFromParams ? true : false);
+  const [loading, setLoading] = useState(Boolean(sessionIdFromParams) || Boolean(defaultAgentId));
   const [initialMessages, setInitialMessages] = useState<Message[]>([]);
-  const [agentName, setAgentName] = useState("Agent");
-  const [currentAgentId, setCurrentAgentId] = useState<string | null>(agentIdFromUrl);
+  const [agentName, setAgentName] = useState(defaultAgentId ? "Randi" : "Agent");
+  const [currentAgentId, setCurrentAgentId] = useState<string | null>(defaultAgentId);
   const [sessionId, setSessionId] = useState<string | undefined>(sessionIdFromParams);
   const [selectedModel, setSelectedModel] = useState("meta-llama/llama-3.3-70b-instruct:free");
   const [isCustomizeOpen, setIsCustomizeOpen] = useState(false);
   const [advancedOpen, setAdvancedOpen] = useState(false);
   const [connectedIntegrations, setConnectedIntegrations] = useState<IntegrationSummary[]>([]);
   const [toolsLoading, setToolsLoading] = useState(true);
+  const [sessionError, setSessionError] = useState<string | null>(null);
 
   useEffect(() => {
     const savedModel = localStorage.getItem("randi_selected_model");
@@ -72,46 +79,111 @@ export default function ChatSessionPage() {
   }, []);
 
   useEffect(() => {
-    if (sessionId) {
-      fetch(`/api/chat/sessions/${sessionId}`)
-        .then((res) => res.json())
-        .then((data) => {
-          const messages = Array.isArray(data?.messages)
-            ? data.messages.map((message: {
-              id?: string;
-              role?: "user" | "assistant" | "system";
-              content?: string;
-              createdAt?: string | Date;
-            }) => ({
-              id: message.id || crypto.randomUUID(),
-              role: message.role || "assistant",
-              content: typeof message.content === "string" ? message.content : "",
-              createdAt:
-                message.createdAt instanceof Date
-                  ? message.createdAt
-                  : new Date(message.createdAt || Date.now()),
-            }))
-            : [];
-
-          setInitialMessages(messages);
-          setAgentName(typeof data?.agent?.name === "string" ? data.agent.name : "Agent");
-          if (data?.agent?.id) setCurrentAgentId(data.agent.id);
-          setLoading(false);
-        })
-        .catch((err) => {
-          console.error("Error fetching session:", err);
-          setLoading(false);
-        });
-    } else if (agentIdFromUrl) {
-      fetch(`/api/agents`)
-        .then((res) => res.json())
-        .then((data) => {
-          const agent = (data.agents as AgentSummary[]).find((item) => item.id === agentIdFromUrl || item.slug === agentIdFromUrl);
-          if (agent) setAgentName(agent.name);
-        })
-        .catch((err) => console.error("Error fetching agent:", err));
+    if (sessionIdFromParams || sessionId || !currentAgentId) {
+      if (!sessionIdFromParams && !sessionId && !currentAgentId) {
+        setLoading(false);
+      }
+      return;
     }
-  }, [sessionId, agentIdFromUrl]);
+
+    let cancelled = false;
+
+    const createSession = async () => {
+      setLoading(true);
+      setSessionError(null);
+
+      try {
+        const response = await fetch("/api/chat/start", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ agentId: currentAgentId }),
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || !data?.session?.id) {
+          throw new Error(data?.error || "Failed to prepare a chat session.");
+        }
+
+        if (cancelled) return;
+
+        const session = data.session as SessionPayload;
+        setSessionId(session.id);
+        setInitialMessages([]);
+        setAgentName(typeof session.agent?.name === "string" ? session.agent.name : "Randi");
+        if (session.agentId) setCurrentAgentId(session.agentId);
+        setLoading(false);
+
+        const promptSuffix = initialPrompt ? `?prompt=${encodeURIComponent(initialPrompt)}` : "";
+        router.replace(`/chat/${session.id}${promptSuffix}`);
+      } catch (err) {
+        if (cancelled) return;
+        console.error("Error creating chat session:", err);
+        setSessionError(err instanceof Error ? err.message : "Failed to prepare a chat session.");
+        setLoading(false);
+      }
+    };
+
+    void createSession();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [sessionIdFromParams, sessionId, currentAgentId, router, initialPrompt]);
+
+  useEffect(() => {
+    if (!sessionId) return;
+
+    let cancelled = false;
+
+    const loadSession = async () => {
+      setLoading(true);
+      setSessionError(null);
+
+      try {
+        const response = await fetch(`/api/chat/sessions/${sessionId}`);
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok) {
+          throw new Error(data?.error || "Failed to load chat session.");
+        }
+
+        if (cancelled) return;
+
+        const messages = Array.isArray(data?.messages)
+          ? data.messages.map((message: {
+            id?: string;
+            role?: "user" | "assistant" | "system" | "tool";
+            content?: string;
+            createdAt?: string | Date;
+          }) => ({
+            id: message.id || crypto.randomUUID(),
+            role: message.role || "assistant",
+            content: typeof message.content === "string" ? message.content : "",
+            createdAt:
+              message.createdAt instanceof Date
+                ? message.createdAt
+                : new Date(message.createdAt || Date.now()),
+          }))
+          : [];
+
+        setInitialMessages(messages);
+        setAgentName(typeof data?.agent?.name === "string" ? data.agent.name : "Agent");
+        if (data?.agent?.id) setCurrentAgentId(data.agent.id);
+        setLoading(false);
+      } catch (err) {
+        if (cancelled) return;
+        console.error("Error fetching session:", err);
+        setSessionError(err instanceof Error ? err.message : "Failed to load chat session.");
+        setLoading(false);
+      }
+    };
+
+    void loadSession();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [sessionId]);
 
   const currentModelLabel = useMemo(() => {
     const suffix = selectedModel.split("/").pop();
@@ -127,7 +199,7 @@ export default function ChatSessionPage() {
     );
   }
 
-  if (!agentIdFromUrl && !sessionId) {
+  if (!currentAgentId && !sessionId) {
     return (
       <div className="h-full flex items-center justify-center text-center p-8">
         <div>
@@ -143,14 +215,41 @@ export default function ChatSessionPage() {
     );
   }
 
+  if (!sessionId) {
+    return (
+      <div className="h-full flex items-center justify-center p-8">
+        <div className="max-w-md rounded-2xl border border-rose-500/20 bg-rose-500/10 p-6 text-center">
+          <h2 className="text-2xl font-bold">Couldn’t prepare the chat</h2>
+          <p className="mt-3 text-sm text-rose-200/90">
+            {sessionError || "Randi’s session did not initialize correctly. Please retry and I’ll prepare a fresh chat."}
+          </p>
+          <div className="mt-5 flex justify-center gap-3">
+            <button
+              onClick={() => router.refresh()}
+              className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-primary/90"
+            >
+              Retry
+            </button>
+            <button
+              onClick={() => router.push("/chat")}
+              className="rounded-xl border border-border px-4 py-2 text-sm font-semibold transition-colors hover:bg-muted"
+            >
+              Back to chat hub
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="flex flex-col h-[calc(100vh-3.5rem)] max-w-5xl mx-auto p-4 md:p-6">
-      <div className="mb-4 space-y-4">
+    <div className="flex flex-col h-[calc(100vh-3.5rem)] max-w-5xl mx-auto p-4 md:p-6 gap-4">
+      <div className="rounded-2xl border border-border bg-card/40 p-4 space-y-4">
         <div className="flex items-center justify-between flex-wrap gap-4">
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.push("/chat")}
-              aria-label="Back to chat hub"
+              aria-label="Back to chat"
               className="p-2 hover:bg-muted rounded-full transition-colors"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -165,47 +264,85 @@ export default function ChatSessionPage() {
               </div>
             </div>
           </div>
-          <div className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-4 py-2 text-sm font-medium text-emerald-400">
-            Sensitive tool actions pause here for review
+          <div className="flex flex-wrap items-center gap-2">
+            <span className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5 text-sm font-medium text-emerald-400">
+              Sensitive tool actions pause for review
+            </span>
+            <span className="rounded-full border border-border bg-background/40 px-3 py-1.5 text-sm font-medium text-muted-foreground">
+              {toolsLoading ? "Checking tools…" : `${connectedCount} tool${connectedCount === 1 ? "" : "s"} ready`}
+            </span>
+            <span className="rounded-full border border-border bg-background/40 px-3 py-1.5 text-sm font-medium text-muted-foreground">
+              {currentModelLabel}
+            </span>
           </div>
         </div>
 
-        <div className="grid gap-3 lg:grid-cols-[1.2fr_0.8fr]">
-          <div className="rounded-2xl border border-border bg-card/40 p-4">
-            <p className="text-sm font-semibold text-primary">Core chat</p>
-            <h3 className="mt-2 text-xl font-black tracking-tight">Ask for a real result, not just a topic</h3>
-            <ul className="mt-4 space-y-3">
-              {CHAT_GUIDANCE.map((item) => (
-                <li key={item} className="flex gap-3">
-                  <span className="mt-1 h-2.5 w-2.5 flex-shrink-0 rounded-full bg-primary/80" aria-hidden="true" />
-                  <p className="text-sm text-muted-foreground leading-relaxed">{item}</p>
-                </li>
-              ))}
-            </ul>
+        <div className="flex flex-wrap gap-2">
+          {CHAT_GUIDANCE.map((item) => (
+            <span
+              key={item}
+              className="rounded-full border border-border bg-background/40 px-3 py-1.5 text-sm text-muted-foreground"
+            >
+              {item}
+            </span>
+          ))}
+        </div>
 
-            <div className="mt-4 rounded-2xl border border-border/60 bg-background/40 p-4">
-              <p className="text-sm font-semibold text-foreground">Approval review stays calm and visible</p>
-              <p className="mt-1 text-sm text-muted-foreground leading-relaxed">
-                When approval is needed, Randi pauses in chat and shows what app is involved, what she wants to do, what it likely affects, and what approving or declining means.
-              </p>
-            </div>
+        <div className="flex flex-wrap gap-3 text-sm">
+          <Link href="/integrations" className="font-semibold text-primary hover:underline">
+            {connectedCount > 0 ? "Manage tools" : "Connect tools"}
+          </Link>
+          <Link href="/how-it-works" className="font-semibold text-primary hover:underline">
+            Getting Started
+          </Link>
+        </div>
+
+        {sessionError && (
+          <div className="rounded-xl border border-rose-500/20 bg-rose-500/10 px-4 py-3 text-sm text-rose-300">
+            {sessionError}
           </div>
+        )}
+      </div>
 
-          <div className="rounded-2xl border border-border bg-card/40 p-4">
-            <p className="text-sm font-semibold text-primary">Connected tools</p>
-            <h3 className="mt-2 text-xl font-black tracking-tight">
-              {toolsLoading ? "Checking tools…" : `${connectedCount} tool${connectedCount === 1 ? "" : "s"} ready`}
-            </h3>
-            <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-              {connectedCount > 0
-                ? "Connected tools can help when the task needs real context or actions outside chat."
-                : "No tools connected yet. You can still use chat for planning, analysis, and drafting."}
+      <div className="flex-1 min-h-[28rem]">
+        <ChatWindow
+          key={sessionId || `new-${currentAgentId || "agent"}`}
+          agentId={currentAgentId || ""}
+          sessionId={sessionId}
+          model={selectedModel}
+          initialMessages={initialMessages}
+          initialDraft={initialMessages.length === 0 ? initialPrompt : ""}
+        />
+      </div>
+
+      <div className="rounded-2xl border border-dashed border-border bg-card/20 p-4">
+        <div className="flex items-center justify-between gap-4 flex-wrap">
+          <div>
+            <p className="text-sm font-semibold text-foreground">Workspace details</p>
+            <p className="mt-1 text-sm text-muted-foreground">
+              Model choice and agent controls live here so the main conversation stays visible first.
             </p>
-            <div className="mt-4 flex flex-wrap gap-2">
+          </div>
+          <button
+            onClick={() => setAdvancedOpen((open) => !open)}
+            aria-expanded={advancedOpen}
+            aria-controls="advanced-chat-controls"
+            className="inline-flex items-center gap-2 rounded-xl border border-border bg-muted/50 px-4 py-2 text-sm font-medium transition-colors hover:bg-muted"
+          >
+            <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+            </svg>
+            {advancedOpen ? "Hide workspace details" : "Show workspace details"}
+          </button>
+        </div>
+
+        {advancedOpen && (
+          <div id="advanced-chat-controls" className="mt-4 rounded-2xl border border-border bg-card/30 p-4 space-y-4">
+            <div className="flex flex-wrap gap-2">
               {toolsLoading ? (
                 <span className="text-sm text-muted-foreground">Checking connected tools…</span>
               ) : connectedCount > 0 ? (
-                connectedIntegrations.slice(0, 5).map((integration) => (
+                connectedIntegrations.slice(0, 6).map((integration) => (
                   <span
                     key={integration.slug}
                     className="rounded-full border border-emerald-500/20 bg-emerald-500/10 px-3 py-1.5 text-sm font-medium text-emerald-400"
@@ -217,50 +354,8 @@ export default function ChatSessionPage() {
                 <span className="text-sm text-muted-foreground">No tools connected yet.</span>
               )}
             </div>
-            <div className="mt-4 space-y-3 text-sm">
-              <div>
-                <p className="text-muted-foreground">Current model</p>
-                <p className="font-semibold mt-1">{currentModelLabel}</p>
-              </div>
-              <div>
-                <p className="text-muted-foreground">Approval behavior</p>
-                <p className="font-semibold mt-1">Sensitive actions can ask for review before running.</p>
-              </div>
-            </div>
-            <div className="mt-4 flex flex-wrap gap-3">
-              <Link href="/integrations" className="text-sm font-semibold text-primary hover:underline">
-                {connectedCount > 0 ? "Manage tools" : "Connect tools"}
-              </Link>
-              <Link href="/how-it-works" className="text-sm font-semibold text-primary hover:underline">
-                Getting Started
-              </Link>
-            </div>
-          </div>
-        </div>
 
-        <div className="rounded-2xl border border-dashed border-border bg-card/20 p-4">
-          <div className="flex items-center justify-between gap-4 flex-wrap">
-            <div>
-              <p className="text-sm font-semibold text-foreground">Advanced controls</p>
-              <p className="mt-1 text-sm text-muted-foreground">
-                Optional settings for model choice and agent customization. These do not override approval review.
-              </p>
-            </div>
-            <button
-              onClick={() => setAdvancedOpen((open) => !open)}
-              aria-expanded={advancedOpen}
-              aria-controls="advanced-chat-controls"
-              className="inline-flex items-center gap-2 rounded-xl border border-border bg-muted/50 px-4 py-2 text-sm font-medium transition-colors hover:bg-muted"
-            >
-              <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
-              </svg>
-              {advancedOpen ? "Hide advanced controls" : "Show advanced controls"}
-            </button>
-          </div>
-
-          {advancedOpen && (
-            <div id="advanced-chat-controls" className="mt-4 flex flex-wrap items-center gap-3 rounded-2xl border border-border bg-card/30 p-4">
+            <div className="flex flex-wrap items-center gap-3">
               <button
                 onClick={() => setIsCustomizeOpen(true)}
                 className="flex items-center gap-2 px-3 py-2 bg-muted/50 hover:bg-muted border border-border rounded-lg text-sm font-medium transition-colors"
@@ -268,30 +363,13 @@ export default function ChatSessionPage() {
                 <svg className="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
                 </svg>
-                <span>Customize agent</span>
+                <span>Agent overrides</span>
               </button>
               <ModelSelector selectedModel={selectedModel} onChange={setSelectedModel} />
               {currentAgentId && <RuntimeBadge agentId={currentAgentId} sessionId={sessionId} />}
             </div>
-          )}
-        </div>
-      </div>
-
-      <div className="flex-1 min-h-0">
-        <ChatWindow
-          key={sessionId || `new-${currentAgentId || "agent"}`}
-          agentId={currentAgentId || ""}
-          sessionId={sessionId}
-          model={selectedModel}
-          initialMessages={initialMessages}
-          onSessionCreated={(newSessionId) => {
-            setSessionId(newSessionId);
-            if (!sessionId && typeof window !== "undefined") {
-              const suffix = currentAgentId ? `?agentId=${encodeURIComponent(currentAgentId)}` : "";
-              window.history.replaceState(window.history.state, "", `/chat/${newSessionId}${suffix}`);
-            }
-          }}
-        />
+          </div>
+        )}
       </div>
 
       {currentAgentId && (

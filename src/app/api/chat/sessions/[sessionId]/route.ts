@@ -18,7 +18,7 @@ export async function GET(
       where: { id: sessionId },
       include: {
         agent: {
-          select: { name: true },
+          select: { id: true, name: true, slug: true },
         },
       },
     });

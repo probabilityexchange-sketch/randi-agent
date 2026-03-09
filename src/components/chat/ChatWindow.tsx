@@ -33,7 +33,7 @@ interface ChatWindowProps {
     sessionId?: string;
     model: string;
     initialMessages?: Message[];
-    onSessionCreated?: (sessionId: string) => void;
+    initialDraft?: string;
 }
 
 export function ChatWindow({
@@ -41,6 +41,7 @@ export function ChatWindow({
     sessionId,
     model,
     initialMessages = [],
+    initialDraft = "",
 }: ChatWindowProps) {
     const scrollRef = useRef<HTMLDivElement>(null);
     const [localError, setLocalError] = useState<string | null>(null);
@@ -143,7 +144,7 @@ export function ChatWindow({
     }, [sendMessage]);
 
     return (
-        <div className="flex flex-col h-full bg-card/30 rounded-xl border border-border overflow-hidden">
+        <div className="flex flex-col h-full min-h-[24rem] bg-card/30 rounded-xl border border-border overflow-hidden">
             <div
                 ref={scrollRef}
                 role="log"
@@ -242,6 +243,7 @@ export function ChatWindow({
                 <ChatInput
                     onSend={handleSendMessage}
                     disabled={isLoading}
+                    initialValue={initialDraft}
                 />
             </div>
         </div>

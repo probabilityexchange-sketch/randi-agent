@@ -5,10 +5,11 @@ import { useEffect, useId, useRef, useState, type ChangeEvent, type KeyboardEven
 interface ChatInputProps {
     onSend: (message: string) => void;
     disabled?: boolean;
+    initialValue?: string;
 }
 
-export function ChatInput({ onSend, disabled }: ChatInputProps) {
-    const [input, setInput] = useState("");
+export function ChatInput({ onSend, disabled, initialValue = "" }: ChatInputProps) {
+    const [input, setInput] = useState(initialValue);
     const [isListening, setIsListening] = useState(false);
     const [supportsVoice, setSupportsVoice] = useState(false);
     const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -58,6 +59,19 @@ export function ChatInput({ onSend, disabled }: ChatInputProps) {
             }
         }
     }, []);
+
+    useEffect(() => {
+        if (!initialValue) return;
+
+        setInput((current) => current.trim().length > 0 ? current : initialValue);
+
+        requestAnimationFrame(() => {
+            if (textareaRef.current) {
+                textareaRef.current.style.height = "auto";
+                textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+            }
+        });
+    }, [initialValue]);
 
     const toggleListening = () => {
         if (isListening) {
