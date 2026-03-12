@@ -1,6 +1,18 @@
-import { PrismaClient } from "@prisma/client";
+import "dotenv/config";
+import { PrismaPg } from "@prisma/adapter-pg";
+import { PrismaClient } from "../src/generated/prisma/client";
 
-const prisma = new PrismaClient();
+const connectionString =
+  process.env.DIRECT_URL?.trim() ||
+  process.env.POSTGRES_URL_NON_POOLING?.trim() ||
+  process.env.DATABASE_URL?.trim() ||
+  process.env.POSTGRES_PRISMA_URL?.trim() ||
+  process.env.POSTGRES_URL?.trim() ||
+  "";
+
+const prisma = new PrismaClient({
+  adapter: new PrismaPg({ connectionString }),
+});
 
 async function main() {
   const researchTools = JSON.stringify({

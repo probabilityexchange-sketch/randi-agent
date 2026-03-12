@@ -1,5 +1,5 @@
 import { createHash } from "crypto";
-import { Prisma } from "@prisma/client";
+import { Prisma } from "@/generated/prisma/client";
 
 type UsernameClient = Pick<Prisma.TransactionClient, "user">;
 
