@@ -72,6 +72,19 @@ export function useContainers() {
     return data;
   };
 
+  const snapshotContainer = async (containerId: string, agentSlug: string) => {
+    const res = await fetchApi(`/api/containers/${containerId}/snapshot`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ agentSlug }),
+    });
+    if (!res.ok) {
+      const err = await res.json();
+      throw new Error(err.error);
+    }
+    return await res.json();
+  };
+
   return {
     containers,
     loading,
@@ -79,6 +92,7 @@ export function useContainers() {
     launchContainer,
     stopContainer,
     extendContainer,
+    snapshotContainer,
     refresh: fetchContainers,
   };
 }

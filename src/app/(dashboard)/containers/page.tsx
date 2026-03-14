@@ -3,12 +3,25 @@
 import Link from "next/link";
 import { useContainers } from "@/hooks/useContainers";
 import { ContainerCard } from "@/components/containers/ContainerCard";
+import { useState } from "react";
 
 export default function ContainersPage() {
-  const { containers, loading, stopContainer } = useContainers();
+  const { containers, loading, stopContainer, snapshotContainer } = useContainers();
+  const [snapshotStatus, setSnapshotStatus] = useState<Record<string, boolean>>({});
 
   const active = containers.filter((c) => c.status === "RUNNING");
   const inactive = containers.filter((c) => c.status !== "RUNNING");
+
+  const handleSnapshot = async (containerId: string, agentId: string) => {
+    setSnapshotStatus(prev => ({ ...prev, [containerId]: true }));
+    try {
+      await snapshotContainer(containerId, agentId);
+    } catch (error) {
+      console.error("Snapshot failed:", error);
+    } finally {
+      setSnapshotStatus(prev => ({ ...prev, [containerId]: false }));
+    }
+  };
 
   return (
     <div className="max-w-5xl">
@@ -47,6 +60,8 @@ export default function ContainersPage() {
                     key={container.id}
                     container={container}
                     onStop={stopContainer}
+                    onSnapshot={() => handleSnapshot(container.id, container.agentId)}
+                    snapshotting={snapshotStatus[container.id] || false}
                   />
                 ))}
               </div>

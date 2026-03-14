@@ -528,3 +528,31 @@ if (SSL_KEY_PATH && SSL_CERT_PATH) {
         console.warn("WARNING: Running on plain HTTP. Use a reverse proxy or provide SSL_KEY_PATH/SSL_CERT_PATH for production.");
     });
 }
+
+// --- SNAPSHOT ENDPOINT ---
+app.post('/containers/:id/snapshot', auth, async (req, res) => {
+    const { userId, agentSlug } = req.body;
+    if (!userId || !agentSlug) {
+        return res.status(400).json({ error: "userId and agentSlug are required" });
+    }
+
+    try {
+        const container = docker.getContainer(req.params.id);
+        // Determine volume name from container labels
+        const info = await container.inspect().catch(() => null);
+        const binds = info?.HostConfig?.Binds || [];
+        const volumeBind = binds.find((b) => b.includes('ap-storage'));
+        const volumeName = volumeBind ? volumeBind.split(':')[0] : null;
+        
+        if (!volumeName) {
+            return res.status(400).json({ error: "No storage volume found for container" });
+        }
+
+        await snapshotVolumeAndUpload(volumeName, userId, agentSlug, 
+            crypto.createHash('sha256').update(`${userId}:${agentSlug}`).digest('hex').slice(0, 16));
+        res.json({ success: true });
+    } catch (err) {
+        console.error('[Bridge] Snapshot failed:', err.message);
+        res.status(500).json({ error: err.message });
+    }
+});

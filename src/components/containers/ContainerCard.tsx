@@ -3,18 +3,24 @@
 import Link from "next/link";
 import type { ContainerInfo } from "@/types/container";
 import { StatusBadge } from "./StatusBadge";
+import { StorageCard } from "@/components/storage/StorageCard";
+import { useStorage } from "@/hooks/useStorage";
 
 interface ContainerCardProps {
   container: ContainerInfo;
   onStop: (id: string) => void;
+  onSnapshot?: () => Promise<void>;
+  snapshotting?: boolean;
 }
 
-export function ContainerCard({ container, onStop }: ContainerCardProps) {
+export function ContainerCard({ container, onStop, onSnapshot, snapshotting = false }: ContainerCardProps) {
   const expiresAt = new Date(container.expiresAt);
   const now = new Date();
   const timeLeft = expiresAt.getTime() - now.getTime();
   const hoursLeft = Math.max(0, Math.floor(timeLeft / (1000 * 60 * 60)));
   const minutesLeft = Math.max(0, Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60)));
+
+  const { storage, loading: storageLoading } = useStorage();
 
   return (
     <div className="bg-card border border-border rounded-xl p-5">
@@ -44,7 +50,7 @@ export function ContainerCard({ container, onStop }: ContainerCardProps) {
         </div>
       )}
 
-      <div className="flex items-center justify-between text-sm text-muted-foreground">
+      <div className="flex items-center justify-between text-sm text-muted-foreground mb-4">
         <span>
           {container.status === "RUNNING"
             ? `${hoursLeft}h ${minutesLeft}m remaining`
@@ -67,6 +73,19 @@ export function ContainerCard({ container, onStop }: ContainerCardProps) {
           )}
         </div>
       </div>
+
+      {/* Storage Section */}
+      {container.status === "RUNNING" && (
+        <div className="mt-4">
+          <StorageCard
+            agentSlug={container.agentId}
+            storage={storage}
+            loading={storageLoading}
+            onSnapshot={onSnapshot}
+            snapshotting={snapshotting}
+          />
+        </div>
+      )}
     </div>
   );
 }

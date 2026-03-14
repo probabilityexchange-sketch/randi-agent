@@ -4,7 +4,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
 }
 
 model User {
@@ -45,6 +45,9 @@ model User {
   cryptoGuardrailConfig CryptoGuardrailConfig?
   cryptoDestinationAllowlistEntries CryptoDestinationAllowlistEntry[]
   cryptoAuditLogs    CryptoAuditLog[]
+  // Marketplace relations
+  ownedAgents        AgentConfig[] @relation(name: "AgentOwner")
+  rentalsAsRenter    AgentRental[] @relation("AgentRentalRenter")
 }
 
 model Session {
@@ -60,7 +63,6 @@ model Session {
   @@index([userId])
   @@index([jti])
 }
-
 
 
 model Container {
@@ -185,6 +187,13 @@ model AgentConfig {
   tools          String  @default("[]")
   defaultModel   String  @default("meta-llama/llama-3.3-70b-instruct:free")
   active         Boolean @default(true)
+  // Marketplace fields
+  pricePerSession Int     @default(0) // Price in platform credits per session
+  isPublic       Boolean @default(false)
+  ownerId        String
+  owner          User    @relation(name: "AgentOwner", fields: [ownerId], references: [id])
+  // Reverse relations
+  rentals        AgentRental[] @relation("AgentRental")
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt
 
@@ -192,20 +201,22 @@ model AgentConfig {
   chatSessions ChatSession[]
 }
 
-model StorageVolume {
-  id          String    @id @default(cuid())
-  userId      String
-  agentSlug   String
-  storageKey  String    @unique  // deterministic hash of userId:agentSlug
-  sizeBytes   BigInt?            // size of last snapshot
-  snapshotPath String?           // Supabase Storage object path
-  lastSyncAt  DateTime?
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+model AgentRental {
+  id          String   @id @default(cuid())
+  renterId    String   // User who is renting
+  renter      User     @relation(fields: [renterId], references: [id], onDelete: Cascade, name: "AgentRentalRenter")
+  agentId     String   // Agent being rented
+  agent       AgentConfig @relation(fields: [agentId], references: [id], onDelete: Cascade, name: "AgentRental")
+  startTime   DateTime @default(now())
+  endTime     DateTime?
+  pricePaid   Int      // Price in platform credits paid for this rental
+  status      String   @default("active") // active, completed, cancelled
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@index([userId, agentSlug])
+  @@index([renterId])
+  @@index([agentId])
+  @@index([status])
 }
 
 model UserAgentPreference {
@@ -466,6 +477,22 @@ model CryptoAuditLog {
   @@index([userId, createdAt])
   @@index([workflowId, createdAt])
   @@index([decision, cryptoActionType])
+}
+
+model StorageVolume {
+  id          String    @id @default(cuid())
+  userId      String
+  agentSlug   String
+  storageKey  String    @unique  // deterministic hash of userId:agentSlug
+  sizeBytes   BigInt?            // size of last snapshot
+  snapshotPath String?           // Supabase Storage object path
+  lastSyncAt  DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, agentSlug])
 }
 
 model FleetStats {
