@@ -476,7 +476,6 @@ export type ToolApprovalCreateOrConnectWithoutSessionInput = {
 
 export type ToolApprovalCreateManySessionInputEnvelope = {
   data: Prisma.ToolApprovalCreateManySessionInput | Prisma.ToolApprovalCreateManySessionInput[]
-  skipDuplicates?: boolean
 }
 
 export type ToolApprovalUpsertWithWhereUniqueWithoutSessionInput = {
@@ -1295,7 +1294,6 @@ export type ToolApprovalCreateManyArgs<ExtArgs extends runtime.Types.Extensions.
    * The data used to create many ToolApprovals.
    */
   data: Prisma.ToolApprovalCreateManyInput | Prisma.ToolApprovalCreateManyInput[]
-  skipDuplicates?: boolean
 }
 
 /**
@@ -1314,7 +1312,6 @@ export type ToolApprovalCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Ex
    * The data used to create many ToolApprovals.
    */
   data: Prisma.ToolApprovalCreateManyInput | Prisma.ToolApprovalCreateManyInput[]
-  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */

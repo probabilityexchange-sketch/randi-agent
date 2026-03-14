@@ -392,7 +392,7 @@ export const ModelName = {
   ChatMessage: 'ChatMessage',
   TokenTransaction: 'TokenTransaction',
   AgentConfig: 'AgentConfig',
-  StorageVolume: 'StorageVolume',
+  AgentRental: 'AgentRental',
   UserAgentPreference: 'UserAgentPreference',
   ToolApproval: 'ToolApproval',
   Workflow: 'Workflow',
@@ -404,6 +404,7 @@ export const ModelName = {
   CryptoGuardrailConfig: 'CryptoGuardrailConfig',
   CryptoDestinationAllowlistEntry: 'CryptoDestinationAllowlistEntry',
   CryptoAuditLog: 'CryptoAuditLog',
+  StorageVolume: 'StorageVolume',
   FleetStats: 'FleetStats'
 } as const
 
@@ -420,7 +421,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "container" | "chatSession" | "agentRuntime" | "chatMessage" | "tokenTransaction" | "agentConfig" | "storageVolume" | "userAgentPreference" | "toolApproval" | "workflow" | "workflowRun" | "workflowSchedule" | "policyDecision" | "approvalRequest" | "policyAuditLog" | "cryptoGuardrailConfig" | "cryptoDestinationAllowlistEntry" | "cryptoAuditLog" | "fleetStats"
+    modelProps: "user" | "session" | "container" | "chatSession" | "agentRuntime" | "chatMessage" | "tokenTransaction" | "agentConfig" | "agentRental" | "userAgentPreference" | "toolApproval" | "workflow" | "workflowRun" | "workflowSchedule" | "policyDecision" | "approvalRequest" | "policyAuditLog" | "cryptoGuardrailConfig" | "cryptoDestinationAllowlistEntry" | "cryptoAuditLog" | "storageVolume" | "fleetStats"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -1016,77 +1017,77 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
-    StorageVolume: {
-      payload: Prisma.$StorageVolumePayload<ExtArgs>
-      fields: Prisma.StorageVolumeFieldRefs
+    AgentRental: {
+      payload: Prisma.$AgentRentalPayload<ExtArgs>
+      fields: Prisma.AgentRentalFieldRefs
       operations: {
         findUnique: {
-          args: Prisma.StorageVolumeFindUniqueArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$StorageVolumePayload> | null
+          args: Prisma.AgentRentalFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentRentalPayload> | null
         }
         findUniqueOrThrow: {
-          args: Prisma.StorageVolumeFindUniqueOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$StorageVolumePayload>
+          args: Prisma.AgentRentalFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentRentalPayload>
         }
         findFirst: {
-          args: Prisma.StorageVolumeFindFirstArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$StorageVolumePayload> | null
+          args: Prisma.AgentRentalFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentRentalPayload> | null
         }
         findFirstOrThrow: {
-          args: Prisma.StorageVolumeFindFirstOrThrowArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$StorageVolumePayload>
+          args: Prisma.AgentRentalFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentRentalPayload>
         }
         findMany: {
-          args: Prisma.StorageVolumeFindManyArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$StorageVolumePayload>[]
+          args: Prisma.AgentRentalFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentRentalPayload>[]
         }
         create: {
-          args: Prisma.StorageVolumeCreateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$StorageVolumePayload>
+          args: Prisma.AgentRentalCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentRentalPayload>
         }
         createMany: {
-          args: Prisma.StorageVolumeCreateManyArgs<ExtArgs>
+          args: Prisma.AgentRentalCreateManyArgs<ExtArgs>
           result: BatchPayload
         }
         createManyAndReturn: {
-          args: Prisma.StorageVolumeCreateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$StorageVolumePayload>[]
+          args: Prisma.AgentRentalCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentRentalPayload>[]
         }
         delete: {
-          args: Prisma.StorageVolumeDeleteArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$StorageVolumePayload>
+          args: Prisma.AgentRentalDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentRentalPayload>
         }
         update: {
-          args: Prisma.StorageVolumeUpdateArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$StorageVolumePayload>
+          args: Prisma.AgentRentalUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentRentalPayload>
         }
         deleteMany: {
-          args: Prisma.StorageVolumeDeleteManyArgs<ExtArgs>
+          args: Prisma.AgentRentalDeleteManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateMany: {
-          args: Prisma.StorageVolumeUpdateManyArgs<ExtArgs>
+          args: Prisma.AgentRentalUpdateManyArgs<ExtArgs>
           result: BatchPayload
         }
         updateManyAndReturn: {
-          args: Prisma.StorageVolumeUpdateManyAndReturnArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$StorageVolumePayload>[]
+          args: Prisma.AgentRentalUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentRentalPayload>[]
         }
         upsert: {
-          args: Prisma.StorageVolumeUpsertArgs<ExtArgs>
-          result: runtime.Types.Utils.PayloadToResult<Prisma.$StorageVolumePayload>
+          args: Prisma.AgentRentalUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$AgentRentalPayload>
         }
         aggregate: {
-          args: Prisma.StorageVolumeAggregateArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.AggregateStorageVolume>
+          args: Prisma.AgentRentalAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateAgentRental>
         }
         groupBy: {
-          args: Prisma.StorageVolumeGroupByArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.StorageVolumeGroupByOutputType>[]
+          args: Prisma.AgentRentalGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AgentRentalGroupByOutputType>[]
         }
         count: {
-          args: Prisma.StorageVolumeCountArgs<ExtArgs>
-          result: runtime.Types.Utils.Optional<Prisma.StorageVolumeCountAggregateOutputType> | number
+          args: Prisma.AgentRentalCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AgentRentalCountAggregateOutputType> | number
         }
       }
     }
@@ -1904,6 +1905,80 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    StorageVolume: {
+      payload: Prisma.$StorageVolumePayload<ExtArgs>
+      fields: Prisma.StorageVolumeFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.StorageVolumeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StorageVolumePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.StorageVolumeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StorageVolumePayload>
+        }
+        findFirst: {
+          args: Prisma.StorageVolumeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StorageVolumePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.StorageVolumeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StorageVolumePayload>
+        }
+        findMany: {
+          args: Prisma.StorageVolumeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StorageVolumePayload>[]
+        }
+        create: {
+          args: Prisma.StorageVolumeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StorageVolumePayload>
+        }
+        createMany: {
+          args: Prisma.StorageVolumeCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.StorageVolumeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StorageVolumePayload>[]
+        }
+        delete: {
+          args: Prisma.StorageVolumeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StorageVolumePayload>
+        }
+        update: {
+          args: Prisma.StorageVolumeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StorageVolumePayload>
+        }
+        deleteMany: {
+          args: Prisma.StorageVolumeDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.StorageVolumeUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.StorageVolumeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StorageVolumePayload>[]
+        }
+        upsert: {
+          args: Prisma.StorageVolumeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$StorageVolumePayload>
+        }
+        aggregate: {
+          args: Prisma.StorageVolumeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateStorageVolume>
+        }
+        groupBy: {
+          args: Prisma.StorageVolumeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.StorageVolumeGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.StorageVolumeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.StorageVolumeCountAggregateOutputType> | number
+        }
+      }
+    }
     FleetStats: {
       payload: Prisma.$FleetStatsPayload<ExtArgs>
       fields: Prisma.FleetStatsFieldRefs
@@ -2008,9 +2083,6 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
  */
 
 export const TransactionIsolationLevel = runtime.makeStrictEnum({
-  ReadUncommitted: 'ReadUncommitted',
-  ReadCommitted: 'ReadCommitted',
-  RepeatableRead: 'RepeatableRead',
   Serializable: 'Serializable'
 } as const)
 
@@ -2156,6 +2228,9 @@ export const AgentConfigScalarFieldEnum = {
   tools: 'tools',
   defaultModel: 'defaultModel',
   active: 'active',
+  pricePerSession: 'pricePerSession',
+  isPublic: 'isPublic',
+  ownerId: 'ownerId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -2163,19 +2238,19 @@ export const AgentConfigScalarFieldEnum = {
 export type AgentConfigScalarFieldEnum = (typeof AgentConfigScalarFieldEnum)[keyof typeof AgentConfigScalarFieldEnum]
 
 
-export const StorageVolumeScalarFieldEnum = {
+export const AgentRentalScalarFieldEnum = {
   id: 'id',
-  userId: 'userId',
-  agentSlug: 'agentSlug',
-  storageKey: 'storageKey',
-  sizeBytes: 'sizeBytes',
-  snapshotPath: 'snapshotPath',
-  lastSyncAt: 'lastSyncAt',
+  renterId: 'renterId',
+  agentId: 'agentId',
+  startTime: 'startTime',
+  endTime: 'endTime',
+  pricePaid: 'pricePaid',
+  status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
-export type StorageVolumeScalarFieldEnum = (typeof StorageVolumeScalarFieldEnum)[keyof typeof StorageVolumeScalarFieldEnum]
+export type AgentRentalScalarFieldEnum = (typeof AgentRentalScalarFieldEnum)[keyof typeof AgentRentalScalarFieldEnum]
 
 
 export const UserAgentPreferenceScalarFieldEnum = {
@@ -2391,6 +2466,21 @@ export const CryptoAuditLogScalarFieldEnum = {
 export type CryptoAuditLogScalarFieldEnum = (typeof CryptoAuditLogScalarFieldEnum)[keyof typeof CryptoAuditLogScalarFieldEnum]
 
 
+export const StorageVolumeScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  agentSlug: 'agentSlug',
+  storageKey: 'storageKey',
+  sizeBytes: 'sizeBytes',
+  snapshotPath: 'snapshotPath',
+  lastSyncAt: 'lastSyncAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type StorageVolumeScalarFieldEnum = (typeof StorageVolumeScalarFieldEnum)[keyof typeof StorageVolumeScalarFieldEnum]
+
+
 export const FleetStatsScalarFieldEnum = {
   id: 'id',
   nodeId: 'nodeId',
@@ -2416,14 +2506,6 @@ export const SortOrder = {
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
 
 
-export const QueryMode = {
-  default: 'default',
-  insensitive: 'insensitive'
-} as const
-
-export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
-
-
 export const NullsOrder = {
   first: 'first',
   last: 'last'
@@ -2446,13 +2528,6 @@ export type StringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 
 
 
 /**
- * Reference to a field of type 'String[]'
- */
-export type ListStringFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'String[]'>
-    
-
-
-/**
  * Reference to a field of type 'Int'
  */
 export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int'>
@@ -2460,23 +2535,9 @@ export type IntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'In
 
 
 /**
- * Reference to a field of type 'Int[]'
- */
-export type ListIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Int[]'>
-    
-
-
-/**
  * Reference to a field of type 'DateTime'
  */
 export type DateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime'>
-    
-
-
-/**
- * Reference to a field of type 'DateTime[]'
- */
-export type ListDateTimeFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'DateTime[]'>
     
 
 
@@ -2495,23 +2556,9 @@ export type BigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 
 
 
 /**
- * Reference to a field of type 'BigInt[]'
- */
-export type ListBigIntFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BigInt[]'>
-    
-
-
-/**
  * Reference to a field of type 'Float'
  */
 export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
-    
-
-
-/**
- * Reference to a field of type 'Float[]'
- */
-export type ListFloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float[]'>
     
 
 /**
@@ -2617,7 +2664,7 @@ export type GlobalOmitConfig = {
   chatMessage?: Prisma.ChatMessageOmit
   tokenTransaction?: Prisma.TokenTransactionOmit
   agentConfig?: Prisma.AgentConfigOmit
-  storageVolume?: Prisma.StorageVolumeOmit
+  agentRental?: Prisma.AgentRentalOmit
   userAgentPreference?: Prisma.UserAgentPreferenceOmit
   toolApproval?: Prisma.ToolApprovalOmit
   workflow?: Prisma.WorkflowOmit
@@ -2629,6 +2676,7 @@ export type GlobalOmitConfig = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigOmit
   cryptoDestinationAllowlistEntry?: Prisma.CryptoDestinationAllowlistEntryOmit
   cryptoAuditLog?: Prisma.CryptoAuditLogOmit
+  storageVolume?: Prisma.StorageVolumeOmit
   fleetStats?: Prisma.FleetStatsOmit
 }
 

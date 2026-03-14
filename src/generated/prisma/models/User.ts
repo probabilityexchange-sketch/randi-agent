@@ -348,6 +348,8 @@ export type UserWhereInput = {
   cryptoGuardrailConfig?: Prisma.XOR<Prisma.CryptoGuardrailConfigNullableScalarRelationFilter, Prisma.CryptoGuardrailConfigWhereInput> | null
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryListRelationFilter
   cryptoAuditLogs?: Prisma.CryptoAuditLogListRelationFilter
+  ownedAgents?: Prisma.AgentConfigListRelationFilter
+  rentalsAsRenter?: Prisma.AgentRentalListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -386,6 +388,8 @@ export type UserOrderByWithRelationInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigOrderByWithRelationInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryOrderByRelationAggregateInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogOrderByRelationAggregateInput
+  ownedAgents?: Prisma.AgentConfigOrderByRelationAggregateInput
+  rentalsAsRenter?: Prisma.AgentRentalOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -427,6 +431,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   cryptoGuardrailConfig?: Prisma.XOR<Prisma.CryptoGuardrailConfigNullableScalarRelationFilter, Prisma.CryptoGuardrailConfigWhereInput> | null
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryListRelationFilter
   cryptoAuditLogs?: Prisma.CryptoAuditLogListRelationFilter
+  ownedAgents?: Prisma.AgentConfigListRelationFilter
+  rentalsAsRenter?: Prisma.AgentRentalListRelationFilter
 }, "id" | "email" | "walletAddress" | "username" | "telegramId" | "telegramBotToken">
 
 export type UserOrderByWithAggregationInput = {
@@ -517,6 +523,8 @@ export type UserCreateInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigCreateNestedOneWithoutUserInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryCreateNestedManyWithoutUserInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -555,6 +563,8 @@ export type UserUncheckedCreateInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedCreateNestedOneWithoutUserInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedCreateNestedManyWithoutUserInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
 }
 
 export type UserUpdateInput = {
@@ -593,6 +603,8 @@ export type UserUpdateInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUpdateOneWithoutUserNestedInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUpdateManyWithoutUserNestedInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -631,6 +643,8 @@ export type UserUncheckedUpdateInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedUpdateOneWithoutUserNestedInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedUpdateManyWithoutUserNestedInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -874,18 +888,32 @@ export type UserUpdateOneRequiredWithoutTokenTransactionsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutTokenTransactionsInput, Prisma.UserUpdateWithoutTokenTransactionsInput>, Prisma.UserUncheckedUpdateWithoutTokenTransactionsInput>
 }
 
-export type UserCreateNestedOneWithoutStorageVolumesInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutStorageVolumesInput, Prisma.UserUncheckedCreateWithoutStorageVolumesInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutStorageVolumesInput
+export type UserCreateNestedOneWithoutOwnedAgentsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutOwnedAgentsInput, Prisma.UserUncheckedCreateWithoutOwnedAgentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutOwnedAgentsInput
   connect?: Prisma.UserWhereUniqueInput
 }
 
-export type UserUpdateOneRequiredWithoutStorageVolumesNestedInput = {
-  create?: Prisma.XOR<Prisma.UserCreateWithoutStorageVolumesInput, Prisma.UserUncheckedCreateWithoutStorageVolumesInput>
-  connectOrCreate?: Prisma.UserCreateOrConnectWithoutStorageVolumesInput
-  upsert?: Prisma.UserUpsertWithoutStorageVolumesInput
+export type UserUpdateOneRequiredWithoutOwnedAgentsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutOwnedAgentsInput, Prisma.UserUncheckedCreateWithoutOwnedAgentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutOwnedAgentsInput
+  upsert?: Prisma.UserUpsertWithoutOwnedAgentsInput
   connect?: Prisma.UserWhereUniqueInput
-  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutStorageVolumesInput, Prisma.UserUpdateWithoutStorageVolumesInput>, Prisma.UserUncheckedUpdateWithoutStorageVolumesInput>
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutOwnedAgentsInput, Prisma.UserUpdateWithoutOwnedAgentsInput>, Prisma.UserUncheckedUpdateWithoutOwnedAgentsInput>
+}
+
+export type UserCreateNestedOneWithoutRentalsAsRenterInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutRentalsAsRenterInput, Prisma.UserUncheckedCreateWithoutRentalsAsRenterInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutRentalsAsRenterInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutRentalsAsRenterNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutRentalsAsRenterInput, Prisma.UserUncheckedCreateWithoutRentalsAsRenterInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutRentalsAsRenterInput
+  upsert?: Prisma.UserUpsertWithoutRentalsAsRenterInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutRentalsAsRenterInput, Prisma.UserUpdateWithoutRentalsAsRenterInput>, Prisma.UserUncheckedUpdateWithoutRentalsAsRenterInput>
 }
 
 export type UserCreateNestedOneWithoutAgentPreferencesInput = {
@@ -1028,6 +1056,20 @@ export type UserUpdateOneRequiredWithoutCryptoAuditLogsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCryptoAuditLogsInput, Prisma.UserUpdateWithoutCryptoAuditLogsInput>, Prisma.UserUncheckedUpdateWithoutCryptoAuditLogsInput>
 }
 
+export type UserCreateNestedOneWithoutStorageVolumesInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutStorageVolumesInput, Prisma.UserUncheckedCreateWithoutStorageVolumesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutStorageVolumesInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutStorageVolumesNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutStorageVolumesInput, Prisma.UserUncheckedCreateWithoutStorageVolumesInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutStorageVolumesInput
+  upsert?: Prisma.UserUpsertWithoutStorageVolumesInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutStorageVolumesInput, Prisma.UserUpdateWithoutStorageVolumesInput>, Prisma.UserUncheckedUpdateWithoutStorageVolumesInput>
+}
+
 export type UserCreateWithoutSessionsInput = {
   id?: string
   email?: string | null
@@ -1063,6 +1105,8 @@ export type UserCreateWithoutSessionsInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigCreateNestedOneWithoutUserInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryCreateNestedManyWithoutUserInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -1100,6 +1144,8 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedCreateNestedOneWithoutUserInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedCreateNestedManyWithoutUserInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -1153,6 +1199,8 @@ export type UserUpdateWithoutSessionsInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUpdateOneWithoutUserNestedInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUpdateManyWithoutUserNestedInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -1190,6 +1238,8 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedUpdateOneWithoutUserNestedInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedUpdateManyWithoutUserNestedInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
 }
 
 export type UserCreateWithoutContainersInput = {
@@ -1227,6 +1277,8 @@ export type UserCreateWithoutContainersInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigCreateNestedOneWithoutUserInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryCreateNestedManyWithoutUserInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
 }
 
 export type UserUncheckedCreateWithoutContainersInput = {
@@ -1264,6 +1316,8 @@ export type UserUncheckedCreateWithoutContainersInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedCreateNestedOneWithoutUserInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedCreateNestedManyWithoutUserInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
 }
 
 export type UserCreateOrConnectWithoutContainersInput = {
@@ -1317,6 +1371,8 @@ export type UserUpdateWithoutContainersInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUpdateOneWithoutUserNestedInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUpdateManyWithoutUserNestedInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
 }
 
 export type UserUncheckedUpdateWithoutContainersInput = {
@@ -1354,6 +1410,8 @@ export type UserUncheckedUpdateWithoutContainersInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedUpdateOneWithoutUserNestedInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedUpdateManyWithoutUserNestedInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
 }
 
 export type UserCreateWithoutChatSessionsInput = {
@@ -1391,6 +1449,8 @@ export type UserCreateWithoutChatSessionsInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigCreateNestedOneWithoutUserInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryCreateNestedManyWithoutUserInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
 }
 
 export type UserUncheckedCreateWithoutChatSessionsInput = {
@@ -1428,6 +1488,8 @@ export type UserUncheckedCreateWithoutChatSessionsInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedCreateNestedOneWithoutUserInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedCreateNestedManyWithoutUserInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
 }
 
 export type UserCreateOrConnectWithoutChatSessionsInput = {
@@ -1481,6 +1543,8 @@ export type UserUpdateWithoutChatSessionsInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUpdateOneWithoutUserNestedInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUpdateManyWithoutUserNestedInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
 }
 
 export type UserUncheckedUpdateWithoutChatSessionsInput = {
@@ -1518,6 +1582,8 @@ export type UserUncheckedUpdateWithoutChatSessionsInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedUpdateOneWithoutUserNestedInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedUpdateManyWithoutUserNestedInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
 }
 
 export type UserCreateWithoutAgentRuntimesInput = {
@@ -1555,6 +1621,8 @@ export type UserCreateWithoutAgentRuntimesInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigCreateNestedOneWithoutUserInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryCreateNestedManyWithoutUserInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
 }
 
 export type UserUncheckedCreateWithoutAgentRuntimesInput = {
@@ -1592,6 +1660,8 @@ export type UserUncheckedCreateWithoutAgentRuntimesInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedCreateNestedOneWithoutUserInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedCreateNestedManyWithoutUserInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
 }
 
 export type UserCreateOrConnectWithoutAgentRuntimesInput = {
@@ -1645,6 +1715,8 @@ export type UserUpdateWithoutAgentRuntimesInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUpdateOneWithoutUserNestedInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUpdateManyWithoutUserNestedInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAgentRuntimesInput = {
@@ -1682,6 +1754,8 @@ export type UserUncheckedUpdateWithoutAgentRuntimesInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedUpdateOneWithoutUserNestedInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedUpdateManyWithoutUserNestedInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
 }
 
 export type UserCreateWithoutTokenTransactionsInput = {
@@ -1719,6 +1793,8 @@ export type UserCreateWithoutTokenTransactionsInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigCreateNestedOneWithoutUserInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryCreateNestedManyWithoutUserInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
 }
 
 export type UserUncheckedCreateWithoutTokenTransactionsInput = {
@@ -1756,6 +1832,8 @@ export type UserUncheckedCreateWithoutTokenTransactionsInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedCreateNestedOneWithoutUserInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedCreateNestedManyWithoutUserInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
 }
 
 export type UserCreateOrConnectWithoutTokenTransactionsInput = {
@@ -1809,6 +1887,8 @@ export type UserUpdateWithoutTokenTransactionsInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUpdateOneWithoutUserNestedInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUpdateManyWithoutUserNestedInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTokenTransactionsInput = {
@@ -1846,9 +1926,11 @@ export type UserUncheckedUpdateWithoutTokenTransactionsInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedUpdateOneWithoutUserNestedInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedUpdateManyWithoutUserNestedInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
 }
 
-export type UserCreateWithoutStorageVolumesInput = {
+export type UserCreateWithoutOwnedAgentsInput = {
   id?: string
   email?: string | null
   walletAddress?: string | null
@@ -1873,6 +1955,7 @@ export type UserCreateWithoutStorageVolumesInput = {
   tokenTransactions?: Prisma.TokenTransactionCreateNestedManyWithoutUserInput
   chatSessions?: Prisma.ChatSessionCreateNestedManyWithoutUserInput
   agentRuntimes?: Prisma.AgentRuntimeCreateNestedManyWithoutUserInput
+  storageVolumes?: Prisma.StorageVolumeCreateNestedManyWithoutUserInput
   agentPreferences?: Prisma.UserAgentPreferenceCreateNestedManyWithoutUserInput
   workflows?: Prisma.WorkflowCreateNestedManyWithoutUserInput
   workflowRuns?: Prisma.WorkflowRunCreateNestedManyWithoutUserInput
@@ -1883,9 +1966,10 @@ export type UserCreateWithoutStorageVolumesInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigCreateNestedOneWithoutUserInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryCreateNestedManyWithoutUserInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogCreateNestedManyWithoutUserInput
+  rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
 }
 
-export type UserUncheckedCreateWithoutStorageVolumesInput = {
+export type UserUncheckedCreateWithoutOwnedAgentsInput = {
   id?: string
   email?: string | null
   walletAddress?: string | null
@@ -1910,6 +1994,7 @@ export type UserUncheckedCreateWithoutStorageVolumesInput = {
   tokenTransactions?: Prisma.TokenTransactionUncheckedCreateNestedManyWithoutUserInput
   chatSessions?: Prisma.ChatSessionUncheckedCreateNestedManyWithoutUserInput
   agentRuntimes?: Prisma.AgentRuntimeUncheckedCreateNestedManyWithoutUserInput
+  storageVolumes?: Prisma.StorageVolumeUncheckedCreateNestedManyWithoutUserInput
   agentPreferences?: Prisma.UserAgentPreferenceUncheckedCreateNestedManyWithoutUserInput
   workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutUserInput
   workflowRuns?: Prisma.WorkflowRunUncheckedCreateNestedManyWithoutUserInput
@@ -1920,25 +2005,26 @@ export type UserUncheckedCreateWithoutStorageVolumesInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedCreateNestedOneWithoutUserInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedCreateNestedManyWithoutUserInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedCreateNestedManyWithoutUserInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
 }
 
-export type UserCreateOrConnectWithoutStorageVolumesInput = {
+export type UserCreateOrConnectWithoutOwnedAgentsInput = {
   where: Prisma.UserWhereUniqueInput
-  create: Prisma.XOR<Prisma.UserCreateWithoutStorageVolumesInput, Prisma.UserUncheckedCreateWithoutStorageVolumesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutOwnedAgentsInput, Prisma.UserUncheckedCreateWithoutOwnedAgentsInput>
 }
 
-export type UserUpsertWithoutStorageVolumesInput = {
-  update: Prisma.XOR<Prisma.UserUpdateWithoutStorageVolumesInput, Prisma.UserUncheckedUpdateWithoutStorageVolumesInput>
-  create: Prisma.XOR<Prisma.UserCreateWithoutStorageVolumesInput, Prisma.UserUncheckedCreateWithoutStorageVolumesInput>
+export type UserUpsertWithoutOwnedAgentsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutOwnedAgentsInput, Prisma.UserUncheckedUpdateWithoutOwnedAgentsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutOwnedAgentsInput, Prisma.UserUncheckedCreateWithoutOwnedAgentsInput>
   where?: Prisma.UserWhereInput
 }
 
-export type UserUpdateToOneWithWhereWithoutStorageVolumesInput = {
+export type UserUpdateToOneWithWhereWithoutOwnedAgentsInput = {
   where?: Prisma.UserWhereInput
-  data: Prisma.XOR<Prisma.UserUpdateWithoutStorageVolumesInput, Prisma.UserUncheckedUpdateWithoutStorageVolumesInput>
+  data: Prisma.XOR<Prisma.UserUpdateWithoutOwnedAgentsInput, Prisma.UserUncheckedUpdateWithoutOwnedAgentsInput>
 }
 
-export type UserUpdateWithoutStorageVolumesInput = {
+export type UserUpdateWithoutOwnedAgentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -1963,6 +2049,7 @@ export type UserUpdateWithoutStorageVolumesInput = {
   tokenTransactions?: Prisma.TokenTransactionUpdateManyWithoutUserNestedInput
   chatSessions?: Prisma.ChatSessionUpdateManyWithoutUserNestedInput
   agentRuntimes?: Prisma.AgentRuntimeUpdateManyWithoutUserNestedInput
+  storageVolumes?: Prisma.StorageVolumeUpdateManyWithoutUserNestedInput
   agentPreferences?: Prisma.UserAgentPreferenceUpdateManyWithoutUserNestedInput
   workflows?: Prisma.WorkflowUpdateManyWithoutUserNestedInput
   workflowRuns?: Prisma.WorkflowRunUpdateManyWithoutUserNestedInput
@@ -1973,9 +2060,10 @@ export type UserUpdateWithoutStorageVolumesInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUpdateOneWithoutUserNestedInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUpdateManyWithoutUserNestedInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUpdateManyWithoutUserNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
 }
 
-export type UserUncheckedUpdateWithoutStorageVolumesInput = {
+export type UserUncheckedUpdateWithoutOwnedAgentsInput = {
   id?: Prisma.StringFieldUpdateOperationsInput | string
   email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
   walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
@@ -2000,6 +2088,7 @@ export type UserUncheckedUpdateWithoutStorageVolumesInput = {
   tokenTransactions?: Prisma.TokenTransactionUncheckedUpdateManyWithoutUserNestedInput
   chatSessions?: Prisma.ChatSessionUncheckedUpdateManyWithoutUserNestedInput
   agentRuntimes?: Prisma.AgentRuntimeUncheckedUpdateManyWithoutUserNestedInput
+  storageVolumes?: Prisma.StorageVolumeUncheckedUpdateManyWithoutUserNestedInput
   agentPreferences?: Prisma.UserAgentPreferenceUncheckedUpdateManyWithoutUserNestedInput
   workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutUserNestedInput
   workflowRuns?: Prisma.WorkflowRunUncheckedUpdateManyWithoutUserNestedInput
@@ -2010,6 +2099,179 @@ export type UserUncheckedUpdateWithoutStorageVolumesInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedUpdateOneWithoutUserNestedInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedUpdateManyWithoutUserNestedInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedUpdateManyWithoutUserNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
+}
+
+export type UserCreateWithoutRentalsAsRenterInput = {
+  id?: string
+  email?: string | null
+  walletAddress?: string | null
+  username?: string | null
+  telegramId?: string | null
+  telegramBotToken?: string | null
+  telegramBotUsername?: string | null
+  tier?: string
+  tokenBalance?: number
+  subscriptionStatus?: string
+  subscriptionExpiresAt?: Date | string | null
+  nonce?: string | null
+  nonceExpiresAt?: Date | string | null
+  stakedAmount?: number
+  stakingLevel?: string
+  unstakedAt?: Date | string | null
+  lastYieldClaimAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  containers?: Prisma.ContainerCreateNestedManyWithoutUserInput
+  tokenTransactions?: Prisma.TokenTransactionCreateNestedManyWithoutUserInput
+  chatSessions?: Prisma.ChatSessionCreateNestedManyWithoutUserInput
+  agentRuntimes?: Prisma.AgentRuntimeCreateNestedManyWithoutUserInput
+  storageVolumes?: Prisma.StorageVolumeCreateNestedManyWithoutUserInput
+  agentPreferences?: Prisma.UserAgentPreferenceCreateNestedManyWithoutUserInput
+  workflows?: Prisma.WorkflowCreateNestedManyWithoutUserInput
+  workflowRuns?: Prisma.WorkflowRunCreateNestedManyWithoutUserInput
+  workflowSchedules?: Prisma.WorkflowScheduleCreateNestedManyWithoutUserInput
+  policyDecisions?: Prisma.PolicyDecisionCreateNestedManyWithoutUserInput
+  approvalRequests?: Prisma.ApprovalRequestCreateNestedManyWithoutUserInput
+  policyAuditLogs?: Prisma.PolicyAuditLogCreateNestedManyWithoutUserInput
+  cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigCreateNestedOneWithoutUserInput
+  cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryCreateNestedManyWithoutUserInput
+  cryptoAuditLogs?: Prisma.CryptoAuditLogCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
+}
+
+export type UserUncheckedCreateWithoutRentalsAsRenterInput = {
+  id?: string
+  email?: string | null
+  walletAddress?: string | null
+  username?: string | null
+  telegramId?: string | null
+  telegramBotToken?: string | null
+  telegramBotUsername?: string | null
+  tier?: string
+  tokenBalance?: number
+  subscriptionStatus?: string
+  subscriptionExpiresAt?: Date | string | null
+  nonce?: string | null
+  nonceExpiresAt?: Date | string | null
+  stakedAmount?: number
+  stakingLevel?: string
+  unstakedAt?: Date | string | null
+  lastYieldClaimAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  containers?: Prisma.ContainerUncheckedCreateNestedManyWithoutUserInput
+  tokenTransactions?: Prisma.TokenTransactionUncheckedCreateNestedManyWithoutUserInput
+  chatSessions?: Prisma.ChatSessionUncheckedCreateNestedManyWithoutUserInput
+  agentRuntimes?: Prisma.AgentRuntimeUncheckedCreateNestedManyWithoutUserInput
+  storageVolumes?: Prisma.StorageVolumeUncheckedCreateNestedManyWithoutUserInput
+  agentPreferences?: Prisma.UserAgentPreferenceUncheckedCreateNestedManyWithoutUserInput
+  workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutUserInput
+  workflowRuns?: Prisma.WorkflowRunUncheckedCreateNestedManyWithoutUserInput
+  workflowSchedules?: Prisma.WorkflowScheduleUncheckedCreateNestedManyWithoutUserInput
+  policyDecisions?: Prisma.PolicyDecisionUncheckedCreateNestedManyWithoutUserInput
+  approvalRequests?: Prisma.ApprovalRequestUncheckedCreateNestedManyWithoutUserInput
+  policyAuditLogs?: Prisma.PolicyAuditLogUncheckedCreateNestedManyWithoutUserInput
+  cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedCreateNestedOneWithoutUserInput
+  cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedCreateNestedManyWithoutUserInput
+  cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
+}
+
+export type UserCreateOrConnectWithoutRentalsAsRenterInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutRentalsAsRenterInput, Prisma.UserUncheckedCreateWithoutRentalsAsRenterInput>
+}
+
+export type UserUpsertWithoutRentalsAsRenterInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutRentalsAsRenterInput, Prisma.UserUncheckedUpdateWithoutRentalsAsRenterInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutRentalsAsRenterInput, Prisma.UserUncheckedCreateWithoutRentalsAsRenterInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutRentalsAsRenterInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutRentalsAsRenterInput, Prisma.UserUncheckedUpdateWithoutRentalsAsRenterInput>
+}
+
+export type UserUpdateWithoutRentalsAsRenterInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramBotToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramBotUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tier?: Prisma.StringFieldUpdateOperationsInput | string
+  tokenBalance?: Prisma.IntFieldUpdateOperationsInput | number
+  subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  subscriptionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  nonce?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nonceExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stakedAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  stakingLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  unstakedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastYieldClaimAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  containers?: Prisma.ContainerUpdateManyWithoutUserNestedInput
+  tokenTransactions?: Prisma.TokenTransactionUpdateManyWithoutUserNestedInput
+  chatSessions?: Prisma.ChatSessionUpdateManyWithoutUserNestedInput
+  agentRuntimes?: Prisma.AgentRuntimeUpdateManyWithoutUserNestedInput
+  storageVolumes?: Prisma.StorageVolumeUpdateManyWithoutUserNestedInput
+  agentPreferences?: Prisma.UserAgentPreferenceUpdateManyWithoutUserNestedInput
+  workflows?: Prisma.WorkflowUpdateManyWithoutUserNestedInput
+  workflowRuns?: Prisma.WorkflowRunUpdateManyWithoutUserNestedInput
+  workflowSchedules?: Prisma.WorkflowScheduleUpdateManyWithoutUserNestedInput
+  policyDecisions?: Prisma.PolicyDecisionUpdateManyWithoutUserNestedInput
+  approvalRequests?: Prisma.ApprovalRequestUpdateManyWithoutUserNestedInput
+  policyAuditLogs?: Prisma.PolicyAuditLogUpdateManyWithoutUserNestedInput
+  cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUpdateOneWithoutUserNestedInput
+  cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUpdateManyWithoutUserNestedInput
+  cryptoAuditLogs?: Prisma.CryptoAuditLogUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
+}
+
+export type UserUncheckedUpdateWithoutRentalsAsRenterInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramBotToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramBotUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tier?: Prisma.StringFieldUpdateOperationsInput | string
+  tokenBalance?: Prisma.IntFieldUpdateOperationsInput | number
+  subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  subscriptionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  nonce?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nonceExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stakedAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  stakingLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  unstakedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastYieldClaimAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  containers?: Prisma.ContainerUncheckedUpdateManyWithoutUserNestedInput
+  tokenTransactions?: Prisma.TokenTransactionUncheckedUpdateManyWithoutUserNestedInput
+  chatSessions?: Prisma.ChatSessionUncheckedUpdateManyWithoutUserNestedInput
+  agentRuntimes?: Prisma.AgentRuntimeUncheckedUpdateManyWithoutUserNestedInput
+  storageVolumes?: Prisma.StorageVolumeUncheckedUpdateManyWithoutUserNestedInput
+  agentPreferences?: Prisma.UserAgentPreferenceUncheckedUpdateManyWithoutUserNestedInput
+  workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutUserNestedInput
+  workflowRuns?: Prisma.WorkflowRunUncheckedUpdateManyWithoutUserNestedInput
+  workflowSchedules?: Prisma.WorkflowScheduleUncheckedUpdateManyWithoutUserNestedInput
+  policyDecisions?: Prisma.PolicyDecisionUncheckedUpdateManyWithoutUserNestedInput
+  approvalRequests?: Prisma.ApprovalRequestUncheckedUpdateManyWithoutUserNestedInput
+  policyAuditLogs?: Prisma.PolicyAuditLogUncheckedUpdateManyWithoutUserNestedInput
+  cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedUpdateOneWithoutUserNestedInput
+  cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedUpdateManyWithoutUserNestedInput
+  cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
 }
 
 export type UserCreateWithoutAgentPreferencesInput = {
@@ -2047,6 +2309,8 @@ export type UserCreateWithoutAgentPreferencesInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigCreateNestedOneWithoutUserInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryCreateNestedManyWithoutUserInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
 }
 
 export type UserUncheckedCreateWithoutAgentPreferencesInput = {
@@ -2084,6 +2348,8 @@ export type UserUncheckedCreateWithoutAgentPreferencesInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedCreateNestedOneWithoutUserInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedCreateNestedManyWithoutUserInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
 }
 
 export type UserCreateOrConnectWithoutAgentPreferencesInput = {
@@ -2137,6 +2403,8 @@ export type UserUpdateWithoutAgentPreferencesInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUpdateOneWithoutUserNestedInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUpdateManyWithoutUserNestedInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAgentPreferencesInput = {
@@ -2174,6 +2442,8 @@ export type UserUncheckedUpdateWithoutAgentPreferencesInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedUpdateOneWithoutUserNestedInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedUpdateManyWithoutUserNestedInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
 }
 
 export type UserCreateWithoutWorkflowsInput = {
@@ -2211,6 +2481,8 @@ export type UserCreateWithoutWorkflowsInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigCreateNestedOneWithoutUserInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryCreateNestedManyWithoutUserInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
 }
 
 export type UserUncheckedCreateWithoutWorkflowsInput = {
@@ -2248,6 +2520,8 @@ export type UserUncheckedCreateWithoutWorkflowsInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedCreateNestedOneWithoutUserInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedCreateNestedManyWithoutUserInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
 }
 
 export type UserCreateOrConnectWithoutWorkflowsInput = {
@@ -2301,6 +2575,8 @@ export type UserUpdateWithoutWorkflowsInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUpdateOneWithoutUserNestedInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUpdateManyWithoutUserNestedInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
 }
 
 export type UserUncheckedUpdateWithoutWorkflowsInput = {
@@ -2338,6 +2614,8 @@ export type UserUncheckedUpdateWithoutWorkflowsInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedUpdateOneWithoutUserNestedInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedUpdateManyWithoutUserNestedInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
 }
 
 export type UserCreateWithoutWorkflowRunsInput = {
@@ -2375,6 +2653,8 @@ export type UserCreateWithoutWorkflowRunsInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigCreateNestedOneWithoutUserInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryCreateNestedManyWithoutUserInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
 }
 
 export type UserUncheckedCreateWithoutWorkflowRunsInput = {
@@ -2412,6 +2692,8 @@ export type UserUncheckedCreateWithoutWorkflowRunsInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedCreateNestedOneWithoutUserInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedCreateNestedManyWithoutUserInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
 }
 
 export type UserCreateOrConnectWithoutWorkflowRunsInput = {
@@ -2465,6 +2747,8 @@ export type UserUpdateWithoutWorkflowRunsInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUpdateOneWithoutUserNestedInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUpdateManyWithoutUserNestedInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
 }
 
 export type UserUncheckedUpdateWithoutWorkflowRunsInput = {
@@ -2502,6 +2786,8 @@ export type UserUncheckedUpdateWithoutWorkflowRunsInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedUpdateOneWithoutUserNestedInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedUpdateManyWithoutUserNestedInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
 }
 
 export type UserCreateWithoutWorkflowSchedulesInput = {
@@ -2539,6 +2825,8 @@ export type UserCreateWithoutWorkflowSchedulesInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigCreateNestedOneWithoutUserInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryCreateNestedManyWithoutUserInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
 }
 
 export type UserUncheckedCreateWithoutWorkflowSchedulesInput = {
@@ -2576,6 +2864,8 @@ export type UserUncheckedCreateWithoutWorkflowSchedulesInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedCreateNestedOneWithoutUserInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedCreateNestedManyWithoutUserInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
 }
 
 export type UserCreateOrConnectWithoutWorkflowSchedulesInput = {
@@ -2629,6 +2919,8 @@ export type UserUpdateWithoutWorkflowSchedulesInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUpdateOneWithoutUserNestedInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUpdateManyWithoutUserNestedInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
 }
 
 export type UserUncheckedUpdateWithoutWorkflowSchedulesInput = {
@@ -2666,6 +2958,8 @@ export type UserUncheckedUpdateWithoutWorkflowSchedulesInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedUpdateOneWithoutUserNestedInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedUpdateManyWithoutUserNestedInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
 }
 
 export type UserCreateWithoutPolicyDecisionsInput = {
@@ -2703,6 +2997,8 @@ export type UserCreateWithoutPolicyDecisionsInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigCreateNestedOneWithoutUserInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryCreateNestedManyWithoutUserInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
 }
 
 export type UserUncheckedCreateWithoutPolicyDecisionsInput = {
@@ -2740,6 +3036,8 @@ export type UserUncheckedCreateWithoutPolicyDecisionsInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedCreateNestedOneWithoutUserInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedCreateNestedManyWithoutUserInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
 }
 
 export type UserCreateOrConnectWithoutPolicyDecisionsInput = {
@@ -2793,6 +3091,8 @@ export type UserUpdateWithoutPolicyDecisionsInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUpdateOneWithoutUserNestedInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUpdateManyWithoutUserNestedInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPolicyDecisionsInput = {
@@ -2830,6 +3130,8 @@ export type UserUncheckedUpdateWithoutPolicyDecisionsInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedUpdateOneWithoutUserNestedInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedUpdateManyWithoutUserNestedInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
 }
 
 export type UserCreateWithoutApprovalRequestsInput = {
@@ -2867,6 +3169,8 @@ export type UserCreateWithoutApprovalRequestsInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigCreateNestedOneWithoutUserInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryCreateNestedManyWithoutUserInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
 }
 
 export type UserUncheckedCreateWithoutApprovalRequestsInput = {
@@ -2904,6 +3208,8 @@ export type UserUncheckedCreateWithoutApprovalRequestsInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedCreateNestedOneWithoutUserInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedCreateNestedManyWithoutUserInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
 }
 
 export type UserCreateOrConnectWithoutApprovalRequestsInput = {
@@ -2957,6 +3263,8 @@ export type UserUpdateWithoutApprovalRequestsInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUpdateOneWithoutUserNestedInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUpdateManyWithoutUserNestedInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
 }
 
 export type UserUncheckedUpdateWithoutApprovalRequestsInput = {
@@ -2994,6 +3302,8 @@ export type UserUncheckedUpdateWithoutApprovalRequestsInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedUpdateOneWithoutUserNestedInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedUpdateManyWithoutUserNestedInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
 }
 
 export type UserCreateWithoutPolicyAuditLogsInput = {
@@ -3031,6 +3341,8 @@ export type UserCreateWithoutPolicyAuditLogsInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigCreateNestedOneWithoutUserInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryCreateNestedManyWithoutUserInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
 }
 
 export type UserUncheckedCreateWithoutPolicyAuditLogsInput = {
@@ -3068,6 +3380,8 @@ export type UserUncheckedCreateWithoutPolicyAuditLogsInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedCreateNestedOneWithoutUserInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedCreateNestedManyWithoutUserInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
 }
 
 export type UserCreateOrConnectWithoutPolicyAuditLogsInput = {
@@ -3121,6 +3435,8 @@ export type UserUpdateWithoutPolicyAuditLogsInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUpdateOneWithoutUserNestedInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUpdateManyWithoutUserNestedInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPolicyAuditLogsInput = {
@@ -3158,6 +3474,8 @@ export type UserUncheckedUpdateWithoutPolicyAuditLogsInput = {
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedUpdateOneWithoutUserNestedInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedUpdateManyWithoutUserNestedInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
 }
 
 export type UserCreateWithoutCryptoGuardrailConfigInput = {
@@ -3195,6 +3513,8 @@ export type UserCreateWithoutCryptoGuardrailConfigInput = {
   policyAuditLogs?: Prisma.PolicyAuditLogCreateNestedManyWithoutUserInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryCreateNestedManyWithoutUserInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
 }
 
 export type UserUncheckedCreateWithoutCryptoGuardrailConfigInput = {
@@ -3232,6 +3552,8 @@ export type UserUncheckedCreateWithoutCryptoGuardrailConfigInput = {
   policyAuditLogs?: Prisma.PolicyAuditLogUncheckedCreateNestedManyWithoutUserInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedCreateNestedManyWithoutUserInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
 }
 
 export type UserCreateOrConnectWithoutCryptoGuardrailConfigInput = {
@@ -3285,6 +3607,8 @@ export type UserUpdateWithoutCryptoGuardrailConfigInput = {
   policyAuditLogs?: Prisma.PolicyAuditLogUpdateManyWithoutUserNestedInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUpdateManyWithoutUserNestedInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCryptoGuardrailConfigInput = {
@@ -3322,6 +3646,8 @@ export type UserUncheckedUpdateWithoutCryptoGuardrailConfigInput = {
   policyAuditLogs?: Prisma.PolicyAuditLogUncheckedUpdateManyWithoutUserNestedInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedUpdateManyWithoutUserNestedInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
 }
 
 export type UserCreateWithoutCryptoDestinationAllowlistEntriesInput = {
@@ -3359,6 +3685,8 @@ export type UserCreateWithoutCryptoDestinationAllowlistEntriesInput = {
   policyAuditLogs?: Prisma.PolicyAuditLogCreateNestedManyWithoutUserInput
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigCreateNestedOneWithoutUserInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
 }
 
 export type UserUncheckedCreateWithoutCryptoDestinationAllowlistEntriesInput = {
@@ -3396,6 +3724,8 @@ export type UserUncheckedCreateWithoutCryptoDestinationAllowlistEntriesInput = {
   policyAuditLogs?: Prisma.PolicyAuditLogUncheckedCreateNestedManyWithoutUserInput
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedCreateNestedOneWithoutUserInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
 }
 
 export type UserCreateOrConnectWithoutCryptoDestinationAllowlistEntriesInput = {
@@ -3449,6 +3779,8 @@ export type UserUpdateWithoutCryptoDestinationAllowlistEntriesInput = {
   policyAuditLogs?: Prisma.PolicyAuditLogUpdateManyWithoutUserNestedInput
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUpdateOneWithoutUserNestedInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCryptoDestinationAllowlistEntriesInput = {
@@ -3486,6 +3818,8 @@ export type UserUncheckedUpdateWithoutCryptoDestinationAllowlistEntriesInput = {
   policyAuditLogs?: Prisma.PolicyAuditLogUncheckedUpdateManyWithoutUserNestedInput
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedUpdateOneWithoutUserNestedInput
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
 }
 
 export type UserCreateWithoutCryptoAuditLogsInput = {
@@ -3523,6 +3857,8 @@ export type UserCreateWithoutCryptoAuditLogsInput = {
   policyAuditLogs?: Prisma.PolicyAuditLogCreateNestedManyWithoutUserInput
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigCreateNestedOneWithoutUserInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
 }
 
 export type UserUncheckedCreateWithoutCryptoAuditLogsInput = {
@@ -3560,6 +3896,8 @@ export type UserUncheckedCreateWithoutCryptoAuditLogsInput = {
   policyAuditLogs?: Prisma.PolicyAuditLogUncheckedCreateNestedManyWithoutUserInput
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedCreateNestedOneWithoutUserInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
 }
 
 export type UserCreateOrConnectWithoutCryptoAuditLogsInput = {
@@ -3613,6 +3951,8 @@ export type UserUpdateWithoutCryptoAuditLogsInput = {
   policyAuditLogs?: Prisma.PolicyAuditLogUpdateManyWithoutUserNestedInput
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUpdateOneWithoutUserNestedInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCryptoAuditLogsInput = {
@@ -3650,6 +3990,180 @@ export type UserUncheckedUpdateWithoutCryptoAuditLogsInput = {
   policyAuditLogs?: Prisma.PolicyAuditLogUncheckedUpdateManyWithoutUserNestedInput
   cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedUpdateOneWithoutUserNestedInput
   cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
+}
+
+export type UserCreateWithoutStorageVolumesInput = {
+  id?: string
+  email?: string | null
+  walletAddress?: string | null
+  username?: string | null
+  telegramId?: string | null
+  telegramBotToken?: string | null
+  telegramBotUsername?: string | null
+  tier?: string
+  tokenBalance?: number
+  subscriptionStatus?: string
+  subscriptionExpiresAt?: Date | string | null
+  nonce?: string | null
+  nonceExpiresAt?: Date | string | null
+  stakedAmount?: number
+  stakingLevel?: string
+  unstakedAt?: Date | string | null
+  lastYieldClaimAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  containers?: Prisma.ContainerCreateNestedManyWithoutUserInput
+  tokenTransactions?: Prisma.TokenTransactionCreateNestedManyWithoutUserInput
+  chatSessions?: Prisma.ChatSessionCreateNestedManyWithoutUserInput
+  agentRuntimes?: Prisma.AgentRuntimeCreateNestedManyWithoutUserInput
+  agentPreferences?: Prisma.UserAgentPreferenceCreateNestedManyWithoutUserInput
+  workflows?: Prisma.WorkflowCreateNestedManyWithoutUserInput
+  workflowRuns?: Prisma.WorkflowRunCreateNestedManyWithoutUserInput
+  workflowSchedules?: Prisma.WorkflowScheduleCreateNestedManyWithoutUserInput
+  policyDecisions?: Prisma.PolicyDecisionCreateNestedManyWithoutUserInput
+  approvalRequests?: Prisma.ApprovalRequestCreateNestedManyWithoutUserInput
+  policyAuditLogs?: Prisma.PolicyAuditLogCreateNestedManyWithoutUserInput
+  cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigCreateNestedOneWithoutUserInput
+  cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryCreateNestedManyWithoutUserInput
+  cryptoAuditLogs?: Prisma.CryptoAuditLogCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
+}
+
+export type UserUncheckedCreateWithoutStorageVolumesInput = {
+  id?: string
+  email?: string | null
+  walletAddress?: string | null
+  username?: string | null
+  telegramId?: string | null
+  telegramBotToken?: string | null
+  telegramBotUsername?: string | null
+  tier?: string
+  tokenBalance?: number
+  subscriptionStatus?: string
+  subscriptionExpiresAt?: Date | string | null
+  nonce?: string | null
+  nonceExpiresAt?: Date | string | null
+  stakedAmount?: number
+  stakingLevel?: string
+  unstakedAt?: Date | string | null
+  lastYieldClaimAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  containers?: Prisma.ContainerUncheckedCreateNestedManyWithoutUserInput
+  tokenTransactions?: Prisma.TokenTransactionUncheckedCreateNestedManyWithoutUserInput
+  chatSessions?: Prisma.ChatSessionUncheckedCreateNestedManyWithoutUserInput
+  agentRuntimes?: Prisma.AgentRuntimeUncheckedCreateNestedManyWithoutUserInput
+  agentPreferences?: Prisma.UserAgentPreferenceUncheckedCreateNestedManyWithoutUserInput
+  workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutUserInput
+  workflowRuns?: Prisma.WorkflowRunUncheckedCreateNestedManyWithoutUserInput
+  workflowSchedules?: Prisma.WorkflowScheduleUncheckedCreateNestedManyWithoutUserInput
+  policyDecisions?: Prisma.PolicyDecisionUncheckedCreateNestedManyWithoutUserInput
+  approvalRequests?: Prisma.ApprovalRequestUncheckedCreateNestedManyWithoutUserInput
+  policyAuditLogs?: Prisma.PolicyAuditLogUncheckedCreateNestedManyWithoutUserInput
+  cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedCreateNestedOneWithoutUserInput
+  cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedCreateNestedManyWithoutUserInput
+  cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
+}
+
+export type UserCreateOrConnectWithoutStorageVolumesInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutStorageVolumesInput, Prisma.UserUncheckedCreateWithoutStorageVolumesInput>
+}
+
+export type UserUpsertWithoutStorageVolumesInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutStorageVolumesInput, Prisma.UserUncheckedUpdateWithoutStorageVolumesInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutStorageVolumesInput, Prisma.UserUncheckedCreateWithoutStorageVolumesInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutStorageVolumesInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutStorageVolumesInput, Prisma.UserUncheckedUpdateWithoutStorageVolumesInput>
+}
+
+export type UserUpdateWithoutStorageVolumesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramBotToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramBotUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tier?: Prisma.StringFieldUpdateOperationsInput | string
+  tokenBalance?: Prisma.IntFieldUpdateOperationsInput | number
+  subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  subscriptionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  nonce?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nonceExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stakedAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  stakingLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  unstakedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastYieldClaimAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  containers?: Prisma.ContainerUpdateManyWithoutUserNestedInput
+  tokenTransactions?: Prisma.TokenTransactionUpdateManyWithoutUserNestedInput
+  chatSessions?: Prisma.ChatSessionUpdateManyWithoutUserNestedInput
+  agentRuntimes?: Prisma.AgentRuntimeUpdateManyWithoutUserNestedInput
+  agentPreferences?: Prisma.UserAgentPreferenceUpdateManyWithoutUserNestedInput
+  workflows?: Prisma.WorkflowUpdateManyWithoutUserNestedInput
+  workflowRuns?: Prisma.WorkflowRunUpdateManyWithoutUserNestedInput
+  workflowSchedules?: Prisma.WorkflowScheduleUpdateManyWithoutUserNestedInput
+  policyDecisions?: Prisma.PolicyDecisionUpdateManyWithoutUserNestedInput
+  approvalRequests?: Prisma.ApprovalRequestUpdateManyWithoutUserNestedInput
+  policyAuditLogs?: Prisma.PolicyAuditLogUpdateManyWithoutUserNestedInput
+  cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUpdateOneWithoutUserNestedInput
+  cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUpdateManyWithoutUserNestedInput
+  cryptoAuditLogs?: Prisma.CryptoAuditLogUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
+}
+
+export type UserUncheckedUpdateWithoutStorageVolumesInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramBotToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramBotUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tier?: Prisma.StringFieldUpdateOperationsInput | string
+  tokenBalance?: Prisma.IntFieldUpdateOperationsInput | number
+  subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  subscriptionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  nonce?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nonceExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stakedAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  stakingLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  unstakedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastYieldClaimAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  containers?: Prisma.ContainerUncheckedUpdateManyWithoutUserNestedInput
+  tokenTransactions?: Prisma.TokenTransactionUncheckedUpdateManyWithoutUserNestedInput
+  chatSessions?: Prisma.ChatSessionUncheckedUpdateManyWithoutUserNestedInput
+  agentRuntimes?: Prisma.AgentRuntimeUncheckedUpdateManyWithoutUserNestedInput
+  agentPreferences?: Prisma.UserAgentPreferenceUncheckedUpdateManyWithoutUserNestedInput
+  workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutUserNestedInput
+  workflowRuns?: Prisma.WorkflowRunUncheckedUpdateManyWithoutUserNestedInput
+  workflowSchedules?: Prisma.WorkflowScheduleUncheckedUpdateManyWithoutUserNestedInput
+  policyDecisions?: Prisma.PolicyDecisionUncheckedUpdateManyWithoutUserNestedInput
+  approvalRequests?: Prisma.ApprovalRequestUncheckedUpdateManyWithoutUserNestedInput
+  policyAuditLogs?: Prisma.PolicyAuditLogUncheckedUpdateManyWithoutUserNestedInput
+  cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedUpdateOneWithoutUserNestedInput
+  cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedUpdateManyWithoutUserNestedInput
+  cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
 }
 
 
@@ -3673,6 +4187,8 @@ export type UserCountOutputType = {
   policyAuditLogs: number
   cryptoDestinationAllowlistEntries: number
   cryptoAuditLogs: number
+  ownedAgents: number
+  rentalsAsRenter: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -3691,6 +4207,8 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   policyAuditLogs?: boolean | UserCountOutputTypeCountPolicyAuditLogsArgs
   cryptoDestinationAllowlistEntries?: boolean | UserCountOutputTypeCountCryptoDestinationAllowlistEntriesArgs
   cryptoAuditLogs?: boolean | UserCountOutputTypeCountCryptoAuditLogsArgs
+  ownedAgents?: boolean | UserCountOutputTypeCountOwnedAgentsArgs
+  rentalsAsRenter?: boolean | UserCountOutputTypeCountRentalsAsRenterArgs
 }
 
 /**
@@ -3808,6 +4326,20 @@ export type UserCountOutputTypeCountCryptoAuditLogsArgs<ExtArgs extends runtime.
   where?: Prisma.CryptoAuditLogWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountOwnedAgentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AgentConfigWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountRentalsAsRenterArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AgentRentalWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -3845,6 +4377,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   cryptoGuardrailConfig?: boolean | Prisma.User$cryptoGuardrailConfigArgs<ExtArgs>
   cryptoDestinationAllowlistEntries?: boolean | Prisma.User$cryptoDestinationAllowlistEntriesArgs<ExtArgs>
   cryptoAuditLogs?: boolean | Prisma.User$cryptoAuditLogsArgs<ExtArgs>
+  ownedAgents?: boolean | Prisma.User$ownedAgentsArgs<ExtArgs>
+  rentalsAsRenter?: boolean | Prisma.User$rentalsAsRenterArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -3932,6 +4466,8 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   cryptoGuardrailConfig?: boolean | Prisma.User$cryptoGuardrailConfigArgs<ExtArgs>
   cryptoDestinationAllowlistEntries?: boolean | Prisma.User$cryptoDestinationAllowlistEntriesArgs<ExtArgs>
   cryptoAuditLogs?: boolean | Prisma.User$cryptoAuditLogsArgs<ExtArgs>
+  ownedAgents?: boolean | Prisma.User$ownedAgentsArgs<ExtArgs>
+  rentalsAsRenter?: boolean | Prisma.User$rentalsAsRenterArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -3956,6 +4492,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     cryptoGuardrailConfig: Prisma.$CryptoGuardrailConfigPayload<ExtArgs> | null
     cryptoDestinationAllowlistEntries: Prisma.$CryptoDestinationAllowlistEntryPayload<ExtArgs>[]
     cryptoAuditLogs: Prisma.$CryptoAuditLogPayload<ExtArgs>[]
+    ownedAgents: Prisma.$AgentConfigPayload<ExtArgs>[]
+    rentalsAsRenter: Prisma.$AgentRentalPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -4387,6 +4925,8 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   cryptoGuardrailConfig<T extends Prisma.User$cryptoGuardrailConfigArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$cryptoGuardrailConfigArgs<ExtArgs>>): Prisma.Prisma__CryptoGuardrailConfigClient<runtime.Types.Result.GetResult<Prisma.$CryptoGuardrailConfigPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
   cryptoDestinationAllowlistEntries<T extends Prisma.User$cryptoDestinationAllowlistEntriesArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$cryptoDestinationAllowlistEntriesArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CryptoDestinationAllowlistEntryPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   cryptoAuditLogs<T extends Prisma.User$cryptoAuditLogsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$cryptoAuditLogsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CryptoAuditLogPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  ownedAgents<T extends Prisma.User$ownedAgentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$ownedAgentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AgentConfigPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  rentalsAsRenter<T extends Prisma.User$rentalsAsRenterArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$rentalsAsRenterArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AgentRentalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -4664,7 +5204,6 @@ export type UserCreateManyArgs<ExtArgs extends runtime.Types.Extensions.Internal
    * The data used to create many Users.
    */
   data: Prisma.UserCreateManyInput | Prisma.UserCreateManyInput[]
-  skipDuplicates?: boolean
 }
 
 /**
@@ -4683,7 +5222,6 @@ export type UserCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Extensions
    * The data used to create many Users.
    */
   data: Prisma.UserCreateManyInput | Prisma.UserCreateManyInput[]
-  skipDuplicates?: boolean
 }
 
 /**
@@ -5199,6 +5737,54 @@ export type User$cryptoAuditLogsArgs<ExtArgs extends runtime.Types.Extensions.In
   take?: number
   skip?: number
   distinct?: Prisma.CryptoAuditLogScalarFieldEnum | Prisma.CryptoAuditLogScalarFieldEnum[]
+}
+
+/**
+ * User.ownedAgents
+ */
+export type User$ownedAgentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AgentConfig
+   */
+  select?: Prisma.AgentConfigSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AgentConfig
+   */
+  omit?: Prisma.AgentConfigOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AgentConfigInclude<ExtArgs> | null
+  where?: Prisma.AgentConfigWhereInput
+  orderBy?: Prisma.AgentConfigOrderByWithRelationInput | Prisma.AgentConfigOrderByWithRelationInput[]
+  cursor?: Prisma.AgentConfigWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AgentConfigScalarFieldEnum | Prisma.AgentConfigScalarFieldEnum[]
+}
+
+/**
+ * User.rentalsAsRenter
+ */
+export type User$rentalsAsRenterArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AgentRental
+   */
+  select?: Prisma.AgentRentalSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AgentRental
+   */
+  omit?: Prisma.AgentRentalOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AgentRentalInclude<ExtArgs> | null
+  where?: Prisma.AgentRentalWhereInput
+  orderBy?: Prisma.AgentRentalOrderByWithRelationInput | Prisma.AgentRentalOrderByWithRelationInput[]
+  cursor?: Prisma.AgentRentalWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AgentRentalScalarFieldEnum | Prisma.AgentRentalScalarFieldEnum[]
 }
 
 /**

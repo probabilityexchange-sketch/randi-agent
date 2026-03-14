@@ -10,11 +10,11 @@ const schema = z.object({
 
 export async function POST(
   request: NextRequest,
-  { params }: { params: { containerId: string } }
+  { params }: { params: Promise<{ containerId: string }> }
 ) {
   try {
     const auth = await requireAuth();
-    const { containerId } = params;
+    const { containerId } = await params;
 
     const container = await prisma.container.findUnique({
       where: { id: containerId },

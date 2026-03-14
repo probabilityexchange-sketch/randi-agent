@@ -5,11 +5,11 @@ import { getContainerLogs } from "@/lib/docker/lifecycle";
 
 export async function GET(
   request: NextRequest,
-  { params }: { params: { containerId: string } }
+  { params }: { params: Promise<{ containerId: string }> }
 ) {
   try {
     const auth = await requireAuth();
-    const { containerId } = params;
+    const { containerId } = await params;
 
     const container = await prisma.container.findUnique({
       where: { id: containerId },

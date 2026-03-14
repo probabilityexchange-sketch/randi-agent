@@ -896,7 +896,6 @@ export type CryptoAuditLogCreateOrConnectWithoutUserInput = {
 
 export type CryptoAuditLogCreateManyUserInputEnvelope = {
   data: Prisma.CryptoAuditLogCreateManyUserInput | Prisma.CryptoAuditLogCreateManyUserInput[]
-  skipDuplicates?: boolean
 }
 
 export type CryptoAuditLogUpsertWithWhereUniqueWithoutUserInput = {
@@ -995,7 +994,6 @@ export type CryptoAuditLogCreateOrConnectWithoutSessionInput = {
 
 export type CryptoAuditLogCreateManySessionInputEnvelope = {
   data: Prisma.CryptoAuditLogCreateManySessionInput | Prisma.CryptoAuditLogCreateManySessionInput[]
-  skipDuplicates?: boolean
 }
 
 export type CryptoAuditLogUpsertWithWhereUniqueWithoutSessionInput = {
@@ -1067,7 +1065,6 @@ export type CryptoAuditLogCreateOrConnectWithoutWorkflowInput = {
 
 export type CryptoAuditLogCreateManyWorkflowInputEnvelope = {
   data: Prisma.CryptoAuditLogCreateManyWorkflowInput | Prisma.CryptoAuditLogCreateManyWorkflowInput[]
-  skipDuplicates?: boolean
 }
 
 export type CryptoAuditLogUpsertWithWhereUniqueWithoutWorkflowInput = {
@@ -2191,7 +2188,6 @@ export type CryptoAuditLogCreateManyArgs<ExtArgs extends runtime.Types.Extension
    * The data used to create many CryptoAuditLogs.
    */
   data: Prisma.CryptoAuditLogCreateManyInput | Prisma.CryptoAuditLogCreateManyInput[]
-  skipDuplicates?: boolean
 }
 
 /**
@@ -2210,7 +2206,6 @@ export type CryptoAuditLogCreateManyAndReturnArgs<ExtArgs extends runtime.Types.
    * The data used to create many CryptoAuditLogs.
    */
   data: Prisma.CryptoAuditLogCreateManyInput | Prisma.CryptoAuditLogCreateManyInput[]
-  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */

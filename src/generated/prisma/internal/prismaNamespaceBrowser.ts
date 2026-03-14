@@ -59,7 +59,7 @@ export const ModelName = {
   ChatMessage: 'ChatMessage',
   TokenTransaction: 'TokenTransaction',
   AgentConfig: 'AgentConfig',
-  StorageVolume: 'StorageVolume',
+  AgentRental: 'AgentRental',
   UserAgentPreference: 'UserAgentPreference',
   ToolApproval: 'ToolApproval',
   Workflow: 'Workflow',
@@ -71,6 +71,7 @@ export const ModelName = {
   CryptoGuardrailConfig: 'CryptoGuardrailConfig',
   CryptoDestinationAllowlistEntry: 'CryptoDestinationAllowlistEntry',
   CryptoAuditLog: 'CryptoAuditLog',
+  StorageVolume: 'StorageVolume',
   FleetStats: 'FleetStats'
 } as const
 
@@ -81,9 +82,6 @@ export type ModelName = (typeof ModelName)[keyof typeof ModelName]
  */
 
 export const TransactionIsolationLevel = runtime.makeStrictEnum({
-  ReadUncommitted: 'ReadUncommitted',
-  ReadCommitted: 'ReadCommitted',
-  RepeatableRead: 'RepeatableRead',
   Serializable: 'Serializable'
 } as const)
 
@@ -229,6 +227,9 @@ export const AgentConfigScalarFieldEnum = {
   tools: 'tools',
   defaultModel: 'defaultModel',
   active: 'active',
+  pricePerSession: 'pricePerSession',
+  isPublic: 'isPublic',
+  ownerId: 'ownerId',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
@@ -236,19 +237,19 @@ export const AgentConfigScalarFieldEnum = {
 export type AgentConfigScalarFieldEnum = (typeof AgentConfigScalarFieldEnum)[keyof typeof AgentConfigScalarFieldEnum]
 
 
-export const StorageVolumeScalarFieldEnum = {
+export const AgentRentalScalarFieldEnum = {
   id: 'id',
-  userId: 'userId',
-  agentSlug: 'agentSlug',
-  storageKey: 'storageKey',
-  sizeBytes: 'sizeBytes',
-  snapshotPath: 'snapshotPath',
-  lastSyncAt: 'lastSyncAt',
+  renterId: 'renterId',
+  agentId: 'agentId',
+  startTime: 'startTime',
+  endTime: 'endTime',
+  pricePaid: 'pricePaid',
+  status: 'status',
   createdAt: 'createdAt',
   updatedAt: 'updatedAt'
 } as const
 
-export type StorageVolumeScalarFieldEnum = (typeof StorageVolumeScalarFieldEnum)[keyof typeof StorageVolumeScalarFieldEnum]
+export type AgentRentalScalarFieldEnum = (typeof AgentRentalScalarFieldEnum)[keyof typeof AgentRentalScalarFieldEnum]
 
 
 export const UserAgentPreferenceScalarFieldEnum = {
@@ -464,6 +465,21 @@ export const CryptoAuditLogScalarFieldEnum = {
 export type CryptoAuditLogScalarFieldEnum = (typeof CryptoAuditLogScalarFieldEnum)[keyof typeof CryptoAuditLogScalarFieldEnum]
 
 
+export const StorageVolumeScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  agentSlug: 'agentSlug',
+  storageKey: 'storageKey',
+  sizeBytes: 'sizeBytes',
+  snapshotPath: 'snapshotPath',
+  lastSyncAt: 'lastSyncAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type StorageVolumeScalarFieldEnum = (typeof StorageVolumeScalarFieldEnum)[keyof typeof StorageVolumeScalarFieldEnum]
+
+
 export const FleetStatsScalarFieldEnum = {
   id: 'id',
   nodeId: 'nodeId',
@@ -487,14 +503,6 @@ export const SortOrder = {
 } as const
 
 export type SortOrder = (typeof SortOrder)[keyof typeof SortOrder]
-
-
-export const QueryMode = {
-  default: 'default',
-  insensitive: 'insensitive'
-} as const
-
-export type QueryMode = (typeof QueryMode)[keyof typeof QueryMode]
 
 
 export const NullsOrder = {

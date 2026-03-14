@@ -5,11 +5,11 @@ import { getComputeBridge } from "@/lib/compute/bridge-client";
 
 export async function GET(
   req: NextRequest,
-  { params }: { params: { containerId: string } }
+  { params }: { params: Promise<{ containerId: string }> }
 ) {
   try {
     const auth = await requireAuth();
-    const { containerId } = params;
+    const { containerId } = await params;
 
     // Verify this container belongs to the authenticated user
     const container = await prisma.container.findFirst({

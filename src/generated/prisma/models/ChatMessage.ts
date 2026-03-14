@@ -404,7 +404,6 @@ export type ChatMessageCreateOrConnectWithoutSessionInput = {
 
 export type ChatMessageCreateManySessionInputEnvelope = {
   data: Prisma.ChatMessageCreateManySessionInput | Prisma.ChatMessageCreateManySessionInput[]
-  skipDuplicates?: boolean
 }
 
 export type ChatMessageUpsertWithWhereUniqueWithoutSessionInput = {
@@ -1190,7 +1189,6 @@ export type ChatMessageCreateManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * The data used to create many ChatMessages.
    */
   data: Prisma.ChatMessageCreateManyInput | Prisma.ChatMessageCreateManyInput[]
-  skipDuplicates?: boolean
 }
 
 /**
@@ -1209,7 +1207,6 @@ export type ChatMessageCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Ext
    * The data used to create many ChatMessages.
    */
   data: Prisma.ChatMessageCreateManyInput | Prisma.ChatMessageCreateManyInput[]
-  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */
