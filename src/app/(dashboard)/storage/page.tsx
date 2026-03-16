@@ -202,7 +202,7 @@ function StorageVolumeCard({ volume, onDelete, deleting }: StorageVolumeCardProp
             <div className="flex justify-between text-sm">
               <span className="text-muted-foreground">Size</span>
               <span className="font-mono">
-                {formatStorageSize(BigInt(volume.sizeBytes))}
+                {formatStorageSize(BigInt(volume.sizeBytes ?? 0))}
               </span>
             </div>
             <div className="flex justify-between text-sm">
