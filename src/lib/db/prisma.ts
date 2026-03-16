@@ -150,6 +150,7 @@ function createPrismaClient(): PrismaClient {
   return new PrismaClient({
     adapter: new PrismaPg({
       connectionString: selected.url,
+      ssl: { rejectUnauthorized: false },
     }),
   });
 }
