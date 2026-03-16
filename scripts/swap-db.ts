@@ -15,25 +15,35 @@ function main() {
 
     let content = fs.readFileSync(SCHEMA_PATH, "utf-8");
 
-    if (targetProvider === "postgresql") {
-        // Swap sqlite -> postgresql
-        content = content.replace(
-            /datasource db \{\s+provider = "sqlite"\s+url\s+= env\("DATABASE_URL"\)\s+\}/,
-            `datasource db {
+    const pgBlock = `datasource db {
   provider  = "postgresql"
   url       = env("DATABASE_URL")
   directUrl = env("DIRECT_URL")
-}`
-        );
-    } else {
-        // Swap postgresql -> sqlite
-        content = content.replace(
-            /datasource db \{\s+provider\s+= "postgresql"\s+url\s+= env\("DATABASE_URL"\)\s+directUrl = env\("DIRECT_URL"\)\s+\}/,
-            `datasource db {
+}`;
+
+    const sqliteBlock = `datasource db {
   provider = "sqlite"
-  url      = env("DATABASE_URL")
-}`
+}`;
+
+    if (targetProvider === "postgresql") {
+        // Match any datasource db block (with or without url/directUrl lines)
+        const replaced = content.replace(
+            /datasource db \{[^}]+\}/,
+            pgBlock
         );
+        if (replaced === content) {
+            console.error("WARNING: Could not find datasource db block to swap");
+        }
+        content = replaced;
+    } else {
+        const replaced = content.replace(
+            /datasource db \{[^}]+\}/,
+            sqliteBlock
+        );
+        if (replaced === content) {
+            console.error("WARNING: Could not find datasource db block to swap");
+        }
+        content = replaced;
     }
 
     fs.writeFileSync(SCHEMA_PATH, content);
