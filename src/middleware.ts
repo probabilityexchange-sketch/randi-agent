@@ -39,6 +39,16 @@ export async function middleware(request: NextRequest) {
 
   if (protectedPath) {
     if (!token) {
+      // If the user just came from /login, the cookie may not have propagated
+      // yet (Set-Cookie race). Let the client-side auth hook handle the retry
+      // instead of hard-redirecting back to /login which creates a loop.
+      const referer = request.headers.get("referer") || "";
+      const comingFromLogin = referer.includes("/login");
+      if (comingFromLogin) {
+        // Allow the navigation through — the page will render and the
+        // client-side useAuth hook will handle the session check.
+        return NextResponse.next();
+      }
       return NextResponse.redirect(new URL("/login", request.url));
     }
 
