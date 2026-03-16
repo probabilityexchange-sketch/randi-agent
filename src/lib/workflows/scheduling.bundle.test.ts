@@ -1,8 +1,7 @@
-import test from "node:test";
-import assert from "node:assert/strict";
+import { describe, it, expect } from "vitest";
 import { buildWorkflowScheduleDeploymentBundle } from "@/lib/workflows/scheduling";
 
-test("builds a complete deployment bundle for github actions", () => {
+it("builds a complete deployment bundle for github actions", () => {
   const bundle = buildWorkflowScheduleDeploymentBundle({
     scheduleId: "sched_123",
     workflowId: "wf_123",
@@ -13,24 +12,24 @@ test("builds a complete deployment bundle for github actions", () => {
     baseUrl: "https://api.test.com",
   });
 
-  assert.equal(bundle.scheduleId, "sched_123");
-  assert.equal(bundle.workflowId, "wf_123");
-  assert.equal(bundle.title, "Test Workflow");
-  assert.equal(bundle.filename, "scheduled-workflow-wf_123.yml");
-  assert.match(bundle.content, /X-Workflow-Schedule-Token/);
-  assert.match(bundle.content, /https:\/\/api\.test\.com/);
-  
+  expect(bundle.scheduleId).toBe("sched_123");
+  expect(bundle.workflowId).toBe("wf_123");
+  expect(bundle.title).toBe("Test Workflow");
+  expect(bundle.filename).toBe("scheduled-workflow-wf_123.yml");
+  expect(bundle.content).toMatch(/X-Workflow-Schedule-Token/);
+  expect(bundle.content).toMatch(/https:\/\/api\.test\.com/);
+
   // Secrets
   const secretNames = bundle.secrets.map(s => s.name);
-  assert.ok(secretNames.includes("WORKFLOW_SCHEDULE_TOKEN_SCHED_123"));
-  assert.ok(secretNames.includes("APP_BASE_URL"));
-  
+  expect(secretNames.includes("WORKFLOW_SCHEDULE_TOKEN_SCHED_123")).toBeTruthy();
+  expect(secretNames.includes("APP_BASE_URL")).toBeTruthy();
+
   // Instructions
-  assert.ok(bundle.instructions.length >= 5);
-  assert.ok(bundle.instructions.some(i => i.includes(".github/workflows/scheduled-workflow-wf_123.yml")));
+  expect(bundle.instructions.length >= 5).toBeTruthy();
+  expect(bundle.instructions.some(i => i.includes(".github/workflows/scheduled-workflow-wf_123.yml"))).toBeTruthy();
 });
 
-test("adds resync notice to instructions when state is needs_resync", () => {
+it("adds resync notice to instructions when state is needs_resync", () => {
   const bundle = buildWorkflowScheduleDeploymentBundle({
     scheduleId: "sched_123",
     workflowId: "wf_123",
@@ -40,11 +39,11 @@ test("adds resync notice to instructions when state is needs_resync", () => {
     deploymentState: "needs_resync",
   });
 
-  assert.equal(bundle.syncStatus, "needs_resync");
-  assert.ok(bundle.instructions.some(i => i.includes("NOTE: This workflow has changed")));
+  expect(bundle.syncStatus).toBe("needs_resync");
+  expect(bundle.instructions.some(i => i.includes("NOTE: This workflow has changed"))).toBeTruthy();
 });
 
-test("builds bundle for blocked state", () => {
+it("builds bundle for blocked state", () => {
   const bundle = buildWorkflowScheduleDeploymentBundle({
     scheduleId: "sched_123",
     workflowId: "wf_123",
@@ -54,6 +53,6 @@ test("builds bundle for blocked state", () => {
     deploymentState: "blocked",
   });
 
-  assert.equal(bundle.syncStatus, "blocked");
-  assert.ok(bundle.instructions.length >= 5);
+  expect(bundle.syncStatus).toBe("blocked");
+  expect(bundle.instructions.length >= 5).toBeTruthy();
 });

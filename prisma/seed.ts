@@ -15,6 +15,17 @@ const prisma = new PrismaClient({
 });
 
 async function main() {
+  // 0. Ensure a System User exists to own the default agents
+  const systemUser = await prisma.user.upsert({
+    where: { id: "system-user" },
+    update: {},
+    create: {
+      id: "system-user",
+      username: "system",
+      tier: "PRO",
+    },
+  });
+
   const researchTools = JSON.stringify({
     toolkits: ["hackernews", "coinmarketcap"],
     tools: [],
@@ -46,6 +57,7 @@ async function main() {
         toolkits: ["hackernews", "coinmarketcap"],
         tools: ["browse_web"],
       }),
+      ownerId: systemUser.id,
     },
     create: {
       slug: "research-assistant",
@@ -63,6 +75,7 @@ async function main() {
       }),
       defaultModel: "meta-llama/llama-3.3-70b-instruct:free",
       active: true,
+      ownerId: systemUser.id,
     },
   });
 
@@ -71,6 +84,7 @@ async function main() {
     where: { slug: "code-assistant" },
     update: {
       tools: codeTools,
+      ownerId: systemUser.id,
     },
     create: {
       slug: "code-assistant",
@@ -85,6 +99,7 @@ async function main() {
       tools: codeTools,
       defaultModel: "meta-llama/llama-3.3-70b-instruct:free",
       active: true,
+      ownerId: systemUser.id,
     },
   });
 
@@ -93,6 +108,7 @@ async function main() {
     where: { slug: "productivity-agent" },
     update: {
       tools: productivityTools,
+      ownerId: systemUser.id,
     },
     create: {
       slug: "productivity-agent",
@@ -107,6 +123,7 @@ async function main() {
       tools: productivityTools,
       defaultModel: "meta-llama/llama-3.3-70b-instruct:free",
       active: true,
+      ownerId: systemUser.id,
     },
   });
 
@@ -147,6 +164,7 @@ async function main() {
     update: {
       systemPrompt: leadSystemPrompt,
       tools: leadTools,
+      ownerId: systemUser.id,
     },
     create: {
       slug: "randi-lead",
@@ -161,6 +179,7 @@ async function main() {
       tools: leadTools,
       defaultModel: "meta-llama/llama-3.3-70b-instruct:free",
       active: true,
+      ownerId: systemUser.id,
     },
   });
 
@@ -169,6 +188,7 @@ async function main() {
     where: { slug: "token-launcher" },
     update: {
       tools: tokenLauncherTools,
+      ownerId: systemUser.id,
     },
     create: {
       slug: "token-launcher",
@@ -183,6 +203,7 @@ async function main() {
       tools: tokenLauncherTools,
       defaultModel: "meta-llama/llama-3.3-70b-instruct:free",
       active: true,
+      ownerId: systemUser.id,
     },
   });
 

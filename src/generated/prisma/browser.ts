@@ -58,10 +58,10 @@ export type TokenTransaction = Prisma.TokenTransactionModel
  */
 export type AgentConfig = Prisma.AgentConfigModel
 /**
- * Model StorageVolume
+ * Model AgentRental
  * 
  */
-export type StorageVolume = Prisma.StorageVolumeModel
+export type AgentRental = Prisma.AgentRentalModel
 /**
  * Model UserAgentPreference
  * 
@@ -117,6 +117,11 @@ export type CryptoDestinationAllowlistEntry = Prisma.CryptoDestinationAllowlistE
  * 
  */
 export type CryptoAuditLog = Prisma.CryptoAuditLogModel
+/**
+ * Model StorageVolume
+ * 
+ */
+export type StorageVolume = Prisma.StorageVolumeModel
 /**
  * Model FleetStats
  * 

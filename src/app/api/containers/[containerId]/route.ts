@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAuth, handleAuthError } from "@/lib/auth/middleware";
 import { prisma } from "@/lib/db/prisma";
 import { stopContainer } from "@/lib/docker/lifecycle";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/utils/rate-limit";
 
 export async function GET(
   _request: NextRequest,
@@ -9,6 +10,12 @@ export async function GET(
 ) {
   try {
     const auth = await requireAuth();
+
+    const { allowed } = await checkRateLimit(`containers:${auth.userId}`, RATE_LIMITS.provision);
+    if (!allowed) {
+      return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+    }
+
     const { containerId } = await params;
 
     const container = await prisma.container.findUnique({
@@ -44,6 +51,12 @@ export async function DELETE(
 ) {
   try {
     const auth = await requireAuth();
+
+    const { allowed } = await checkRateLimit(`containers:${auth.userId}`, RATE_LIMITS.provision);
+    if (!allowed) {
+      return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+    }
+
     const { containerId } = await params;
 
     const container = await prisma.container.findUnique({

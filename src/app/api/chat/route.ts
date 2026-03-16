@@ -28,6 +28,7 @@ import {
 import { requiresApproval, describeToolCall } from "@/lib/composio/approval-rules";
 import { parseAgentSkills, buildSkillsContext } from "@/lib/skills/loader";
 import { KILO_COMPOSIO_CHEAT_SHEET } from "@/lib/skills/tool-cheat-sheet";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/utils/rate-limit";
 
 // ---------------------------------------------------------------------------
 // CONFIG & SCHEMAS
@@ -66,6 +67,12 @@ function shouldForceToolCall(message: string): boolean {
 export async function POST(req: NextRequest) {
   try {
     const auth = await requireAuth();
+
+    const { allowed } = await checkRateLimit(`chat:${auth.userId}`, RATE_LIMITS.chat);
+    if (!allowed) {
+      return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+    }
+
     const body = await req.json();
     const parsed = schema.safeParse(body);
     if (!parsed.success) {

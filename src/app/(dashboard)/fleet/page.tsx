@@ -3,11 +3,14 @@
 import { useCallback, useEffect, useState } from "react";
 import type { FleetStatsResponse, FleetNodeStats } from "@/types/fleet";
 import { formatBytes } from "@/types/fleet";
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from "recharts";
 
 export default function FleetPage() {
     const [stats, setStats] = useState<FleetStatsResponse | null>(null);
+    const [historicalData, setHistoricalData] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [timeRange, setTimeRange] = useState<string>("24h"); // 24h, 7d, 30d
 
     const fetchStats = useCallback(async () => {
         try {
@@ -25,11 +28,39 @@ export default function FleetPage() {
         }
     }, []);
 
+    const fetchHistoricalData = useCallback(async () => {
+        try {
+            let since = "";
+            if (timeRange === "24h") {
+                since = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+            } else if (timeRange === "7d") {
+                since = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+            } else if (timeRange === "30d") {
+                since = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+            }
+
+            const res = await fetch(`/api/fleet/metrics?since=${since}&limit=100`);
+            if (res.ok) {
+                const data = await res.json();
+                setHistoricalData(data.stats || []);
+            } else {
+                console.warn("Failed to fetch historical fleet data");
+            }
+        } catch (err) {
+            console.error("Error fetching historical fleet data:", err);
+        }
+    }, [timeRange]);
+
     useEffect(() => {
         void fetchStats();
+        void fetchHistoricalData();
         const interval = setInterval(fetchStats, 30000); // Refresh every 30s
-        return () => clearInterval(interval);
-    }, [fetchStats]);
+        const historicalInterval = setInterval(fetchHistoricalData, 300000); // Refresh historical every 5min
+        return () => {
+            clearInterval(interval);
+            clearInterval(historicalInterval);
+        };
+    }, [fetchStats, fetchHistoricalData]);
 
     if (loading) {
         return (
@@ -62,16 +93,45 @@ export default function FleetPage() {
         ? (Number(stats.aggregate.totalMemoryUsed) / Number(stats.aggregate.totalMemoryLimit)) * 100
         : 0;
 
+    // Prepare data for charts
+    const chartData = historicalData.map(entry => ({
+        time: new Date(entry.reportedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+        cpu: entry.totalCpuPercent,
+        memory: Number(entry.totalMemoryUsed) / (1024 * 1024), // Convert to MB
+        networkRx: Number(entry.totalNetworkRx) / (1024 * 1024), // Convert to MB
+        networkTx: Number(entry.totalNetworkTx) / (1024 * 1024), // Convert to MB
+    }));
+
     return (
         <div className="max-w-6xl">
             <div className="flex items-center justify-between mb-6">
                 <h1 className="text-2xl font-bold">Fleet Monitoring</h1>
-                <button
-                    onClick={fetchStats}
-                    className="px-3 py-1.5 bg-muted hover:bg-border rounded-lg text-sm transition-colors"
-                >
-                    Refresh
-                </button>
+                <div className="flex gap-2">
+                    <button
+                        onClick={() => setTimeRange("24h")}
+                        className={`px-3 py-1.5 ${timeRange === "24h" ? "bg-primary text-primary-foreground" : "bg-muted hover:bg-border"} rounded-lg text-sm transition-colors`}
+                    >
+                        24h
+                    </button>
+                    <button
+                        onClick={() => setTimeRange("7d")}
+                        className={`px-3 py-1.5 ${timeRange === "7d" ? "bg-primary text-primary-foreground" : "bg-muted hover:bg-border"} rounded-lg text-sm transition-colors`}
+                    >
+                        7d
+                    </button>
+                    <button
+                        onClick={() => setTimeRange("30d")}
+                        className={`px-3 py-1.5 ${timeRange === "30d" ? "bg-primary text-primary-foreground" : "bg-muted hover:bg-border"} rounded-lg text-sm transition-colors`}
+                    >
+                        30d
+                    </button>
+                    <button
+                        onClick={fetchStats}
+                        className="px-3 py-1.5 bg-hover:bg-border rounded-lg text-sm transition-colors"
+                    >
+                        Refresh
+                    </button>
+                </div>
             </div>
 
             {/* Aggregate Stats */}
@@ -96,6 +156,60 @@ export default function FleetPage() {
                     </p>
                 </div>
             </div>
+
+            {/* Historical Charts */}
+            {historicalData.length > 0 && (
+                <div className="mb-8">
+                    <h2 className="text-lg font-semibold mb-4">Historical Trends ({timeRange})</h2>
+                    <div className="grid grid-cols-1 gap-6">
+                        {/* CPU Chart */}
+                        <div className="bg-card border border-border rounded-xl p-6">
+                            <h3 className="font-medium mb-4">CPU Usage (%)</h3>
+                            <ResponsiveContainer width="100%" height={250}>
+                                <LineChart data={chartData}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="time" tick={{ fontSize: 12 }} />
+                                    <YAxis tick={{ fontSize: 12 }} />
+                                    <Tooltip />
+                                    <Legend verticalAlign="top" height={36} />
+                                    <Line type="monotone" dataKey="cpu" stroke="#ff6361" strokeWidth={2} dot={false} />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </div>
+
+                        {/* Memory Chart */}
+                        <div className="bg-card border border-border rounded-xl p-6">
+                            <h3 className="font-medium mb-4">Memory Usage (MB)</h3>
+                            <ResponsiveContainer width="100%" height={250}>
+                                <LineChart data={chartData}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="time" tick={{ fontSize: 12 }} />
+                                    <YAxis tick={{ fontSize: 12 }} />
+                                    <Tooltip />
+                                    <Legend verticalAlign="top" height={36} />
+                                    <Line type="monotone" dataKey="memory" stroke="#4cc9f0" strokeWidth={2} dot={false} />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </div>
+
+                        {/* Network Chart */}
+                        <div className="bg-card border border-border rounded-xl p-6">
+                            <h3 className="font-medium mb-4">Network I/O (MB)</h3>
+                            <ResponsiveContainer width="100%" height={250}>
+                                <LineChart data={chartData}>
+                                    <CartesianGrid strokeDasharray="3 3" />
+                                    <XAxis dataKey="time" tick={{ fontSize: 12 }} />
+                                    <YAxis tick={{ fontSize: 12 }} />
+                                    <Tooltip />
+                                    <Legend verticalAlign="top" height={36} />
+                                    <Line type="monotone" dataKey="networkRx" stroke="#f72585" strokeWidth={2} dot={false} name="Received" />
+                                    <Line type="monotone" dataKey="networkTx" stroke="#4cc9f0" strokeWidth={2} dot={false} name="Transmitted" />
+                                </LineChart>
+                            </ResponsiveContainer>
+                        </div>
+                    </div>
+                </div>
+            )}
 
             {/* Network Stats */}
             <div className="bg-card border border-border rounded-xl p-4 mb-8">

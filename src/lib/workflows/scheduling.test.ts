@@ -1,5 +1,4 @@
-import test from "node:test";
-import assert from "node:assert/strict";
+import { describe, it, expect } from "vitest";
 import { compileWorkflowPlan } from "@/lib/workflows/compiler";
 import {
   buildGitHubActionsSchedulePreview,
@@ -10,17 +9,17 @@ import {
   isValidCronExpression,
 } from "@/lib/workflows/scheduling";
 
-test("validates basic cron expressions conservatively", () => {
-  assert.equal(isValidCronExpression("0 * * * *"), true);
-  assert.equal(isValidCronExpression("0 * * *"), false);
+it("validates basic cron expressions conservatively", () => {
+  expect(isValidCronExpression("0 * * * *")).toBe(true);
+  expect(isValidCronExpression("0 * * *")).toBe(false);
 });
 
-test("prefers github actions for scheduled workflow plans", () => {
+it("prefers github actions for scheduled workflow plans", () => {
   const plan = compileWorkflowPlan("Monitor GitHub issues every hour and alert me in Slack");
-  assert.equal(getWorkflowSchedulerTarget(plan), "github_actions");
+  expect(getWorkflowSchedulerTarget(plan)).toBe("github_actions");
 });
 
-test("blocks schedule activation when policy does not allow scheduled runs", () => {
+it("blocks schedule activation when policy does not allow scheduled runs", () => {
   const plan = compileWorkflowPlan("Buy SOL every day and notify me");
   const safety = {
     containsFinancialSteps: true,
@@ -55,11 +54,11 @@ test("blocks schedule activation when policy does not allow scheduled runs", () 
     },
   });
 
-  assert.equal(outcome.status, "blocked");
-  assert.match(outcome.reason ?? "", /ready|blocked|manual/i);
+  expect(outcome.status).toBe("blocked");
+  expect(outcome.reason ?? "").toMatch(/ready|blocked|manual/i);
 });
 
-test("builds a github actions preview with per-schedule secret metadata", () => {
+it("builds a github actions preview with per-schedule secret metadata", () => {
   const preview = buildGitHubActionsSchedulePreview({
     scheduleId: "sched_123",
     workflowId: "wf_123",
@@ -68,11 +67,11 @@ test("builds a github actions preview with per-schedule secret metadata", () => 
     timezone: "UTC",
   });
 
-  assert.equal(preview.secretName, buildWorkflowScheduleSecretName("sched_123"));
-  assert.match(preview.yaml, /X-Workflow-Schedule-Token/);
-  assert.match(preview.workflowPath, /scheduled-workflow-wf_123\.yml/);
+  expect(preview.secretName).toBe(buildWorkflowScheduleSecretName("sched_123"));
+  expect(preview.yaml).toMatch(/X-Workflow-Schedule-Token/);
+  expect(preview.workflowPath).toMatch(/scheduled-workflow-wf_123\.yml/);
 });
 
-test("hashes schedule tokens deterministically", () => {
-  assert.equal(hashWorkflowScheduleToken("abc"), hashWorkflowScheduleToken("abc"));
+it("hashes schedule tokens deterministically", () => {
+  expect(hashWorkflowScheduleToken("abc")).toBe(hashWorkflowScheduleToken("abc"));
 });

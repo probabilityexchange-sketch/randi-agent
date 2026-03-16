@@ -3,6 +3,7 @@ import { z } from "zod";
 import { prisma } from "@/lib/db/prisma";
 import { requireAuth, handleAuthError } from "@/lib/auth/middleware";
 import { getApprovalRequestForUser, resolveApprovalRequest } from "@/lib/policy/service";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/utils/rate-limit";
 
 const schema = z.object({
     approvalId: z.string().min(1),
@@ -18,6 +19,12 @@ const schema = z.object({
 export async function POST(req: NextRequest) {
     try {
         const auth = await requireAuth();
+
+        const { allowed } = await checkRateLimit(`chat-approve:${auth.userId}`, RATE_LIMITS.toolApproval);
+        if (!allowed) {
+            return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+        }
+
         const body = await req.json();
         const parsed = schema.safeParse(body);
 
@@ -88,6 +95,12 @@ export async function POST(req: NextRequest) {
 export async function GET(req: NextRequest) {
     try {
         const auth = await requireAuth();
+
+        const { allowed } = await checkRateLimit(`chat-approve:${auth.userId}`, RATE_LIMITS.toolApproval);
+        if (!allowed) {
+            return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+        }
+
         const { searchParams } = new URL(req.url);
         const approvalId = searchParams.get("approvalId");
 

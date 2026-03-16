@@ -24,6 +24,7 @@ import {
     isPremiumModel,
     type StakingLevel
 } from "@/lib/token-gating";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/utils/rate-limit";
 
 // Input schema
 const schema = z.object({
@@ -39,6 +40,12 @@ const MAX_HISTORY = 10;
 export async function POST(req: NextRequest) {
     try {
         const auth = await requireAuth();
+
+        const { allowed } = await checkRateLimit(`chat-v2:${auth.userId}`, RATE_LIMITS.chat);
+        if (!allowed) {
+            return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+        }
+
         const body = await req.json();
         const { agentId, agentSlug, sessionId, message, model } = schema.parse(body);
 

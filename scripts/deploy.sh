@@ -11,7 +11,7 @@ DB_USER="agentplatform"
 DB_NAME="agentplatform"
 DB_PASSWORD=$(openssl rand -hex 16)
 JWT_SECRET=$(openssl rand -hex 32)
-TREASURY_WALLET="2Hnkz9D72u7xcoA18tMdFLSRanAkj4eWcGB7iFH296N7"
+TREASURY_WALLET="${TREASURY_WALLET:?ERROR: TREASURY_WALLET environment variable must be set}"
 
 # Validate required Cloudflare credentials for HTTPS cert generation
 if [ -z "${CF_API_EMAIL:-}" ]; then

@@ -1,10 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/utils/rate-limit";
 
 export async function GET(
     request: NextRequest,
     { params }: { params: Promise<{ username: string }> }
 ) {
+    const ip = request.headers.get("x-forwarded-for") ?? "anon";
+    const { allowed } = await checkRateLimit(`user-profile:${ip}`, RATE_LIMITS.general);
+    if (!allowed) {
+        return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+    }
+
     const { username } = await params;
 
     try {

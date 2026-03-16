@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import { requireAuth, handleAuthError } from "@/lib/auth/middleware";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/utils/rate-limit";
 
 export async function GET(
   _req: NextRequest,
@@ -8,6 +9,12 @@ export async function GET(
 ) {
   try {
     const auth = await requireAuth();
+
+    const { allowed } = await checkRateLimit(`chat-session:${auth.userId}`, RATE_LIMITS.general);
+    if (!allowed) {
+      return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+    }
+
     const { sessionId } = await params;
 
     const { searchParams } = new URL(_req.url);

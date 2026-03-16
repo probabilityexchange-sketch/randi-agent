@@ -11,7 +11,10 @@
     "db:push": "npx prisma db push",
     "db:seed": "npx tsx prisma/seed.ts",
     "db:studio": "npx prisma studio",
-    "cleanup": "npx tsx scripts/cleanup-containers.ts"
+    "cleanup": "npx tsx scripts/cleanup-containers.ts",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
   },
   "prisma": {
     "seed": "npx tsx prisma/seed.ts"
@@ -20,7 +23,7 @@
     "@ai-sdk/mcp": "^1.0.25",
     "@ai-sdk/openai": "^3.0.37",
     "@ai-sdk/react": "^3.0.108",
-    "@composio/core": "^0.6.3",
+    "@composio/core": "^0.6.4",
     "@composio/vercel": "^0.6.4",
     "@prisma/adapter-pg": "^7.4.2",
     "@prisma/client": "^7.4.2",
@@ -48,6 +51,7 @@
     "react-dom": "19.2.4",
     "react-markdown": "^10.1.0",
     "react-syntax-highlighter": "^16.1.1",
+    "recharts": "^3.8.0",
     "remark-gfm": "^4.0.1",
     "tweetnacl": "^1.0.3",
     "uuid": "^13.0.0",
@@ -65,6 +69,7 @@
     "eslint-config-next": "15.5.12",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vitest": "^4.1.0"
   }
 }

@@ -9,6 +9,7 @@ import {
     getSnapshotDownloadUrl,
 } from "@/lib/storage/storage-service";
 import { prisma } from "@/lib/db/prisma";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/utils/rate-limit";
 
 /**
  * GET /api/storage/snapshot?agentSlug=...
@@ -17,6 +18,12 @@ import { prisma } from "@/lib/db/prisma";
 export async function GET(req: NextRequest) {
     try {
         const auth = await requireAuth();
+
+        const { allowed } = await checkRateLimit(`storage-snapshot:${auth.userId}`, RATE_LIMITS.provision);
+        if (!allowed) {
+            return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+        }
+
         const agentSlug = req.nextUrl.searchParams.get("agentSlug");
         if (!agentSlug) {
             return NextResponse.json({ error: "agentSlug is required" }, { status: 400 });
@@ -57,6 +64,12 @@ const snapshotPostSchema = z.discriminatedUnion("action", [
 export async function POST(req: NextRequest) {
     try {
         const auth = await requireAuth();
+
+        const { allowed } = await checkRateLimit(`storage-snapshot:${auth.userId}`, RATE_LIMITS.provision);
+        if (!allowed) {
+            return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+        }
+
         const rawBody = await req.json();
         const parsed = snapshotPostSchema.safeParse(rawBody);
         if (!parsed.success) {
@@ -100,13 +113,21 @@ export async function PUT(req: NextRequest) {
         return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
+    const bridgePutSchema = z.object({
+        storageKey: z.string().min(1),
+        userId: z.string().min(1),
+        agentSlug: z.string().min(1),
+        sizeBytes: z.number().int().nonnegative(),
+    });
+
     try {
-        const { storageKey, userId, agentSlug, sizeBytes } = await req.json();
-        if (!storageKey || !userId || !agentSlug || typeof sizeBytes !== "number") {
-            return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
+        const rawBody = await req.json();
+        const parsed = bridgePutSchema.safeParse(rawBody);
+        if (!parsed.success) {
+            return NextResponse.json({ error: "Missing required fields", details: parsed.error.flatten().fieldErrors }, { status: 400 });
         }
 
-        await recordSnapshot(userId, agentSlug, storageKey, sizeBytes);
+        await recordSnapshot(parsed.data.userId, parsed.data.agentSlug, parsed.data.storageKey, parsed.data.sizeBytes);
         return NextResponse.json({ success: true });
     } catch (err) {
         console.error("Bridge snapshot record failed:", err);

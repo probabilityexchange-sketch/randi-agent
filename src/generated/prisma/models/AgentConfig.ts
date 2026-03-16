@@ -32,6 +32,7 @@ export type AgentConfigAvgAggregateOutputType = {
   memoryLimit: number | null
   cpuLimit: number | null
   pidLimit: number | null
+  pricePerSession: number | null
 }
 
 export type AgentConfigSumAggregateOutputType = {
@@ -40,6 +41,7 @@ export type AgentConfigSumAggregateOutputType = {
   memoryLimit: bigint | null
   cpuLimit: bigint | null
   pidLimit: number | null
+  pricePerSession: number | null
 }
 
 export type AgentConfigMinAggregateOutputType = {
@@ -60,6 +62,9 @@ export type AgentConfigMinAggregateOutputType = {
   tools: string | null
   defaultModel: string | null
   active: boolean | null
+  pricePerSession: number | null
+  isPublic: boolean | null
+  ownerId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -82,6 +87,9 @@ export type AgentConfigMaxAggregateOutputType = {
   tools: string | null
   defaultModel: string | null
   active: boolean | null
+  pricePerSession: number | null
+  isPublic: boolean | null
+  ownerId: string | null
   createdAt: Date | null
   updatedAt: Date | null
 }
@@ -104,6 +112,9 @@ export type AgentConfigCountAggregateOutputType = {
   tools: number
   defaultModel: number
   active: number
+  pricePerSession: number
+  isPublic: number
+  ownerId: number
   createdAt: number
   updatedAt: number
   _all: number
@@ -116,6 +127,7 @@ export type AgentConfigAvgAggregateInputType = {
   memoryLimit?: true
   cpuLimit?: true
   pidLimit?: true
+  pricePerSession?: true
 }
 
 export type AgentConfigSumAggregateInputType = {
@@ -124,6 +136,7 @@ export type AgentConfigSumAggregateInputType = {
   memoryLimit?: true
   cpuLimit?: true
   pidLimit?: true
+  pricePerSession?: true
 }
 
 export type AgentConfigMinAggregateInputType = {
@@ -144,6 +157,9 @@ export type AgentConfigMinAggregateInputType = {
   tools?: true
   defaultModel?: true
   active?: true
+  pricePerSession?: true
+  isPublic?: true
+  ownerId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -166,6 +182,9 @@ export type AgentConfigMaxAggregateInputType = {
   tools?: true
   defaultModel?: true
   active?: true
+  pricePerSession?: true
+  isPublic?: true
+  ownerId?: true
   createdAt?: true
   updatedAt?: true
 }
@@ -188,6 +207,9 @@ export type AgentConfigCountAggregateInputType = {
   tools?: true
   defaultModel?: true
   active?: true
+  pricePerSession?: true
+  isPublic?: true
+  ownerId?: true
   createdAt?: true
   updatedAt?: true
   _all?: true
@@ -297,6 +319,9 @@ export type AgentConfigGroupByOutputType = {
   tools: string
   defaultModel: string
   active: boolean
+  pricePerSession: number
+  isPublic: boolean
+  ownerId: string
   createdAt: Date
   updatedAt: Date
   _count: AgentConfigCountAggregateOutputType | null
@@ -342,8 +367,13 @@ export type AgentConfigWhereInput = {
   tools?: Prisma.StringFilter<"AgentConfig"> | string
   defaultModel?: Prisma.StringFilter<"AgentConfig"> | string
   active?: Prisma.BoolFilter<"AgentConfig"> | boolean
+  pricePerSession?: Prisma.IntFilter<"AgentConfig"> | number
+  isPublic?: Prisma.BoolFilter<"AgentConfig"> | boolean
+  ownerId?: Prisma.StringFilter<"AgentConfig"> | string
   createdAt?: Prisma.DateTimeFilter<"AgentConfig"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"AgentConfig"> | Date | string
+  owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  rentals?: Prisma.AgentRentalListRelationFilter
   containers?: Prisma.ContainerListRelationFilter
   chatSessions?: Prisma.ChatSessionListRelationFilter
 }
@@ -366,8 +396,13 @@ export type AgentConfigOrderByWithRelationInput = {
   tools?: Prisma.SortOrder
   defaultModel?: Prisma.SortOrder
   active?: Prisma.SortOrder
+  pricePerSession?: Prisma.SortOrder
+  isPublic?: Prisma.SortOrder
+  ownerId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
+  owner?: Prisma.UserOrderByWithRelationInput
+  rentals?: Prisma.AgentRentalOrderByRelationAggregateInput
   containers?: Prisma.ContainerOrderByRelationAggregateInput
   chatSessions?: Prisma.ChatSessionOrderByRelationAggregateInput
 }
@@ -393,8 +428,13 @@ export type AgentConfigWhereUniqueInput = Prisma.AtLeast<{
   tools?: Prisma.StringFilter<"AgentConfig"> | string
   defaultModel?: Prisma.StringFilter<"AgentConfig"> | string
   active?: Prisma.BoolFilter<"AgentConfig"> | boolean
+  pricePerSession?: Prisma.IntFilter<"AgentConfig"> | number
+  isPublic?: Prisma.BoolFilter<"AgentConfig"> | boolean
+  ownerId?: Prisma.StringFilter<"AgentConfig"> | string
   createdAt?: Prisma.DateTimeFilter<"AgentConfig"> | Date | string
   updatedAt?: Prisma.DateTimeFilter<"AgentConfig"> | Date | string
+  owner?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  rentals?: Prisma.AgentRentalListRelationFilter
   containers?: Prisma.ContainerListRelationFilter
   chatSessions?: Prisma.ChatSessionListRelationFilter
 }, "id" | "slug">
@@ -417,6 +457,9 @@ export type AgentConfigOrderByWithAggregationInput = {
   tools?: Prisma.SortOrder
   defaultModel?: Prisma.SortOrder
   active?: Prisma.SortOrder
+  pricePerSession?: Prisma.SortOrder
+  isPublic?: Prisma.SortOrder
+  ownerId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
   _count?: Prisma.AgentConfigCountOrderByAggregateInput
@@ -447,6 +490,9 @@ export type AgentConfigScalarWhereWithAggregatesInput = {
   tools?: Prisma.StringWithAggregatesFilter<"AgentConfig"> | string
   defaultModel?: Prisma.StringWithAggregatesFilter<"AgentConfig"> | string
   active?: Prisma.BoolWithAggregatesFilter<"AgentConfig"> | boolean
+  pricePerSession?: Prisma.IntWithAggregatesFilter<"AgentConfig"> | number
+  isPublic?: Prisma.BoolWithAggregatesFilter<"AgentConfig"> | boolean
+  ownerId?: Prisma.StringWithAggregatesFilter<"AgentConfig"> | string
   createdAt?: Prisma.DateTimeWithAggregatesFilter<"AgentConfig"> | Date | string
   updatedAt?: Prisma.DateTimeWithAggregatesFilter<"AgentConfig"> | Date | string
 }
@@ -469,8 +515,12 @@ export type AgentConfigCreateInput = {
   tools?: string
   defaultModel?: string
   active?: boolean
+  pricePerSession?: number
+  isPublic?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  owner: Prisma.UserCreateNestedOneWithoutOwnedAgentsInput
+  rentals?: Prisma.AgentRentalCreateNestedManyWithoutAgentInput
   containers?: Prisma.ContainerCreateNestedManyWithoutAgentInput
   chatSessions?: Prisma.ChatSessionCreateNestedManyWithoutAgentInput
 }
@@ -493,8 +543,12 @@ export type AgentConfigUncheckedCreateInput = {
   tools?: string
   defaultModel?: string
   active?: boolean
+  pricePerSession?: number
+  isPublic?: boolean
+  ownerId: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  rentals?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutAgentInput
   containers?: Prisma.ContainerUncheckedCreateNestedManyWithoutAgentInput
   chatSessions?: Prisma.ChatSessionUncheckedCreateNestedManyWithoutAgentInput
 }
@@ -517,8 +571,12 @@ export type AgentConfigUpdateInput = {
   tools?: Prisma.StringFieldUpdateOperationsInput | string
   defaultModel?: Prisma.StringFieldUpdateOperationsInput | string
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pricePerSession?: Prisma.IntFieldUpdateOperationsInput | number
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  owner?: Prisma.UserUpdateOneRequiredWithoutOwnedAgentsNestedInput
+  rentals?: Prisma.AgentRentalUpdateManyWithoutAgentNestedInput
   containers?: Prisma.ContainerUpdateManyWithoutAgentNestedInput
   chatSessions?: Prisma.ChatSessionUpdateManyWithoutAgentNestedInput
 }
@@ -541,8 +599,12 @@ export type AgentConfigUncheckedUpdateInput = {
   tools?: Prisma.StringFieldUpdateOperationsInput | string
   defaultModel?: Prisma.StringFieldUpdateOperationsInput | string
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pricePerSession?: Prisma.IntFieldUpdateOperationsInput | number
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  rentals?: Prisma.AgentRentalUncheckedUpdateManyWithoutAgentNestedInput
   containers?: Prisma.ContainerUncheckedUpdateManyWithoutAgentNestedInput
   chatSessions?: Prisma.ChatSessionUncheckedUpdateManyWithoutAgentNestedInput
 }
@@ -565,6 +627,9 @@ export type AgentConfigCreateManyInput = {
   tools?: string
   defaultModel?: string
   active?: boolean
+  pricePerSession?: number
+  isPublic?: boolean
+  ownerId: string
   createdAt?: Date | string
   updatedAt?: Date | string
 }
@@ -587,6 +652,8 @@ export type AgentConfigUpdateManyMutationInput = {
   tools?: Prisma.StringFieldUpdateOperationsInput | string
   defaultModel?: Prisma.StringFieldUpdateOperationsInput | string
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pricePerSession?: Prisma.IntFieldUpdateOperationsInput | number
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
@@ -609,8 +676,21 @@ export type AgentConfigUncheckedUpdateManyInput = {
   tools?: Prisma.StringFieldUpdateOperationsInput | string
   defaultModel?: Prisma.StringFieldUpdateOperationsInput | string
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pricePerSession?: Prisma.IntFieldUpdateOperationsInput | number
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+}
+
+export type AgentConfigListRelationFilter = {
+  every?: Prisma.AgentConfigWhereInput
+  some?: Prisma.AgentConfigWhereInput
+  none?: Prisma.AgentConfigWhereInput
+}
+
+export type AgentConfigOrderByRelationAggregateInput = {
+  _count?: Prisma.SortOrder
 }
 
 export type AgentConfigScalarRelationFilter = {
@@ -636,6 +716,9 @@ export type AgentConfigCountOrderByAggregateInput = {
   tools?: Prisma.SortOrder
   defaultModel?: Prisma.SortOrder
   active?: Prisma.SortOrder
+  pricePerSession?: Prisma.SortOrder
+  isPublic?: Prisma.SortOrder
+  ownerId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -646,6 +729,7 @@ export type AgentConfigAvgOrderByAggregateInput = {
   memoryLimit?: Prisma.SortOrder
   cpuLimit?: Prisma.SortOrder
   pidLimit?: Prisma.SortOrder
+  pricePerSession?: Prisma.SortOrder
 }
 
 export type AgentConfigMaxOrderByAggregateInput = {
@@ -666,6 +750,9 @@ export type AgentConfigMaxOrderByAggregateInput = {
   tools?: Prisma.SortOrder
   defaultModel?: Prisma.SortOrder
   active?: Prisma.SortOrder
+  pricePerSession?: Prisma.SortOrder
+  isPublic?: Prisma.SortOrder
+  ownerId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -688,6 +775,9 @@ export type AgentConfigMinOrderByAggregateInput = {
   tools?: Prisma.SortOrder
   defaultModel?: Prisma.SortOrder
   active?: Prisma.SortOrder
+  pricePerSession?: Prisma.SortOrder
+  isPublic?: Prisma.SortOrder
+  ownerId?: Prisma.SortOrder
   createdAt?: Prisma.SortOrder
   updatedAt?: Prisma.SortOrder
 }
@@ -698,6 +788,49 @@ export type AgentConfigSumOrderByAggregateInput = {
   memoryLimit?: Prisma.SortOrder
   cpuLimit?: Prisma.SortOrder
   pidLimit?: Prisma.SortOrder
+  pricePerSession?: Prisma.SortOrder
+}
+
+export type AgentConfigCreateNestedManyWithoutOwnerInput = {
+  create?: Prisma.XOR<Prisma.AgentConfigCreateWithoutOwnerInput, Prisma.AgentConfigUncheckedCreateWithoutOwnerInput> | Prisma.AgentConfigCreateWithoutOwnerInput[] | Prisma.AgentConfigUncheckedCreateWithoutOwnerInput[]
+  connectOrCreate?: Prisma.AgentConfigCreateOrConnectWithoutOwnerInput | Prisma.AgentConfigCreateOrConnectWithoutOwnerInput[]
+  createMany?: Prisma.AgentConfigCreateManyOwnerInputEnvelope
+  connect?: Prisma.AgentConfigWhereUniqueInput | Prisma.AgentConfigWhereUniqueInput[]
+}
+
+export type AgentConfigUncheckedCreateNestedManyWithoutOwnerInput = {
+  create?: Prisma.XOR<Prisma.AgentConfigCreateWithoutOwnerInput, Prisma.AgentConfigUncheckedCreateWithoutOwnerInput> | Prisma.AgentConfigCreateWithoutOwnerInput[] | Prisma.AgentConfigUncheckedCreateWithoutOwnerInput[]
+  connectOrCreate?: Prisma.AgentConfigCreateOrConnectWithoutOwnerInput | Prisma.AgentConfigCreateOrConnectWithoutOwnerInput[]
+  createMany?: Prisma.AgentConfigCreateManyOwnerInputEnvelope
+  connect?: Prisma.AgentConfigWhereUniqueInput | Prisma.AgentConfigWhereUniqueInput[]
+}
+
+export type AgentConfigUpdateManyWithoutOwnerNestedInput = {
+  create?: Prisma.XOR<Prisma.AgentConfigCreateWithoutOwnerInput, Prisma.AgentConfigUncheckedCreateWithoutOwnerInput> | Prisma.AgentConfigCreateWithoutOwnerInput[] | Prisma.AgentConfigUncheckedCreateWithoutOwnerInput[]
+  connectOrCreate?: Prisma.AgentConfigCreateOrConnectWithoutOwnerInput | Prisma.AgentConfigCreateOrConnectWithoutOwnerInput[]
+  upsert?: Prisma.AgentConfigUpsertWithWhereUniqueWithoutOwnerInput | Prisma.AgentConfigUpsertWithWhereUniqueWithoutOwnerInput[]
+  createMany?: Prisma.AgentConfigCreateManyOwnerInputEnvelope
+  set?: Prisma.AgentConfigWhereUniqueInput | Prisma.AgentConfigWhereUniqueInput[]
+  disconnect?: Prisma.AgentConfigWhereUniqueInput | Prisma.AgentConfigWhereUniqueInput[]
+  delete?: Prisma.AgentConfigWhereUniqueInput | Prisma.AgentConfigWhereUniqueInput[]
+  connect?: Prisma.AgentConfigWhereUniqueInput | Prisma.AgentConfigWhereUniqueInput[]
+  update?: Prisma.AgentConfigUpdateWithWhereUniqueWithoutOwnerInput | Prisma.AgentConfigUpdateWithWhereUniqueWithoutOwnerInput[]
+  updateMany?: Prisma.AgentConfigUpdateManyWithWhereWithoutOwnerInput | Prisma.AgentConfigUpdateManyWithWhereWithoutOwnerInput[]
+  deleteMany?: Prisma.AgentConfigScalarWhereInput | Prisma.AgentConfigScalarWhereInput[]
+}
+
+export type AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput = {
+  create?: Prisma.XOR<Prisma.AgentConfigCreateWithoutOwnerInput, Prisma.AgentConfigUncheckedCreateWithoutOwnerInput> | Prisma.AgentConfigCreateWithoutOwnerInput[] | Prisma.AgentConfigUncheckedCreateWithoutOwnerInput[]
+  connectOrCreate?: Prisma.AgentConfigCreateOrConnectWithoutOwnerInput | Prisma.AgentConfigCreateOrConnectWithoutOwnerInput[]
+  upsert?: Prisma.AgentConfigUpsertWithWhereUniqueWithoutOwnerInput | Prisma.AgentConfigUpsertWithWhereUniqueWithoutOwnerInput[]
+  createMany?: Prisma.AgentConfigCreateManyOwnerInputEnvelope
+  set?: Prisma.AgentConfigWhereUniqueInput | Prisma.AgentConfigWhereUniqueInput[]
+  disconnect?: Prisma.AgentConfigWhereUniqueInput | Prisma.AgentConfigWhereUniqueInput[]
+  delete?: Prisma.AgentConfigWhereUniqueInput | Prisma.AgentConfigWhereUniqueInput[]
+  connect?: Prisma.AgentConfigWhereUniqueInput | Prisma.AgentConfigWhereUniqueInput[]
+  update?: Prisma.AgentConfigUpdateWithWhereUniqueWithoutOwnerInput | Prisma.AgentConfigUpdateWithWhereUniqueWithoutOwnerInput[]
+  updateMany?: Prisma.AgentConfigUpdateManyWithWhereWithoutOwnerInput | Prisma.AgentConfigUpdateManyWithWhereWithoutOwnerInput[]
+  deleteMany?: Prisma.AgentConfigScalarWhereInput | Prisma.AgentConfigScalarWhereInput[]
 }
 
 export type AgentConfigCreateNestedOneWithoutContainersInput = {
@@ -736,6 +869,127 @@ export type BigIntFieldUpdateOperationsInput = {
   divide?: bigint | number
 }
 
+export type AgentConfigCreateNestedOneWithoutRentalsInput = {
+  create?: Prisma.XOR<Prisma.AgentConfigCreateWithoutRentalsInput, Prisma.AgentConfigUncheckedCreateWithoutRentalsInput>
+  connectOrCreate?: Prisma.AgentConfigCreateOrConnectWithoutRentalsInput
+  connect?: Prisma.AgentConfigWhereUniqueInput
+}
+
+export type AgentConfigUpdateOneRequiredWithoutRentalsNestedInput = {
+  create?: Prisma.XOR<Prisma.AgentConfigCreateWithoutRentalsInput, Prisma.AgentConfigUncheckedCreateWithoutRentalsInput>
+  connectOrCreate?: Prisma.AgentConfigCreateOrConnectWithoutRentalsInput
+  upsert?: Prisma.AgentConfigUpsertWithoutRentalsInput
+  connect?: Prisma.AgentConfigWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.AgentConfigUpdateToOneWithWhereWithoutRentalsInput, Prisma.AgentConfigUpdateWithoutRentalsInput>, Prisma.AgentConfigUncheckedUpdateWithoutRentalsInput>
+}
+
+export type AgentConfigCreateWithoutOwnerInput = {
+  id?: string
+  slug: string
+  name: string
+  description: string
+  image: string
+  internalPort: number
+  tokensPerHour?: number
+  requiredTier?: string
+  memoryLimit: bigint | number
+  cpuLimit: bigint | number
+  pidLimit?: number
+  envVars?: string
+  volumes?: string
+  systemPrompt?: string
+  tools?: string
+  defaultModel?: string
+  active?: boolean
+  pricePerSession?: number
+  isPublic?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  rentals?: Prisma.AgentRentalCreateNestedManyWithoutAgentInput
+  containers?: Prisma.ContainerCreateNestedManyWithoutAgentInput
+  chatSessions?: Prisma.ChatSessionCreateNestedManyWithoutAgentInput
+}
+
+export type AgentConfigUncheckedCreateWithoutOwnerInput = {
+  id?: string
+  slug: string
+  name: string
+  description: string
+  image: string
+  internalPort: number
+  tokensPerHour?: number
+  requiredTier?: string
+  memoryLimit: bigint | number
+  cpuLimit: bigint | number
+  pidLimit?: number
+  envVars?: string
+  volumes?: string
+  systemPrompt?: string
+  tools?: string
+  defaultModel?: string
+  active?: boolean
+  pricePerSession?: number
+  isPublic?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  rentals?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutAgentInput
+  containers?: Prisma.ContainerUncheckedCreateNestedManyWithoutAgentInput
+  chatSessions?: Prisma.ChatSessionUncheckedCreateNestedManyWithoutAgentInput
+}
+
+export type AgentConfigCreateOrConnectWithoutOwnerInput = {
+  where: Prisma.AgentConfigWhereUniqueInput
+  create: Prisma.XOR<Prisma.AgentConfigCreateWithoutOwnerInput, Prisma.AgentConfigUncheckedCreateWithoutOwnerInput>
+}
+
+export type AgentConfigCreateManyOwnerInputEnvelope = {
+  data: Prisma.AgentConfigCreateManyOwnerInput | Prisma.AgentConfigCreateManyOwnerInput[]
+}
+
+export type AgentConfigUpsertWithWhereUniqueWithoutOwnerInput = {
+  where: Prisma.AgentConfigWhereUniqueInput
+  update: Prisma.XOR<Prisma.AgentConfigUpdateWithoutOwnerInput, Prisma.AgentConfigUncheckedUpdateWithoutOwnerInput>
+  create: Prisma.XOR<Prisma.AgentConfigCreateWithoutOwnerInput, Prisma.AgentConfigUncheckedCreateWithoutOwnerInput>
+}
+
+export type AgentConfigUpdateWithWhereUniqueWithoutOwnerInput = {
+  where: Prisma.AgentConfigWhereUniqueInput
+  data: Prisma.XOR<Prisma.AgentConfigUpdateWithoutOwnerInput, Prisma.AgentConfigUncheckedUpdateWithoutOwnerInput>
+}
+
+export type AgentConfigUpdateManyWithWhereWithoutOwnerInput = {
+  where: Prisma.AgentConfigScalarWhereInput
+  data: Prisma.XOR<Prisma.AgentConfigUpdateManyMutationInput, Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerInput>
+}
+
+export type AgentConfigScalarWhereInput = {
+  AND?: Prisma.AgentConfigScalarWhereInput | Prisma.AgentConfigScalarWhereInput[]
+  OR?: Prisma.AgentConfigScalarWhereInput[]
+  NOT?: Prisma.AgentConfigScalarWhereInput | Prisma.AgentConfigScalarWhereInput[]
+  id?: Prisma.StringFilter<"AgentConfig"> | string
+  slug?: Prisma.StringFilter<"AgentConfig"> | string
+  name?: Prisma.StringFilter<"AgentConfig"> | string
+  description?: Prisma.StringFilter<"AgentConfig"> | string
+  image?: Prisma.StringFilter<"AgentConfig"> | string
+  internalPort?: Prisma.IntFilter<"AgentConfig"> | number
+  tokensPerHour?: Prisma.IntFilter<"AgentConfig"> | number
+  requiredTier?: Prisma.StringFilter<"AgentConfig"> | string
+  memoryLimit?: Prisma.BigIntFilter<"AgentConfig"> | bigint | number
+  cpuLimit?: Prisma.BigIntFilter<"AgentConfig"> | bigint | number
+  pidLimit?: Prisma.IntFilter<"AgentConfig"> | number
+  envVars?: Prisma.StringFilter<"AgentConfig"> | string
+  volumes?: Prisma.StringFilter<"AgentConfig"> | string
+  systemPrompt?: Prisma.StringFilter<"AgentConfig"> | string
+  tools?: Prisma.StringFilter<"AgentConfig"> | string
+  defaultModel?: Prisma.StringFilter<"AgentConfig"> | string
+  active?: Prisma.BoolFilter<"AgentConfig"> | boolean
+  pricePerSession?: Prisma.IntFilter<"AgentConfig"> | number
+  isPublic?: Prisma.BoolFilter<"AgentConfig"> | boolean
+  ownerId?: Prisma.StringFilter<"AgentConfig"> | string
+  createdAt?: Prisma.DateTimeFilter<"AgentConfig"> | Date | string
+  updatedAt?: Prisma.DateTimeFilter<"AgentConfig"> | Date | string
+}
+
 export type AgentConfigCreateWithoutContainersInput = {
   id?: string
   slug: string
@@ -754,8 +1008,12 @@ export type AgentConfigCreateWithoutContainersInput = {
   tools?: string
   defaultModel?: string
   active?: boolean
+  pricePerSession?: number
+  isPublic?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  owner: Prisma.UserCreateNestedOneWithoutOwnedAgentsInput
+  rentals?: Prisma.AgentRentalCreateNestedManyWithoutAgentInput
   chatSessions?: Prisma.ChatSessionCreateNestedManyWithoutAgentInput
 }
 
@@ -777,8 +1035,12 @@ export type AgentConfigUncheckedCreateWithoutContainersInput = {
   tools?: string
   defaultModel?: string
   active?: boolean
+  pricePerSession?: number
+  isPublic?: boolean
+  ownerId: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  rentals?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutAgentInput
   chatSessions?: Prisma.ChatSessionUncheckedCreateNestedManyWithoutAgentInput
 }
 
@@ -816,8 +1078,12 @@ export type AgentConfigUpdateWithoutContainersInput = {
   tools?: Prisma.StringFieldUpdateOperationsInput | string
   defaultModel?: Prisma.StringFieldUpdateOperationsInput | string
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pricePerSession?: Prisma.IntFieldUpdateOperationsInput | number
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  owner?: Prisma.UserUpdateOneRequiredWithoutOwnedAgentsNestedInput
+  rentals?: Prisma.AgentRentalUpdateManyWithoutAgentNestedInput
   chatSessions?: Prisma.ChatSessionUpdateManyWithoutAgentNestedInput
 }
 
@@ -839,8 +1105,12 @@ export type AgentConfigUncheckedUpdateWithoutContainersInput = {
   tools?: Prisma.StringFieldUpdateOperationsInput | string
   defaultModel?: Prisma.StringFieldUpdateOperationsInput | string
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pricePerSession?: Prisma.IntFieldUpdateOperationsInput | number
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  rentals?: Prisma.AgentRentalUncheckedUpdateManyWithoutAgentNestedInput
   chatSessions?: Prisma.ChatSessionUncheckedUpdateManyWithoutAgentNestedInput
 }
 
@@ -862,8 +1132,12 @@ export type AgentConfigCreateWithoutChatSessionsInput = {
   tools?: string
   defaultModel?: string
   active?: boolean
+  pricePerSession?: number
+  isPublic?: boolean
   createdAt?: Date | string
   updatedAt?: Date | string
+  owner: Prisma.UserCreateNestedOneWithoutOwnedAgentsInput
+  rentals?: Prisma.AgentRentalCreateNestedManyWithoutAgentInput
   containers?: Prisma.ContainerCreateNestedManyWithoutAgentInput
 }
 
@@ -885,8 +1159,12 @@ export type AgentConfigUncheckedCreateWithoutChatSessionsInput = {
   tools?: string
   defaultModel?: string
   active?: boolean
+  pricePerSession?: number
+  isPublic?: boolean
+  ownerId: string
   createdAt?: Date | string
   updatedAt?: Date | string
+  rentals?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutAgentInput
   containers?: Prisma.ContainerUncheckedCreateNestedManyWithoutAgentInput
 }
 
@@ -924,8 +1202,12 @@ export type AgentConfigUpdateWithoutChatSessionsInput = {
   tools?: Prisma.StringFieldUpdateOperationsInput | string
   defaultModel?: Prisma.StringFieldUpdateOperationsInput | string
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pricePerSession?: Prisma.IntFieldUpdateOperationsInput | number
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  owner?: Prisma.UserUpdateOneRequiredWithoutOwnedAgentsNestedInput
+  rentals?: Prisma.AgentRentalUpdateManyWithoutAgentNestedInput
   containers?: Prisma.ContainerUpdateManyWithoutAgentNestedInput
 }
 
@@ -947,9 +1229,239 @@ export type AgentConfigUncheckedUpdateWithoutChatSessionsInput = {
   tools?: Prisma.StringFieldUpdateOperationsInput | string
   defaultModel?: Prisma.StringFieldUpdateOperationsInput | string
   active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pricePerSession?: Prisma.IntFieldUpdateOperationsInput | number
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  rentals?: Prisma.AgentRentalUncheckedUpdateManyWithoutAgentNestedInput
+  containers?: Prisma.ContainerUncheckedUpdateManyWithoutAgentNestedInput
+}
+
+export type AgentConfigCreateWithoutRentalsInput = {
+  id?: string
+  slug: string
+  name: string
+  description: string
+  image: string
+  internalPort: number
+  tokensPerHour?: number
+  requiredTier?: string
+  memoryLimit: bigint | number
+  cpuLimit: bigint | number
+  pidLimit?: number
+  envVars?: string
+  volumes?: string
+  systemPrompt?: string
+  tools?: string
+  defaultModel?: string
+  active?: boolean
+  pricePerSession?: number
+  isPublic?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  owner: Prisma.UserCreateNestedOneWithoutOwnedAgentsInput
+  containers?: Prisma.ContainerCreateNestedManyWithoutAgentInput
+  chatSessions?: Prisma.ChatSessionCreateNestedManyWithoutAgentInput
+}
+
+export type AgentConfigUncheckedCreateWithoutRentalsInput = {
+  id?: string
+  slug: string
+  name: string
+  description: string
+  image: string
+  internalPort: number
+  tokensPerHour?: number
+  requiredTier?: string
+  memoryLimit: bigint | number
+  cpuLimit: bigint | number
+  pidLimit?: number
+  envVars?: string
+  volumes?: string
+  systemPrompt?: string
+  tools?: string
+  defaultModel?: string
+  active?: boolean
+  pricePerSession?: number
+  isPublic?: boolean
+  ownerId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  containers?: Prisma.ContainerUncheckedCreateNestedManyWithoutAgentInput
+  chatSessions?: Prisma.ChatSessionUncheckedCreateNestedManyWithoutAgentInput
+}
+
+export type AgentConfigCreateOrConnectWithoutRentalsInput = {
+  where: Prisma.AgentConfigWhereUniqueInput
+  create: Prisma.XOR<Prisma.AgentConfigCreateWithoutRentalsInput, Prisma.AgentConfigUncheckedCreateWithoutRentalsInput>
+}
+
+export type AgentConfigUpsertWithoutRentalsInput = {
+  update: Prisma.XOR<Prisma.AgentConfigUpdateWithoutRentalsInput, Prisma.AgentConfigUncheckedUpdateWithoutRentalsInput>
+  create: Prisma.XOR<Prisma.AgentConfigCreateWithoutRentalsInput, Prisma.AgentConfigUncheckedCreateWithoutRentalsInput>
+  where?: Prisma.AgentConfigWhereInput
+}
+
+export type AgentConfigUpdateToOneWithWhereWithoutRentalsInput = {
+  where?: Prisma.AgentConfigWhereInput
+  data: Prisma.XOR<Prisma.AgentConfigUpdateWithoutRentalsInput, Prisma.AgentConfigUncheckedUpdateWithoutRentalsInput>
+}
+
+export type AgentConfigUpdateWithoutRentalsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  image?: Prisma.StringFieldUpdateOperationsInput | string
+  internalPort?: Prisma.IntFieldUpdateOperationsInput | number
+  tokensPerHour?: Prisma.IntFieldUpdateOperationsInput | number
+  requiredTier?: Prisma.StringFieldUpdateOperationsInput | string
+  memoryLimit?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  cpuLimit?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  pidLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  envVars?: Prisma.StringFieldUpdateOperationsInput | string
+  volumes?: Prisma.StringFieldUpdateOperationsInput | string
+  systemPrompt?: Prisma.StringFieldUpdateOperationsInput | string
+  tools?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultModel?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pricePerSession?: Prisma.IntFieldUpdateOperationsInput | number
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  owner?: Prisma.UserUpdateOneRequiredWithoutOwnedAgentsNestedInput
+  containers?: Prisma.ContainerUpdateManyWithoutAgentNestedInput
+  chatSessions?: Prisma.ChatSessionUpdateManyWithoutAgentNestedInput
+}
+
+export type AgentConfigUncheckedUpdateWithoutRentalsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  image?: Prisma.StringFieldUpdateOperationsInput | string
+  internalPort?: Prisma.IntFieldUpdateOperationsInput | number
+  tokensPerHour?: Prisma.IntFieldUpdateOperationsInput | number
+  requiredTier?: Prisma.StringFieldUpdateOperationsInput | string
+  memoryLimit?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  cpuLimit?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  pidLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  envVars?: Prisma.StringFieldUpdateOperationsInput | string
+  volumes?: Prisma.StringFieldUpdateOperationsInput | string
+  systemPrompt?: Prisma.StringFieldUpdateOperationsInput | string
+  tools?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultModel?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pricePerSession?: Prisma.IntFieldUpdateOperationsInput | number
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  ownerId?: Prisma.StringFieldUpdateOperationsInput | string
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   containers?: Prisma.ContainerUncheckedUpdateManyWithoutAgentNestedInput
+  chatSessions?: Prisma.ChatSessionUncheckedUpdateManyWithoutAgentNestedInput
+}
+
+export type AgentConfigCreateManyOwnerInput = {
+  id?: string
+  slug: string
+  name: string
+  description: string
+  image: string
+  internalPort: number
+  tokensPerHour?: number
+  requiredTier?: string
+  memoryLimit: bigint | number
+  cpuLimit: bigint | number
+  pidLimit?: number
+  envVars?: string
+  volumes?: string
+  systemPrompt?: string
+  tools?: string
+  defaultModel?: string
+  active?: boolean
+  pricePerSession?: number
+  isPublic?: boolean
+  createdAt?: Date | string
+  updatedAt?: Date | string
+}
+
+export type AgentConfigUpdateWithoutOwnerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  image?: Prisma.StringFieldUpdateOperationsInput | string
+  internalPort?: Prisma.IntFieldUpdateOperationsInput | number
+  tokensPerHour?: Prisma.IntFieldUpdateOperationsInput | number
+  requiredTier?: Prisma.StringFieldUpdateOperationsInput | string
+  memoryLimit?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  cpuLimit?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  pidLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  envVars?: Prisma.StringFieldUpdateOperationsInput | string
+  volumes?: Prisma.StringFieldUpdateOperationsInput | string
+  systemPrompt?: Prisma.StringFieldUpdateOperationsInput | string
+  tools?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultModel?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pricePerSession?: Prisma.IntFieldUpdateOperationsInput | number
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  rentals?: Prisma.AgentRentalUpdateManyWithoutAgentNestedInput
+  containers?: Prisma.ContainerUpdateManyWithoutAgentNestedInput
+  chatSessions?: Prisma.ChatSessionUpdateManyWithoutAgentNestedInput
+}
+
+export type AgentConfigUncheckedUpdateWithoutOwnerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  image?: Prisma.StringFieldUpdateOperationsInput | string
+  internalPort?: Prisma.IntFieldUpdateOperationsInput | number
+  tokensPerHour?: Prisma.IntFieldUpdateOperationsInput | number
+  requiredTier?: Prisma.StringFieldUpdateOperationsInput | string
+  memoryLimit?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  cpuLimit?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  pidLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  envVars?: Prisma.StringFieldUpdateOperationsInput | string
+  volumes?: Prisma.StringFieldUpdateOperationsInput | string
+  systemPrompt?: Prisma.StringFieldUpdateOperationsInput | string
+  tools?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultModel?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pricePerSession?: Prisma.IntFieldUpdateOperationsInput | number
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  rentals?: Prisma.AgentRentalUncheckedUpdateManyWithoutAgentNestedInput
+  containers?: Prisma.ContainerUncheckedUpdateManyWithoutAgentNestedInput
+  chatSessions?: Prisma.ChatSessionUncheckedUpdateManyWithoutAgentNestedInput
+}
+
+export type AgentConfigUncheckedUpdateManyWithoutOwnerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  name?: Prisma.StringFieldUpdateOperationsInput | string
+  description?: Prisma.StringFieldUpdateOperationsInput | string
+  image?: Prisma.StringFieldUpdateOperationsInput | string
+  internalPort?: Prisma.IntFieldUpdateOperationsInput | number
+  tokensPerHour?: Prisma.IntFieldUpdateOperationsInput | number
+  requiredTier?: Prisma.StringFieldUpdateOperationsInput | string
+  memoryLimit?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  cpuLimit?: Prisma.BigIntFieldUpdateOperationsInput | bigint | number
+  pidLimit?: Prisma.IntFieldUpdateOperationsInput | number
+  envVars?: Prisma.StringFieldUpdateOperationsInput | string
+  volumes?: Prisma.StringFieldUpdateOperationsInput | string
+  systemPrompt?: Prisma.StringFieldUpdateOperationsInput | string
+  tools?: Prisma.StringFieldUpdateOperationsInput | string
+  defaultModel?: Prisma.StringFieldUpdateOperationsInput | string
+  active?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  pricePerSession?: Prisma.IntFieldUpdateOperationsInput | number
+  isPublic?: Prisma.BoolFieldUpdateOperationsInput | boolean
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
 }
 
 
@@ -958,11 +1470,13 @@ export type AgentConfigUncheckedUpdateWithoutChatSessionsInput = {
  */
 
 export type AgentConfigCountOutputType = {
+  rentals: number
   containers: number
   chatSessions: number
 }
 
 export type AgentConfigCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  rentals?: boolean | AgentConfigCountOutputTypeCountRentalsArgs
   containers?: boolean | AgentConfigCountOutputTypeCountContainersArgs
   chatSessions?: boolean | AgentConfigCountOutputTypeCountChatSessionsArgs
 }
@@ -975,6 +1489,13 @@ export type AgentConfigCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.
    * Select specific fields to fetch from the AgentConfigCountOutputType
    */
   select?: Prisma.AgentConfigCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * AgentConfigCountOutputType without action
+ */
+export type AgentConfigCountOutputTypeCountRentalsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.AgentRentalWhereInput
 }
 
 /**
@@ -1010,8 +1531,13 @@ export type AgentConfigSelect<ExtArgs extends runtime.Types.Extensions.InternalA
   tools?: boolean
   defaultModel?: boolean
   active?: boolean
+  pricePerSession?: boolean
+  isPublic?: boolean
+  ownerId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  rentals?: boolean | Prisma.AgentConfig$rentalsArgs<ExtArgs>
   containers?: boolean | Prisma.AgentConfig$containersArgs<ExtArgs>
   chatSessions?: boolean | Prisma.AgentConfig$chatSessionsArgs<ExtArgs>
   _count?: boolean | Prisma.AgentConfigCountOutputTypeDefaultArgs<ExtArgs>
@@ -1035,8 +1561,12 @@ export type AgentConfigSelectCreateManyAndReturn<ExtArgs extends runtime.Types.E
   tools?: boolean
   defaultModel?: boolean
   active?: boolean
+  pricePerSession?: boolean
+  isPublic?: boolean
+  ownerId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["agentConfig"]>
 
 export type AgentConfigSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -1057,8 +1587,12 @@ export type AgentConfigSelectUpdateManyAndReturn<ExtArgs extends runtime.Types.E
   tools?: boolean
   defaultModel?: boolean
   active?: boolean
+  pricePerSession?: boolean
+  isPublic?: boolean
+  ownerId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
+  owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["agentConfig"]>
 
 export type AgentConfigSelectScalar = {
@@ -1079,22 +1613,33 @@ export type AgentConfigSelectScalar = {
   tools?: boolean
   defaultModel?: boolean
   active?: boolean
+  pricePerSession?: boolean
+  isPublic?: boolean
+  ownerId?: boolean
   createdAt?: boolean
   updatedAt?: boolean
 }
 
-export type AgentConfigOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "slug" | "name" | "description" | "image" | "internalPort" | "tokensPerHour" | "requiredTier" | "memoryLimit" | "cpuLimit" | "pidLimit" | "envVars" | "volumes" | "systemPrompt" | "tools" | "defaultModel" | "active" | "createdAt" | "updatedAt", ExtArgs["result"]["agentConfig"]>
+export type AgentConfigOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "slug" | "name" | "description" | "image" | "internalPort" | "tokensPerHour" | "requiredTier" | "memoryLimit" | "cpuLimit" | "pidLimit" | "envVars" | "volumes" | "systemPrompt" | "tools" | "defaultModel" | "active" | "pricePerSession" | "isPublic" | "ownerId" | "createdAt" | "updatedAt", ExtArgs["result"]["agentConfig"]>
 export type AgentConfigInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  rentals?: boolean | Prisma.AgentConfig$rentalsArgs<ExtArgs>
   containers?: boolean | Prisma.AgentConfig$containersArgs<ExtArgs>
   chatSessions?: boolean | Prisma.AgentConfig$chatSessionsArgs<ExtArgs>
   _count?: boolean | Prisma.AgentConfigCountOutputTypeDefaultArgs<ExtArgs>
 }
-export type AgentConfigIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
-export type AgentConfigIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
+export type AgentConfigIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}
+export type AgentConfigIncludeUpdateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  owner?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+}
 
 export type $AgentConfigPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   name: "AgentConfig"
   objects: {
+    owner: Prisma.$UserPayload<ExtArgs>
+    rentals: Prisma.$AgentRentalPayload<ExtArgs>[]
     containers: Prisma.$ContainerPayload<ExtArgs>[]
     chatSessions: Prisma.$ChatSessionPayload<ExtArgs>[]
   }
@@ -1116,6 +1661,9 @@ export type $AgentConfigPayload<ExtArgs extends runtime.Types.Extensions.Interna
     tools: string
     defaultModel: string
     active: boolean
+    pricePerSession: number
+    isPublic: boolean
+    ownerId: string
     createdAt: Date
     updatedAt: Date
   }, ExtArgs["result"]["agentConfig"]>
@@ -1512,6 +2060,8 @@ readonly fields: AgentConfigFieldRefs;
  */
 export interface Prisma__AgentConfigClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
+  owner<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  rentals<T extends Prisma.AgentConfig$rentalsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AgentConfig$rentalsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AgentRentalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   containers<T extends Prisma.AgentConfig$containersArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AgentConfig$containersArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ContainerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   chatSessions<T extends Prisma.AgentConfig$chatSessionsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.AgentConfig$chatSessionsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ChatSessionPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
@@ -1560,6 +2110,9 @@ export interface AgentConfigFieldRefs {
   readonly tools: Prisma.FieldRef<"AgentConfig", 'String'>
   readonly defaultModel: Prisma.FieldRef<"AgentConfig", 'String'>
   readonly active: Prisma.FieldRef<"AgentConfig", 'Boolean'>
+  readonly pricePerSession: Prisma.FieldRef<"AgentConfig", 'Int'>
+  readonly isPublic: Prisma.FieldRef<"AgentConfig", 'Boolean'>
+  readonly ownerId: Prisma.FieldRef<"AgentConfig", 'String'>
   readonly createdAt: Prisma.FieldRef<"AgentConfig", 'DateTime'>
   readonly updatedAt: Prisma.FieldRef<"AgentConfig", 'DateTime'>
 }
@@ -1791,7 +2344,6 @@ export type AgentConfigCreateManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * The data used to create many AgentConfigs.
    */
   data: Prisma.AgentConfigCreateManyInput | Prisma.AgentConfigCreateManyInput[]
-  skipDuplicates?: boolean
 }
 
 /**
@@ -1810,7 +2362,10 @@ export type AgentConfigCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Ext
    * The data used to create many AgentConfigs.
    */
   data: Prisma.AgentConfigCreateManyInput | Prisma.AgentConfigCreateManyInput[]
-  skipDuplicates?: boolean
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AgentConfigIncludeCreateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1881,6 +2436,10 @@ export type AgentConfigUpdateManyAndReturnArgs<ExtArgs extends runtime.Types.Ext
    * Limit how many AgentConfigs to update.
    */
   limit?: number
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AgentConfigIncludeUpdateManyAndReturn<ExtArgs> | null
 }
 
 /**
@@ -1947,6 +2506,30 @@ export type AgentConfigDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * Limit how many AgentConfigs to delete.
    */
   limit?: number
+}
+
+/**
+ * AgentConfig.rentals
+ */
+export type AgentConfig$rentalsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the AgentRental
+   */
+  select?: Prisma.AgentRentalSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the AgentRental
+   */
+  omit?: Prisma.AgentRentalOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.AgentRentalInclude<ExtArgs> | null
+  where?: Prisma.AgentRentalWhereInput
+  orderBy?: Prisma.AgentRentalOrderByWithRelationInput | Prisma.AgentRentalOrderByWithRelationInput[]
+  cursor?: Prisma.AgentRentalWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.AgentRentalScalarFieldEnum | Prisma.AgentRentalScalarFieldEnum[]
 }
 
 /**

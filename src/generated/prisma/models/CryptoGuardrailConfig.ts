@@ -1283,7 +1283,6 @@ export type CryptoGuardrailConfigCreateManyArgs<ExtArgs extends runtime.Types.Ex
    * The data used to create many CryptoGuardrailConfigs.
    */
   data: Prisma.CryptoGuardrailConfigCreateManyInput | Prisma.CryptoGuardrailConfigCreateManyInput[]
-  skipDuplicates?: boolean
 }
 
 /**
@@ -1302,7 +1301,6 @@ export type CryptoGuardrailConfigCreateManyAndReturnArgs<ExtArgs extends runtime
    * The data used to create many CryptoGuardrailConfigs.
    */
   data: Prisma.CryptoGuardrailConfigCreateManyInput | Prisma.CryptoGuardrailConfigCreateManyInput[]
-  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */

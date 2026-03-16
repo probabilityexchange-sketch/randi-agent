@@ -1,5 +1,20 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/utils/rate-limit";
+import { z } from "zod";
+
+const bigintField = z.union([z.number(), z.string()]).optional().default(0).transform(v => BigInt(v));
+
+const fleetStatsSchema = z.object({
+    nodeId: z.string().min(1),
+    nodeRegion: z.string().min(1),
+    totalContainers: z.number().int().min(0).default(0),
+    totalCpuPercent: z.number().min(0).default(0),
+    totalMemoryUsed: bigintField,
+    totalMemoryLimit: bigintField,
+    totalNetworkRx: bigintField,
+    totalNetworkTx: bigintField,
+});
 
 /**
  * GET /api/fleet/stats
@@ -9,6 +24,12 @@ import { prisma } from "@/lib/db/prisma";
  * - since: ISO timestamp to get stats after a certain time
  */
 export async function GET(req: NextRequest) {
+    const ip = req.headers.get("x-forwarded-for") ?? "anon";
+    const { allowed } = await checkRateLimit(`fleet-stats:${ip}`, RATE_LIMITS.general);
+    if (!allowed) {
+        return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+    }
+
     try {
         const nodeId = req.nextUrl.searchParams.get("nodeId");
         const since = req.nextUrl.searchParams.get("since");
@@ -118,34 +139,24 @@ export async function POST(req: NextRequest) {
 
     try {
         const body = await req.json();
-        const {
-            nodeId,
-            nodeRegion,
-            totalContainers,
-            totalCpuPercent,
-            totalMemoryUsed,
-            totalMemoryLimit,
-            totalNetworkRx,
-            totalNetworkTx,
-        } = body;
-
-        if (!nodeId || !nodeRegion) {
+        const parsed = fleetStatsSchema.safeParse(body);
+        if (!parsed.success) {
             return NextResponse.json(
-                { error: "nodeId and nodeRegion are required" },
+                { error: "Invalid request body", details: parsed.error.flatten().fieldErrors },
                 { status: 400 }
             );
         }
 
         const stat = await prisma.fleetStats.create({
             data: {
-                nodeId,
-                nodeRegion,
-                totalContainers: totalContainers ?? 0,
-                totalCpuPercent: totalCpuPercent ?? 0,
-                totalMemoryUsed: BigInt(totalMemoryUsed ?? 0),
-                totalMemoryLimit: BigInt(totalMemoryLimit ?? 0),
-                totalNetworkRx: BigInt(totalNetworkRx ?? 0),
-                totalNetworkTx: BigInt(totalNetworkTx ?? 0),
+                nodeId: parsed.data.nodeId,
+                nodeRegion: parsed.data.nodeRegion,
+                totalContainers: parsed.data.totalContainers,
+                totalCpuPercent: parsed.data.totalCpuPercent,
+                totalMemoryUsed: parsed.data.totalMemoryUsed,
+                totalMemoryLimit: parsed.data.totalMemoryLimit,
+                totalNetworkRx: parsed.data.totalNetworkRx,
+                totalNetworkTx: parsed.data.totalNetworkTx,
             },
         });
 

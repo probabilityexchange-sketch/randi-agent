@@ -1,12 +1,11 @@
-import test from "node:test";
-import assert from "node:assert/strict";
+import { describe, it, expect } from "vitest";
 import {
   estimateWorkflowCost,
   estimateWorkflowRunCost,
   getDefaultModelCost,
 } from "./estimator";
 
-test("estimates workflow cost with steps", () => {
+it("estimates workflow cost with steps", () => {
   const result = estimateWorkflowCost({
     steps: [
       { id: "1", description: "Research task", kind: "research", toolHints: [] },
@@ -15,13 +14,13 @@ test("estimates workflow cost with steps", () => {
     ],
   });
 
-  assert.ok(result.totalEstimate > 0);
-  assert.ok(result.breakdown.length === 3);
-  assert.strictEqual(result.isMinimum, true);
-  assert.ok(result.disclaimer.includes("external") || result.disclaimer.includes("minimum"));
+  expect(result.totalEstimate > 0).toBeTruthy();
+  expect(result.breakdown.length).toBe(3);
+  expect(result.isMinimum).toBe(true);
+  expect(result.disclaimer.includes("external") || result.disclaimer.includes("minimum")).toBeTruthy();
 });
 
-test("estimates workflow cost from plan JSON", () => {
+it("estimates workflow cost from plan JSON", () => {
   const planJson = JSON.stringify({
     steps: [
       { id: "1", description: "Research", kind: "research", toolHints: [] },
@@ -30,23 +29,23 @@ test("estimates workflow cost from plan JSON", () => {
 
   const result = estimateWorkflowRunCost({ workflowPlanJson: planJson });
 
-  assert.ok(result.totalEstimate > 0);
-  assert.strictEqual(result.breakdown.length, 1);
+  expect(result.totalEstimate > 0).toBeTruthy();
+  expect(result.breakdown.length).toBe(1);
 });
 
-test("handles invalid plan JSON gracefully", () => {
+it("handles invalid plan JSON gracefully", () => {
   const result = estimateWorkflowRunCost({ workflowPlanJson: "invalid json" });
 
-  assert.ok(result.totalEstimate > 0);
-  assert.ok(result.disclaimer.includes("fallback"));
+  expect(result.totalEstimate > 0).toBeTruthy();
+  expect(result.disclaimer.includes("fallback")).toBeTruthy();
 });
 
-test("returns default model cost", () => {
+it("returns default model cost", () => {
   const cost = getDefaultModelCost();
-  assert.ok(cost > 0);
+  expect(cost > 0).toBeTruthy();
 });
 
-test("estimates different costs for different step kinds", () => {
+it("estimates different costs for different step kinds", () => {
   const researchResult = estimateWorkflowCost({
     steps: [{ id: "1", description: "Research", kind: "research", toolHints: [] }],
   });
@@ -55,5 +54,5 @@ test("estimates different costs for different step kinds", () => {
     steps: [{ id: "1", description: "Notify", kind: "notify", toolHints: [] }],
   });
 
-  assert.notStrictEqual(researchResult.totalEstimate, notifyResult.totalEstimate);
+  expect(researchResult.totalEstimate).not.toBe(notifyResult.totalEstimate);
 });

@@ -4,6 +4,7 @@ import { createChatCompletion } from "@/lib/openrouter/client";
 import { executeOrchestrationToolCall, ORCHESTRATION_TOOLS, formatSpecialistResponse } from "@/lib/orchestration/tools";
 import { getAgentToolsFromConfig, composioToolsToOpenAI, executeOpenAIToolCall } from "@/lib/composio/client";
 import { getRandiContext } from "@/lib/randi/context";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/utils/rate-limit";
 import type OpenAI from "openai";
 
 type ChatTool = OpenAI.Chat.Completions.ChatCompletionTool;
@@ -18,6 +19,11 @@ export async function POST(req: NextRequest) {
         if (!token) {
             console.error("[Telegram Webhook] Error: No token provided in URL");
             return NextResponse.json({ error: "No token" }, { status: 400 });
+        }
+
+        const { allowed } = await checkRateLimit(`telegram:${token}`, RATE_LIMITS.chat);
+        if (!allowed) {
+            return NextResponse.json({ error: "Too many requests" }, { status: 429 });
         }
 
         const body = await req.json();

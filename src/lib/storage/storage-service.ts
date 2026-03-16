@@ -6,7 +6,7 @@ const STORAGE_BUCKET = "agent-storage";
 
 let _supabase: SupabaseClient | null = null;
 
-function getSupabaseAdmin(): SupabaseClient {
+export function getSupabaseAdmin(): SupabaseClient {
     if (_supabase) return _supabase;
 
     const url = process.env.NEXT_PUBLIC_SUPABASE_URL;

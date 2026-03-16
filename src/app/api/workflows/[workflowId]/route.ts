@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { requireAuth, handleAuthError } from "@/lib/auth/middleware";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/utils/rate-limit";
 import { getWorkflowById, listWorkflowRuns } from "@/lib/workflows/service";
 
 export async function GET(
@@ -8,6 +9,12 @@ export async function GET(
 ) {
   try {
     const auth = await requireAuth();
+
+    const { allowed } = await checkRateLimit(`workflows:${auth.userId}`, RATE_LIMITS.general);
+    if (!allowed) {
+      return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+    }
+
     const { workflowId } = await params;
     const { searchParams } = new URL(req.url);
     const includeRuns = searchParams.get("includeRuns") === "true";

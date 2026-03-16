@@ -3,6 +3,7 @@ import { PublicKey } from "@solana/web3.js";
 import { getAssociatedTokenAddress } from "@solana/spl-token";
 import { prisma } from "@/lib/db/prisma";
 import { requireAuth, handleAuthError } from "@/lib/auth/middleware";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/utils/rate-limit";
 import { connection } from "@/lib/solana/connection";
 import {
     getStakingLevel,
@@ -26,6 +27,11 @@ interface ParsedTokenAccountData {
 export async function POST(req: NextRequest) {
     try {
         const auth = await requireAuth();
+
+        const { allowed } = await checkRateLimit(`staking-verify:${auth.userId}`, RATE_LIMITS.general);
+        if (!allowed) {
+            return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+        }
 
         const user = await prisma.user.findUnique({
             where: { id: auth.userId },
@@ -146,6 +152,11 @@ export async function POST(req: NextRequest) {
 export async function GET() {
     try {
         const auth = await requireAuth();
+
+        const { allowed } = await checkRateLimit(`staking-verify:${auth.userId}`, RATE_LIMITS.general);
+        if (!allowed) {
+            return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+        }
 
         const user = await prisma.user.findUnique({
             where: { id: auth.userId },

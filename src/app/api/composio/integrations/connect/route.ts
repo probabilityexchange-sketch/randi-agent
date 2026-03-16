@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { requireAuth, handleAuthError } from "@/lib/auth/middleware";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/utils/rate-limit";
 import {
   getComposioClient,
   resolveComposioUserId,
@@ -37,6 +38,12 @@ function getCallbackBaseUrl(request: NextRequest): string {
 export async function POST(request: NextRequest) {
   try {
     const auth = await requireAuth();
+
+    const { allowed } = await checkRateLimit(`composio-connect:${auth.userId}`, RATE_LIMITS.general);
+    if (!allowed) {
+      return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+    }
+
     const composio = await getComposioClient();
 
     if (!composio) {

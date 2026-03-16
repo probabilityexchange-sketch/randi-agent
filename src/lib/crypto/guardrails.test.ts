@@ -1,5 +1,4 @@
-import test from "node:test";
-import assert from "node:assert/strict";
+import { describe, it, expect } from "vitest";
 import { evaluateCryptoGuardrails } from "@/lib/crypto/guardrails";
 
 const cryptoConfig = {
@@ -10,7 +9,7 @@ const cryptoConfig = {
   blockScheduledCrypto: true,
 };
 
-test("allows read-only crypto actions", () => {
+it("allows read-only crypto actions", () => {
   const decision = evaluateCryptoGuardrails({
     subjectType: "tool_call",
     triggerSource: "chat",
@@ -23,12 +22,12 @@ test("allows read-only crypto actions", () => {
     destinations: [],
   });
 
-  assert.equal(decision.decision, "allow");
-  assert.equal(decision.simulateOnly, false);
-  assert.equal(decision.requiresApproval, false);
+  expect(decision.decision).toBe("allow");
+  expect(decision.simulateOnly).toBe(false);
+  expect(decision.requiresApproval).toBe(false);
 });
 
-test("requires approval for within-cap allowlisted crypto writes", () => {
+it("requires approval for within-cap allowlisted crypto writes", () => {
   const decision = evaluateCryptoGuardrails({
     subjectType: "tool_call",
     triggerSource: "chat",
@@ -46,12 +45,12 @@ test("requires approval for within-cap allowlisted crypto writes", () => {
     destinations: [{ destination: "0xallow", asset: "USDC", active: true }],
   });
 
-  assert.equal(decision.decision, "approve");
-  assert.equal(decision.capStatus, "within_cap");
-  assert.equal(decision.allowlistStatus, "allowlisted");
+  expect(decision.decision).toBe("approve");
+  expect(decision.capStatus).toBe("within_cap");
+  expect(decision.allowlistStatus).toBe("allowlisted");
 });
 
-test("denies over-cap crypto writes", () => {
+it("denies over-cap crypto writes", () => {
   const decision = evaluateCryptoGuardrails({
     subjectType: "tool_call",
     triggerSource: "chat",
@@ -69,11 +68,11 @@ test("denies over-cap crypto writes", () => {
     destinations: [{ destination: "0xallow", asset: "USDC", active: true }],
   });
 
-  assert.equal(decision.decision, "deny");
-  assert.equal(decision.capStatus, "over_cap");
+  expect(decision.decision).toBe("deny");
+  expect(decision.capStatus).toBe("over_cap");
 });
 
-test("simulates crypto writes when amount is missing", () => {
+it("simulates crypto writes when amount is missing", () => {
   const decision = evaluateCryptoGuardrails({
     subjectType: "tool_call",
     triggerSource: "chat",
@@ -89,12 +88,12 @@ test("simulates crypto writes when amount is missing", () => {
     destinations: [{ destination: "exchange-account", active: true }],
   });
 
-  assert.equal(decision.decision, "simulate");
-  assert.equal(decision.simulateOnly, true);
-  assert.equal(decision.capStatus, "missing_amount");
+  expect(decision.decision).toBe("simulate");
+  expect(decision.simulateOnly).toBe(true);
+  expect(decision.capStatus).toBe("missing_amount");
 });
 
-test("denies scheduled crypto writes even when capped and allowlisted", () => {
+it("denies scheduled crypto writes even when capped and allowlisted", () => {
   const decision = evaluateCryptoGuardrails({
     subjectType: "tool_call",
     triggerSource: "schedule",
@@ -112,5 +111,5 @@ test("denies scheduled crypto writes even when capped and allowlisted", () => {
     destinations: [{ destination: "0xallow", asset: "USDC", active: true }],
   });
 
-  assert.equal(decision.decision, "deny");
+  expect(decision.decision).toBe("deny");
 });

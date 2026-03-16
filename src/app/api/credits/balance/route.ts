@@ -1,10 +1,16 @@
 import { NextResponse } from "next/server";
 import { requireAuth, handleAuthError } from "@/lib/auth/middleware";
 import { prisma } from "@/lib/db/prisma";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/utils/rate-limit";
 
 export async function GET() {
   try {
     const auth = await requireAuth();
+
+    const { allowed } = await checkRateLimit(`credits-balance:${auth.userId}`, RATE_LIMITS.general);
+    if (!allowed) {
+      return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+    }
 
     const user = await prisma.user.findUnique({
       where: { id: auth.userId },

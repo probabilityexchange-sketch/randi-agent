@@ -1,10 +1,17 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db/prisma";
 import { requireAuth, handleAuthError } from "@/lib/auth/middleware";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/utils/rate-limit";
 
 export async function POST(req: NextRequest) {
     try {
         const auth = await requireAuth();
+
+        const { allowed } = await checkRateLimit(`chat-start:${auth.userId}`, RATE_LIMITS.chat);
+        if (!allowed) {
+            return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+        }
+
         const { agentId = 'randi-lead', preferDedicated = false } = await req.json();
 
         // 1. Resolve agent

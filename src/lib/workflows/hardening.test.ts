@@ -1,5 +1,4 @@
-import test from "node:test";
-import assert from "node:assert/strict";
+import { describe, it, expect } from "vitest";
 import { deriveWorkflowSafety } from "@/lib/workflows/persistence";
 import { evaluatePolicy } from "@/lib/policy/engine";
 import { getScheduleActivationOutcome } from "@/lib/workflows/scheduling";
@@ -43,7 +42,7 @@ const mockWorkflowPlan = (overrides: Partial<WorkflowPlan>): WorkflowPlan => ({
   ...overrides,
 });
 
-test("deriveWorkflowSafety identifies crypto tools in toolHints as financial", () => {
+it("deriveWorkflowSafety identifies crypto tools in toolHints as financial", () => {
   const plan = mockWorkflowPlan({
     steps: [
       {
@@ -57,11 +56,11 @@ test("deriveWorkflowSafety identifies crypto tools in toolHints as financial", (
   });
 
   const safety = deriveWorkflowSafety(plan);
-  assert.equal(safety.containsFinancialSteps, true, "Should flag as financial due to crypto tool in toolHints");
-  assert.equal(safety.riskLevel, "high", "Should have high risk level");
+  expect(safety.containsFinancialSteps).toBe(true);
+  expect(safety.riskLevel).toBe("high");
 });
 
-test("deriveWorkflowSafety distinguishes between read and write crypto tools", () => {
+it("deriveWorkflowSafety distinguishes between read and write crypto tools", () => {
   const planRead = mockWorkflowPlan({
     steps: [
       {
@@ -75,7 +74,7 @@ test("deriveWorkflowSafety distinguishes between read and write crypto tools", (
   });
 
   const safetyRead = deriveWorkflowSafety(planRead);
-  assert.equal(safetyRead.containsFinancialSteps, false, "Read-only crypto tool should not flag as financial");
+  expect(safetyRead.containsFinancialSteps).toBe(false);
 
   const planWrite = mockWorkflowPlan({
     steps: [
@@ -90,10 +89,10 @@ test("deriveWorkflowSafety distinguishes between read and write crypto tools", (
   });
 
   const safetyWrite = deriveWorkflowSafety(planWrite);
-  assert.equal(safetyWrite.containsFinancialSteps, true, "Write-like crypto tool should flag as financial");
+  expect(safetyWrite.containsFinancialSteps).toBe(true);
 });
 
-test("getScheduleActivationOutcome blocks activation for financial workflows", () => {
+it("getScheduleActivationOutcome blocks activation for financial workflows", () => {
   const plan = mockWorkflowPlan({
     steps: [
       {
@@ -107,7 +106,7 @@ test("getScheduleActivationOutcome blocks activation for financial workflows", (
   });
 
   const safety = deriveWorkflowSafety(plan);
-  
+
   // Evaluate policy for schedule
   const policyDecision = evaluatePolicy({
     subjectType: "workflow_run",
@@ -129,7 +128,7 @@ test("getScheduleActivationOutcome blocks activation for financial workflows", (
     },
   });
 
-  assert.equal(policyDecision.decision, "deny", "Policy should deny scheduled financial workflow");
+  expect(policyDecision.decision).toBe("deny");
 
   const outcome = getScheduleActivationOutcome({
     workflowStatus: "ready",
@@ -138,11 +137,11 @@ test("getScheduleActivationOutcome blocks activation for financial workflows", (
     policyDecision,
   });
 
-  assert.equal(outcome.status, "blocked", "Schedule should be blocked for financial workflow");
-  assert.match(outcome.reason ?? "", /remain blocked/i);
+  expect(outcome.status).toBe("blocked");
+  expect(outcome.reason ?? "").toMatch(/remain blocked/i);
 });
 
-test("evaluatePolicy blocks scheduled financial workflows even if metadata is inconsistent", () => {
+it("evaluatePolicy blocks scheduled financial workflows even if metadata is inconsistent", () => {
   const safety = {
     containsFinancialSteps: false, // INCONSISTENT METADATA - this is the blind spot
     requiresApproval: false,
@@ -177,6 +176,6 @@ test("evaluatePolicy blocks scheduled financial workflows even if metadata is in
   });
 
   // AFTER FIX: This should now be "deny" because evaluatePolicy checks the scopes
-  assert.equal(decision.decision, "deny", "Policy MUST deny scheduled financial workflow even if metadata is inconsistent");
-  assert.match(decision.reason, /remain blocked/i);
+  expect(decision.decision).toBe("deny");
+  expect(decision.reason).toMatch(/remain blocked/i);
 });

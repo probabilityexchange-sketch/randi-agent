@@ -1,5 +1,4 @@
-import test from "node:test";
-import assert from "node:assert/strict";
+import { describe, it, expect } from "vitest";
 import { compileWorkflowPlan } from "./compiler";
 import {
   canStartWorkflowRun,
@@ -12,15 +11,15 @@ import {
   serializeWorkflowRetryHistory,
 } from "./persistence";
 
-test("serializes and restores workflow plans safely", () => {
+it("serializes and restores workflow plans safely", () => {
   const plan = compileWorkflowPlan("Check GitHub issues daily and summarize them in Slack");
   const serialized = serializeWorkflowPlan(plan);
   const restored = deserializeWorkflowPlan(serialized);
 
-  assert.deepEqual(restored, plan);
+  expect(restored).toEqual(plan);
 });
 
-test("marks financial workflows as blocked for execution", () => {
+it("marks financial workflows as blocked for execution", () => {
   const plan = compileWorkflowPlan("Buy SOL when price drops and send a Telegram update");
   const safety = deriveWorkflowSafety(plan);
   const policyDecision = evaluateWorkflowRunPolicy({
@@ -43,16 +42,16 @@ test("marks financial workflows as blocked for execution", () => {
   });
   const decision = canStartWorkflowRun({ workflowStatus: "draft", safety });
 
-  assert.equal(safety.containsFinancialSteps, true);
-  assert.equal(safety.requiresTransactionCaps, true);
-  assert.equal(safety.simulateOnlyByDefault, true);
-  assert.equal(policyDecision.decision, "simulate");
-  assert.equal(decision.allowed, false);
-  assert.equal(decision.status, "blocked");
-  assert.match(decision.blockedReason ?? "", /Workflow requires explicit approval/i);
+  expect(safety.containsFinancialSteps).toBe(true);
+  expect(safety.requiresTransactionCaps).toBe(true);
+  expect(safety.simulateOnlyByDefault).toBe(true);
+  expect(policyDecision.decision).toBe("simulate");
+  expect(decision.allowed).toBe(false);
+  expect(decision.status).toBe("blocked");
+  expect(decision.blockedReason ?? "").toMatch(/Workflow requires explicit approval/i);
 });
 
-test("marks low-risk workflows as ready when no open questions remain", () => {
+it("marks low-risk workflows as ready when no open questions remain", () => {
   const plan = {
     ...compileWorkflowPlan("Summarize yesterday's GitHub issues in Slack"),
     openQuestions: [],
@@ -61,12 +60,12 @@ test("marks low-risk workflows as ready when no open questions remain", () => {
   const status = determineRunnableStatus(plan, safety);
   const decision = canStartWorkflowRun({ workflowStatus: status, safety });
 
-  assert.equal(status, "ready");
-  assert.equal(decision.allowed, true);
-  assert.equal(decision.status, "pending");
+  expect(status).toBe("ready");
+  expect(decision.allowed).toBe(true);
+  expect(decision.status).toBe("pending");
 });
 
-test("round-trips retry history metadata", () => {
+it("round-trips retry history metadata", () => {
   const retryHistory = [
     {
       attempt: 1,
@@ -78,10 +77,10 @@ test("round-trips retry history metadata", () => {
   const serialized = serializeWorkflowRetryHistory(retryHistory);
   const restored = deserializeWorkflowRetryHistory(serialized);
 
-  assert.deepEqual(restored, retryHistory);
+  expect(restored).toEqual(retryHistory);
 });
 
-test("routes approval-required workflow runs through policy", () => {
+it("routes approval-required workflow runs through policy", () => {
   const plan = compileWorkflowPlan("Post a Slack summary after reviewing GitHub issues and wait for approval before sending");
   const safety = deriveWorkflowSafety(plan);
   const decision = evaluateWorkflowRunPolicy({
@@ -93,6 +92,6 @@ test("routes approval-required workflow runs through policy", () => {
     safety,
   });
 
-  assert.equal(decision.decision, "approve");
-  assert.equal(decision.requiresApproval, true);
+  expect(decision.decision).toBe("approve");
+  expect(decision.requiresApproval).toBe(true);
 });

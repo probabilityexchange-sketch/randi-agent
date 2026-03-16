@@ -1,5 +1,4 @@
-import test from "node:test";
-import assert from "node:assert/strict";
+import { describe, it, expect } from "vitest";
 
 import {
   buildSpecialistDelegationPrompt,
@@ -21,18 +20,18 @@ const baseArgs: DelegateToSpecialistArgs = {
   completionCriteria: ["Stop after two sources are checked.", "Report if a source is unavailable."],
 };
 
-test("buildSpecialistDelegationPrompt includes bounded contract details", () => {
+it("buildSpecialistDelegationPrompt includes bounded contract details", () => {
   const prompt = buildSpecialistDelegationPrompt(baseArgs);
 
-  assert.match(prompt, /Delegated task summary: Check two market data sources/);
-  assert.match(prompt, /Expected output format: structured_findings/);
-  assert.match(prompt, /Scope notes:/);
-  assert.match(prompt, /Completion criteria:/);
-  assert.match(prompt, /Return only valid JSON matching this shape:/);
-  assert.match(prompt, /Do not simulate tool results/);
+  expect(prompt).toMatch(/Delegated task summary: Check two market data sources/);
+  expect(prompt).toMatch(/Expected output format: structured_findings/);
+  expect(prompt).toMatch(/Scope notes:/);
+  expect(prompt).toMatch(/Completion criteria:/);
+  expect(prompt).toMatch(/Return only valid JSON matching this shape:/);
+  expect(prompt).toMatch(/Do not simulate tool results/);
 });
 
-test("parseSpecialistResponseEnvelope preserves structured completion details", () => {
+it("parseSpecialistResponseEnvelope preserves structured completion details", () => {
   const envelope = parseSpecialistResponseEnvelope(
     JSON.stringify({
       status: "partial",
@@ -48,24 +47,24 @@ test("parseSpecialistResponseEnvelope preserves structured completion details", 
     baseArgs
   );
 
-  assert.equal(envelope.specialistSlug, "research-assistant");
-  assert.equal(envelope.status, "partial");
-  assert.deepEqual(envelope.completedWork, ["Checked CoinMarketCap headlines", "Reviewed one browser snapshot"]);
-  assert.equal(envelope.evidence.length, 2);
-  assert.deepEqual(envelope.blockedBy, ["Second source returned a timeout"]);
-  assert.deepEqual(envelope.unresolved, ["Need confirmation from another independent source"]);
+  expect(envelope.specialistSlug).toBe("research-assistant");
+  expect(envelope.status).toBe("partial");
+  expect(envelope.completedWork).toEqual(["Checked CoinMarketCap headlines", "Reviewed one browser snapshot"]);
+  expect(envelope.evidence.length).toBe(2);
+  expect(envelope.blockedBy).toEqual(["Second source returned a timeout"]);
+  expect(envelope.unresolved).toEqual(["Need confirmation from another independent source"]);
 });
 
-test("parseSpecialistResponseEnvelope marks unstructured text as unresolved raw handoff", () => {
+it("parseSpecialistResponseEnvelope marks unstructured text as unresolved raw handoff", () => {
   const envelope = parseSpecialistResponseEnvelope("Looked around and found some things.", baseArgs);
 
-  assert.equal(envelope.status, "failed");
-  assert.equal(envelope.output, "Looked around and found some things.");
-  assert.deepEqual(envelope.completedWork, []);
-  assert.match(envelope.unresolved[0], /unstructured/i);
+  expect(envelope.status).toBe("failed");
+  expect(envelope.output).toBe("Looked around and found some things.");
+  expect(envelope.completedWork).toEqual([]);
+  expect(envelope.unresolved[0]).toMatch(/unstructured/i);
 });
 
-test("formatSpecialistResponse returns human readable markdown", () => {
+it("formatSpecialistResponse returns human readable markdown", () => {
   const envelope: SpecialistResponseEnvelope = {
     specialistSlug: "token-launcher",
     status: "completed",
@@ -80,14 +79,14 @@ test("formatSpecialistResponse returns human readable markdown", () => {
 
   const formatted = formatSpecialistResponse(envelope);
 
-  assert.match(formatted, /✅ \*TOKEN LAUNCH SPECIALIST REPORT\*/);
-  assert.match(formatted, /Launch \$RANDI token on Base/);
-  assert.match(formatted, /The token launch post is ready/);
-  assert.match(formatted, /- Validated parameters/);
-  assert.match(formatted, /- Generated !clawnch post/);
+  expect(formatted).toMatch(/✅ \*TOKEN LAUNCH SPECIALIST REPORT\*/);
+  expect(formatted).toMatch(/Launch \$RANDI token on Base/);
+  expect(formatted).toMatch(/The token launch post is ready/);
+  expect(formatted).toMatch(/- Validated parameters/);
+  expect(formatted).toMatch(/- Generated !clawnch post/);
 });
 
-test("formatSpecialistResponse handles blocked status with emoji", () => {
+it("formatSpecialistResponse handles blocked status with emoji", () => {
   const envelope: SpecialistResponseEnvelope = {
     specialistSlug: "research-assistant",
     status: "blocked",
@@ -102,10 +101,9 @@ test("formatSpecialistResponse handles blocked status with emoji", () => {
 
   const formatted = formatSpecialistResponse(envelope);
 
-  assert.match(formatted, /🛑 \*RESEARCH SPECIALIST REPORT\*/);
-  assert.match(formatted, /\*Blocked By:\*/);
-  assert.match(formatted, /- API is down/);
-  assert.match(formatted, /\*Unresolved Issues:\*/);
-  assert.match(formatted, /- Price remains unknown/);
+  expect(formatted).toMatch(/🛑 \*RESEARCH SPECIALIST REPORT\*/);
+  expect(formatted).toMatch(/\*Blocked By:\*/);
+  expect(formatted).toMatch(/- API is down/);
+  expect(formatted).toMatch(/\*Unresolved Issues:\*/);
+  expect(formatted).toMatch(/- Price remains unknown/);
 });
-
