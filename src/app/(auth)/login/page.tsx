@@ -20,7 +20,11 @@ export default function LoginPage() {
 
   useEffect(() => {
     if (isAuthenticated && sessionReady) {
-      router.push("/dashboard");
+      // Use replace instead of push to prevent the middleware redirect race:
+      // push creates a new navigation that the middleware may intercept before
+      // the auth cookie is visible, bouncing the user back to /login.
+      // replace also avoids a back-button loop.
+      router.replace("/dashboard");
     }
   }, [isAuthenticated, sessionReady, router]);
 
