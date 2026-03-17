@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { SelfMaintenanceService } from "@/lib/self-maintenance";
+import { SelfMaintenanceService, AnalysisResult } from "@/lib/self-maintenance";
 
 export const runtime = "nodejs";
 
@@ -18,8 +18,8 @@ export async function POST(request: Request) {
       success: true,
       analysis: {
         filesAnalyzed: result.analysis.length,
-        totalIssues: result.analysis.reduce((sum: number, file) => sum + file.issues.length, 0),
-        filesWithIssues: result.analysis.filter((f) => f.issues.length > 0).length
+        totalIssues: result.analysis.reduce((sum: number, file: AnalysisResult) => sum + file.issues.length, 0),
+        filesWithIssues: result.analysis.filter((f: AnalysisResult) => f.issues.length > 0).length
       },
       plan: {
         totalImprovements: result.plan.improvements.length,
