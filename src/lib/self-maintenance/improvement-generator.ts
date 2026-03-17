@@ -1,4 +1,5 @@
 import { AnalysisResult } from './analyzer';
+import { join } from 'path';
 
 export interface Improvement {
   filepath: string;
