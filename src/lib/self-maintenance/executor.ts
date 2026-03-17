@@ -51,11 +51,13 @@ export class ImprovementExecutor {
           return await this.executeDocAdd(improvement);
         case 'test-add':
           return await this.executeTestAdd(improvement);
-        default:
-          return {
-            success: false,
-            error: `Unsupported improvement type: ${improvement.type}`
-          };
+         default:
+           return {
+             success: false,
+             error: `Unsupported improvement type: ${improvement.type}`,
+             output: '',
+             filesChanged: []
+           };
       }
     } catch (error) {
       return {
