@@ -61,11 +61,11 @@ This roadmap outlines the strategic phases for evolving the Randi Agent Platform
 
 ## 👑 Phase 7: The Sovereign Agent (Vision)
 **Objective**: Transform from a chatbot to a fully autonomous, self-funded identity.
+- [ ] **Self-Maintenance Loop**: Randi can inspect its own codebase, identify drift or improvement opportunities, and launch bounded remote coding sessions that return review-ready changes.
+- [ ] **Autonomous Feature Execution**: Randi can turn roadmap items and maintenance requests into scoped implementation tasks with progress reporting, diff summaries, and branch-ready output.
 - [ ] **Brand Growth Pack**: Autonomous X and Farcaster monitoring/engagement skills.
 - [ ] **Infinite Memory Vault**: Persistent, personalized RAG storage for every user.
 - [ ] **Agent Swarms**: Multi-agent orchestration (PM -> Developer -> Tester) for complex builds.
-- [ ] **Self-Maintenance Loop**: Randi can inspect its own codebase, identify drift or improvement opportunities, and launch bounded remote coding sessions that return review-ready changes.
-- [ ] **Autonomous Feature Execution**: Randi can turn roadmap items and maintenance requests into scoped implementation tasks with progress reporting, diff summaries, and branch-ready output.
 - [ ] **Commercial Autonomy**: Shopify and Stripe skills to let Randi manage storefronts and refunds.
 - [ ] **Randi Minions**: "One-shot" end-to-end coding agents. [View Implementation Plan](file:///C:/Users/billy/.gemini/antigravity/brain/66f2185b-21de-4d7a-a758-907738220bed/implementation_plan.md)
 

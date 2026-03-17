@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "npx prisma generate && next build",
     "start": "next start",
-    "lint": "eslint",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "db:migrate": "npx prisma migrate dev",
     "db:push": "npx prisma db push",
     "db:seed": "npx tsx prisma/seed.ts",
@@ -14,7 +17,11 @@
     "cleanup": "npx tsx scripts/cleanup-containers.ts",
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "test:e2e": "playwright test",
+    "prepare": "husky",
+    "validate:skills": "tsx scripts/validate-skills.ts",
+    "self-maintenance": "tsx src/lib/self-maintenance/index.ts"
   },
   "prisma": {
     "seed": "npx tsx prisma/seed.ts"
@@ -67,6 +74,10 @@
     "@types/uuid": "^10.0.0",
     "eslint": "^10",
     "eslint-config-next": "15.5.12",
+    "eslint-config-prettier": "^9.0.0",
+    "husky": "^8.0.0",
+    "lint-staged": "^15.0.0",
+    "prettier": "^3.0.0",
     "tailwindcss": "^4",
     "tsx": "^4.21.0",
     "typescript": "^5",
