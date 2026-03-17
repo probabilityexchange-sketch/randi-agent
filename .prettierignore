@@ -1,0 +1,11 @@
+.next/
+out/
+build/
+node_modules/
+*.log
+coverage/
+*.tar.gz
+*.ttf
+*.png
+*.pdf
+*.ico

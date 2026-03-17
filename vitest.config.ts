@@ -6,7 +6,19 @@ export default defineConfig({
     globals: true,
     environment: "node",
     include: ["src/**/*.test.ts", "src/**/*.spec.ts"],
-    exclude: ["node_modules", ".next"],
+    exclude: ["node_modules", ".next", "out", "build", "e2e"],
+    coverage: {
+      provider: "v8",
+      reporter: ["text", "json", "html"],
+      thresholds: {
+        lines: 70,
+        functions: 70,
+        branches: 70,
+        statements: 70,
+      },
+      include: ["src/**/*.{ts,tsx}"],
+      exclude: ["src/**/*.test.ts", "src/**/*.spec.ts", "src/lib/kilo/**"],
+    },
   },
   resolve: {
     alias: {
