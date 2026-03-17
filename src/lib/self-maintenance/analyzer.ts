@@ -2,13 +2,13 @@ import { execSync } from 'child_process';
 import { existsSync, readdirSync, statSync } from 'fs';
 import { join, relative, resolve } from 'path';
 
-interface AnalysisResult {
+export interface AnalysisResult {
   filepath: string;
   issues: Issue[];
   metrics: Metrics;
 }
 
-interface Issue {
+export interface Issue {
   type: 'lint' | 'format' | 'test' | 'documentation' | 'complexity';
   severity: 'error' | 'warning' | 'info';
   message: string;
@@ -17,7 +17,7 @@ interface Issue {
   ruleId?: string;
 }
 
-interface Metrics {
+export interface Metrics {
   lines: number;
   statements: number;
   branches: number;
