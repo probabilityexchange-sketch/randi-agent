@@ -1,0 +1,52 @@
+{
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenpetersen.vscode-prettier-vscode",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit"
+  },
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ],
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "typescript.enablePromptUseWorkspaceTsdk": true,
+  "files.exclude": {
+    "**/.git": true,
+    "**/.svn": true,
+    "**/.hg": true,
+    "**/CVS": true,
+    "**/.DS_Store": true,
+    "**/.next": true,
+    "**/out": true,
+    "**/build": true,
+    "**/node_modules": true,
+    "**/coverage": true,
+    "**/*.log": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/.next": true,
+    "**/out": true,
+    "**/build": true,
+    "**/coverage": true,
+    "**/*.log": true,
+    "**/*.tar.gz": true,
+    "**/*.ttf": true
+  },
+  "files.watcherExclude": {
+    "**/node_modules/**": true,
+    "**/.next/**": true,
+    "**/out/**": true,
+    "**/build/**": true,
+    "**/coverage/**": true,
+    "**/*.log": true
+  },
+  "typescript.tsserver.maxTsServerMemory": 4096,
+  "typescript.tsserver.log": "off",
+  "editor.minimap.enabled": false,
+  "workbench.list.smoothScrolling": true,
+  "diffEditor.ignoreTrimWhitespace": false,
+  "explorer.excludeGitIgnore": true
+}

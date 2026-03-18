@@ -1,0 +1,573 @@
+=== NEW FILE: src/app/api/livekit/token/route.ts ===
+import { NextRequest, NextResponse } from "next/server";
+import { z } from "zod";
+import type { TokenSourceResponsePayload } from "livekit-client";
+import { AccessToken } from "livekit-server-sdk";
+
+import { requireAuth, handleAuthError } from "@/lib/auth/middleware";
+import { prisma } from "@/lib/db/prisma";
+import {
+  buildChatVoiceJobMetadata,
+  buildChatVoiceParticipantIdentity,
+  buildChatVoiceRoomConfiguration,
+  buildChatVoiceRoomName,
+  getLiveKitServerConfig,
+  resolveLiveKitAgentName,
+} from "@/lib/livekit/chat-voice";
+
+const querySchema = z.object({
+  sessionId: z.string().min(1),
+});
+
+function jsonResponse(body: object, init?: ResponseInit) {
+  return NextResponse.json(body, {
+    ...init,
+    headers: {
+      "Cache-Control": "no-store",
+      ...(init?.headers ?? {}),
+    },
+  });
+}
+
+export async function POST(req: NextRequest) {
+  try {
+    const liveKit = getLiveKitServerConfig();
+
+    if (!liveKit) {
+      return jsonResponse(
+        {
+          error:
+            "LiveKit voice is unavailable until LIVEKIT_URL, LIVEKIT_API_KEY, and LIVEKIT_API_SECRET are configured.",
+          code: "livekit_not_configured",
+        },
+        { status: 503 },
+      );
+    }
+
+    const auth = await requireAuth();
+    const { sessionId } = querySchema.parse({
+      sessionId: req.nextUrl.searchParams.get("sessionId"),
+    });
+
+    const session = await prisma.chatSession.findUnique({
+      where: { id: sessionId },
+      include: {
+        agent: {
+          select: {
+            id: true,
+            slug: true,
+            envVars: true,
+          },
+        },
+      },
+    });
+
+    if (!session || session.userId !== auth.userId) {
+      return jsonResponse({ error: "Session not found" }, { status: 404 });
+    }
+
+    const liveKitAgentName = resolveLiveKitAgentName({
+      agentEnvVars: session.agent.envVars,
+      fallbackAgentName: liveKit.defaultAgentName,
+    });
+
+    if (!liveKitAgentName) {
+      return jsonResponse(
+        {
+          error:
+            "LiveKit voice is unavailable until LIVEKIT_AGENT_NAME is configured or the agent envVars include livekitAgentName.",
+          code: "livekit_agent_not_configured",
+        },
+        { status: 503 },
+      );
+    }
+
+    const roomName = buildChatVoiceRoomName(session.id);
+    const participantIdentity = buildChatVoiceParticipantIdentity(session.id);
+    const participantName = "Randi chat user";
+    const dispatchMetadata = buildChatVoiceJobMetadata({
+      sessionId: session.id,
+      userId: auth.userId,
+      agentId: session.agent.id,
+      agentSlug: session.agent.slug,
+    });
+
+    const token = new AccessToken(liveKit.apiKey, liveKit.apiSecret, {
+      identity: participantIdentity,
+      name: participantName,
+      metadata: JSON.stringify({
+        source: "agent-platform-chat",
+        sessionId: session.id,
+      }),
+    });
+
+    token.addGrant({ roomJoin: true, room: roomName });
+    token.roomConfig = buildChatVoiceRoomConfiguration(liveKitAgentName, dispatchMetadata);
+
+    const payload: TokenSourceResponsePayload = {
+      server_url: liveKit.serverUrl,
+      participant_token: await token.toJwt(),
+    };
+
+    return jsonResponse(payload);
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return jsonResponse({ error: "Invalid LiveKit token request" }, { status: 400 });
+    }
+
+    return handleAuthError(error);
+  }
+}=== NEW FILE: src/components/chat/VoiceChatPanel.tsx ===
+"use client";
+
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { TokenSource } from "livekit-client";
+import {
+  BarVisualizer,
+  RoomAudioRenderer,
+  SessionProvider,
+  useAgent,
+  useSession,
+} from "@livekit/components-react";
+
+type VoiceStatus = "idle" | "connecting" | "live" | "error";
+
+interface VoiceChatPanelProps {
+  agentName: string;
+  sessionId: string;
+}
+
+const STATUS_LABELS: Record<VoiceStatus, string> = {
+  idle: "Idle",
+  connecting: "Connecting",
+  live: "Live",
+  error: "Error",
+};
+
+const STATUS_STYLES: Record<VoiceStatus, string> = {
+  idle: "border-border bg-muted/50 text-muted-foreground",
+  connecting: "border-amber-500/20 bg-amber-500/10 text-amber-400",
+  live: "border-emerald-500/20 bg-emerald-500/10 text-emerald-400",
+  error: "border-rose-500/20 bg-rose-500/10 text-rose-400",
+};
+
+function getErrorMessage(error: unknown): string {
+  if (error instanceof Error && error.message.trim()) {
+    return error.message;
+  }
+
+  return "Unable to start the LiveKit voice session.";
+}
+
+function AgentStateSummary() {
+  const agent = useAgent();
+
+  return (
+    <div className="rounded-2xl border border-border/60 bg-background/40 p-4">
+      <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+        Agent state
+      </p>
+      <p className="mt-2 text-lg font-semibold text-foreground capitalize">{agent.state}</p>
+      <p className="mt-1 text-sm text-muted-foreground">
+        {agent.state === "listening" && "Randi is ready for your next voice prompt."}
+        {agent.state === "thinking" && "Randi is processing what you said."}
+        {agent.state === "speaking" && "Randi is responding over LiveKit audio."}
+        {(agent.state === "connecting" || agent.state === "initializing") &&
+          "Waiting for the LiveKit agent worker to join this chat session."}
+        {agent.state === "disconnected" && "The voice session is not connected yet."}
+        {agent.state === "failed" && "The LiveKit agent did not become available in time."}
+        {agent.state === "idle" && "The agent is connected and waiting for live audio."}
+      </p>
+
+      <div className="mt-4 h-16 rounded-xl border border-border/60 bg-background/60 px-3 py-2">
+        {agent.microphoneTrack ? (
+          <BarVisualizer
+            track={agent.microphoneTrack}
+            state={agent.state}
+            barCount={12}
+            options={{ minHeight: 12, maxHeight: 96 }}
+            className="flex h-full items-end gap-1"
+          >
+            <span className="w-2 rounded-full bg-primary/25 transition-colors data-[lk-highlighted=true]:bg-primary" />
+          </BarVisualizer>
+        ) : (
+          <div className="flex h-full items-center justify-center text-sm text-muted-foreground">
+            Agent audio visualizer appears once the LiveKit agent publishes audio.
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+export function VoiceChatPanel({ agentName, sessionId }: VoiceChatPanelProps) {
+  const [error, setError] = useState<string | null>(null);
+  const [isMicrophoneEnabled, setIsMicrophoneEnabled] = useState(false);
+
+  const tokenSource = useMemo(
+    () =>
+      TokenSource.endpoint(`/api/livekit/token?sessionId=${encodeURIComponent(sessionId)}`, {
+        headers: {
+          "X-Requested-With": "XMLHttpRequest",
+        },
+      }),
+    [sessionId],
+  );
+
+  const session = useSession(tokenSource);
+
+  useEffect(() => {
+    return () => {
+      void session.end().catch(() => undefined);
+    };
+  }, [session]);
+
+  useEffect(() => {
+    if (!session.isConnected) {
+      setIsMicrophoneEnabled(false);
+    }
+  }, [session.connectionState, session.isConnected]);
+
+  const status: VoiceStatus = useMemo(() => {
+    if (error) {
+      return "error";
+    }
+
+    if (session.connectionState === "connecting") {
+      return "connecting";
+    }
+
+    if (session.isConnected) {
+      return "live";
+    }
+
+    return "idle";
+  }, [error, session.connectionState, session.isConnected]);
+
+  const helperText = useMemo(() => {
+    if (error) {
+      return error;
+    }
+
+    if (status === "connecting") {
+      return "Connecting to LiveKit and dispatching the configured voice agent for this chat session.";
+    }
+
+    if (status === "live") {
+      return "Your voice session is connected. Speak naturally and Randi will respond over LiveKit audio.";
+    }
+
+    return `Start a LiveKit Agents voice session for ${agentName} without changing the existing text-chat flow below.`;
+  }, [agentName, error, status]);
+
+  const handleStart = useCallback(async () => {
+    setError(null);
+
+    try {
+      await session.start({
+        tracks: {
+          microphone: {
+            enabled: true,
+          },
+        },
+      });
+      setIsMicrophoneEnabled(true);
+    } catch (caughtError) {
+      setError(getErrorMessage(caughtError));
+      setIsMicrophoneEnabled(false);
+    }
+  }, [session]);
+
+  const handleDisconnect = useCallback(async () => {
+    setError(null);
+
+    try {
+      await session.end();
+      setIsMicrophoneEnabled(false);
+    } catch (caughtError) {
+      setError(getErrorMessage(caughtError));
+    }
+  }, [session]);
+
+  const handleToggleMicrophone = useCallback(async () => {
+    setError(null);
+
+    try {
+      const nextEnabled = !session.room.localParticipant.isMicrophoneEnabled;
+      await session.room.localParticipant.setMicrophoneEnabled(nextEnabled);
+      setIsMicrophoneEnabled(nextEnabled);
+    } catch (caughtError) {
+      setError(getErrorMessage(caughtError));
+    }
+  }, [session]);
+
+  return (
+    <SessionProvider session={session}>
+      <div className="rounded-2xl border border-border bg-card/40 p-4">
+        <div className="flex items-start justify-between gap-4 flex-wrap">
+          <div>
+            <p className="text-sm font-semibold text-primary">LiveKit voice</p>
+            <h3 className="mt-2 text-xl font-black tracking-tight">Voice session for this chat</h3>
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+              {helperText}
+            </p>
+          </div>
+          <span
+            className={`inline-flex rounded-full border px-3 py-1 text-sm font-semibold ${STATUS_STYLES[status]}`}
+          >
+            {STATUS_LABELS[status]}
+          </span>
+        </div>
+
+        <div className="mt-4 grid gap-4 lg:grid-cols-[minmax(0,1fr)_320px]">
+          <div className="rounded-2xl border border-border/60 bg-background/40 p-4">
+            <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+              Session controls
+            </p>
+            <div className="mt-3 flex flex-wrap gap-3">
+              {!session.isConnected ? (
+                <button
+                  type="button"
+                  onClick={handleStart}
+                  disabled={status === "connecting"}
+                  className="rounded-xl bg-primary px-4 py-2 text-sm font-semibold text-white transition hover:bg-primary/90 disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {status === "connecting" ? "Connecting…" : "Start voice session"}
+                </button>
+              ) : (
+                <>
+                  <button
+                    type="button"
+                    onClick={handleToggleMicrophone}
+                    className="rounded-xl border border-border bg-background px-4 py-2 text-sm font-semibold text-foreground transition hover:bg-muted"
+                  >
+                    {isMicrophoneEnabled ? "Mute microphone" : "Unmute microphone"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={handleDisconnect}
+                    className="rounded-xl border border-border bg-background px-4 py-2 text-sm font-semibold text-foreground transition hover:bg-muted"
+                  >
+                    End voice session
+                  </button>
+                </>
+              )}
+            </div>
+
+            <div className="mt-4 grid gap-3 sm:grid-cols-2">
+              <div className="rounded-xl border border-border/60 bg-background/60 p-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+                  Transport
+                </p>
+                <p className="mt-2 text-sm text-foreground">LiveKit React session</p>
+              </div>
+              <div className="rounded-xl border border-border/60 bg-background/60 p-3">
+                <p className="text-xs font-semibold uppercase tracking-[0.22em] text-muted-foreground">
+                  Microphone
+                </p>
+                <p className="mt-2 text-sm text-foreground">
+                  {session.isConnected
+                    ? isMicrophoneEnabled
+                      ? "Publishing"
+                      : "Muted"
+                    : "Not connected"}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <AgentStateSummary />
+        </div>
+
+        <RoomAudioRenderer />
+      </div>
+    </SessionProvider>
+  );
+}=== NEW FILE: src/lib/livekit/chat-voice.test.ts ===
+import test from "node:test";
+import assert from "node:assert/strict";
+
+import {
+  CHAT_VOICE_ROOM_PREFIX,
+  buildChatVoiceJobMetadata,
+  buildChatVoiceParticipantIdentity,
+  buildChatVoiceRoomConfiguration,
+  buildChatVoiceRoomName,
+  getLiveKitServerConfig,
+  parseAgentEnvVars,
+  resolveLiveKitAgentName,
+} from "./chat-voice";
+
+test("getLiveKitServerConfig returns null until core server variables are configured", () => {
+  assert.equal(getLiveKitServerConfig({}), null);
+  assert.equal(
+    getLiveKitServerConfig({
+      LIVEKIT_URL: "wss://example.livekit.cloud",
+      LIVEKIT_API_KEY: "",
+      LIVEKIT_API_SECRET: "secret",
+    }),
+    null,
+  );
+});
+
+test("getLiveKitServerConfig trims env values and keeps default agent optional", () => {
+  const config = getLiveKitServerConfig({
+    LIVEKIT_URL: "  wss://example.livekit.cloud  ",
+    LIVEKIT_API_KEY: "  key  ",
+    LIVEKIT_API_SECRET: "  secret  ",
+    LIVEKIT_AGENT_NAME: "  randi-voice  ",
+  });
+
+  assert.deepEqual(config, {
+    serverUrl: "wss://example.livekit.cloud",
+    apiKey: "key",
+    apiSecret: "secret",
+    defaultAgentName: "randi-voice",
+  });
+});
+
+test("parseAgentEnvVars safely handles invalid JSON and non-object payloads", () => {
+  assert.deepEqual(parseAgentEnvVars(undefined), {});
+  assert.deepEqual(parseAgentEnvVars("not-json"), {});
+  assert.deepEqual(parseAgentEnvVars("[]"), {});
+});
+
+test("resolveLiveKitAgentName prefers agent env overrides over global fallback", () => {
+  const agentName = resolveLiveKitAgentName({
+    agentEnvVars: JSON.stringify({ livekitAgentName: "randi-voice-override" }),
+    fallbackAgentName: "randi-voice-default",
+  });
+
+  assert.equal(agentName, "randi-voice-override");
+});
+
+test("resolveLiveKitAgentName falls back to the shared env agent name", () => {
+  const agentName = resolveLiveKitAgentName({
+    agentEnvVars: JSON.stringify({ unrelated: true }),
+    fallbackAgentName: "randi-voice-default",
+  });
+
+  assert.equal(agentName, "randi-voice-default");
+});
+
+test("chat voice helpers generate stable room, identity, metadata, and room config", () => {
+  const sessionId = "sess_123";
+  const roomName = buildChatVoiceRoomName(sessionId);
+  const identity = buildChatVoiceParticipantIdentity(sessionId);
+  const metadata = buildChatVoiceJobMetadata({
+    sessionId,
+    userId: "user_123",
+    agentId: "agent_123",
+    agentSlug: "randi-lead",
+  });
+  const parsedMetadata = JSON.parse(metadata);
+  const roomConfig = buildChatVoiceRoomConfiguration("randi-voice", metadata);
+
+  assert.equal(roomName, `${CHAT_VOICE_ROOM_PREFIX}-${sessionId}`);
+  assert.equal(identity, `chat-user-${sessionId}`);
+  assert.deepEqual(parsedMetadata, {
+    source: "agent-platform-chat",
+    sessionId,
+    userId: "user_123",
+    agentId: "agent_123",
+    agentSlug: "randi-lead",
+  });
+  assert.equal(roomConfig.agents.length, 1);
+  assert.equal(roomConfig.agents[0]?.agentName, "randi-voice");
+  assert.equal(roomConfig.agents[0]?.metadata, metadata);
+});=== NEW FILE: src/lib/livekit/chat-voice.ts ===
+import { RoomAgentDispatch, RoomConfiguration } from "@livekit/protocol";
+
+export const CHAT_VOICE_ROOM_PREFIX = "chat-voice";
+export const LIVEKIT_AGENT_ENV_KEY = "livekitAgentName";
+
+export interface LiveKitServerConfig {
+  apiKey: string;
+  apiSecret: string;
+  defaultAgentName: string | null;
+  serverUrl: string;
+}
+
+export interface ChatVoiceMetadataInput {
+  agentId: string;
+  agentSlug: string;
+  sessionId: string;
+  userId: string;
+}
+
+type LiveKitConfigEnv = Record<string, string | undefined>;
+
+export function getLiveKitServerConfig(
+  env: LiveKitConfigEnv = process.env,
+): LiveKitServerConfig | null {
+  const serverUrl = env.LIVEKIT_URL?.trim();
+  const apiKey = env.LIVEKIT_API_KEY?.trim();
+  const apiSecret = env.LIVEKIT_API_SECRET?.trim();
+
+  if (!serverUrl || !apiKey || !apiSecret) {
+    return null;
+  }
+
+  return {
+    serverUrl,
+    apiKey,
+    apiSecret,
+    defaultAgentName: env.LIVEKIT_AGENT_NAME?.trim() || null,
+  };
+}
+
+export function buildChatVoiceRoomName(sessionId: string): string {
+  return `${CHAT_VOICE_ROOM_PREFIX}-${sessionId}`;
+}
+
+export function buildChatVoiceParticipantIdentity(sessionId: string): string {
+  return `chat-user-${sessionId}`;
+}
+
+export function parseAgentEnvVars(envVars?: string | null): Record<string, unknown> {
+  if (!envVars) {
+    return {};
+  }
+
+  try {
+    const parsed = JSON.parse(envVars);
+    return parsed && typeof parsed === "object" && !Array.isArray(parsed) ? parsed : {};
+  } catch {
+    return {};
+  }
+}
+
+export function resolveLiveKitAgentName(options: {
+  agentEnvVars?: string | null;
+  fallbackAgentName?: string | null;
+}): string | null {
+  const parsedEnv = parseAgentEnvVars(options.agentEnvVars);
+  const override = parsedEnv[LIVEKIT_AGENT_ENV_KEY];
+
+  if (typeof override === "string" && override.trim()) {
+    return override.trim();
+  }
+
+  return options.fallbackAgentName?.trim() || null;
+}
+
+export function buildChatVoiceJobMetadata(input: ChatVoiceMetadataInput): string {
+  return JSON.stringify({
+    source: "agent-platform-chat",
+    sessionId: input.sessionId,
+    userId: input.userId,
+    agentId: input.agentId,
+    agentSlug: input.agentSlug,
+  });
+}
+
+export function buildChatVoiceRoomConfiguration(agentName: string, metadata: string) {
+  return new RoomConfiguration({
+    agents: [
+      new RoomAgentDispatch({
+        agentName,
+        metadata,
+      }),
+    ],
+  });
+}

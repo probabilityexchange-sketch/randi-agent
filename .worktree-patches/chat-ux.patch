@@ -1,0 +1,741 @@
+diff --git a/src/app/api/chat/route.ts b/src/app/api/chat/route.ts
+index ffc850f..747bd71 100644
+--- a/src/app/api/chat/route.ts
++++ b/src/app/api/chat/route.ts
+@@ -1,7 +1,7 @@
+ import { aiOpenRouter } from "@/lib/ai/openrouter";
+ import { streamText, tool, stepCountIs, type ToolSet, type ModelMessage } from "ai";
+ import { handleNonStandardChat } from "@/lib/ai/resilience";
+-import { NextRequest, NextResponse } from "next/server";
++import { NextRequest } from "next/server";
+ import { prisma } from "@/lib/db/prisma";
+ import { requireAuth, handleAuthError } from "@/lib/auth/middleware";
+ import { z } from "zod";
+@@ -28,6 +28,7 @@ import {
+ import { requiresApproval, describeToolCall } from "@/lib/composio/approval-rules";
+ import { parseAgentSkills, buildSkillsContext } from "@/lib/skills/loader";
+ import { KILO_COMPOSIO_CHEAT_SHEET } from "@/lib/skills/tool-cheat-sheet";
++import { createErrorResponse, isApiError, parseApprovalRequiredError, type ErrorCode, type ApiError } from "@/lib/chat/response";
+ 
+ // ---------------------------------------------------------------------------
+ // CONFIG & SCHEMAS
+@@ -225,22 +226,52 @@ export async function POST(req: NextRequest) {
+       const approval = await prisma.toolApproval.findUnique({
+         where: { id: resumeApprovalId },
+       });
+-      if (approval && approval.pendingMessages) {
+-        const baseHistory = JSON.parse(approval.pendingMessages) as ModelMessage[];
++      
++      if (!approval) {
++        return createErrorResponse(
++          "Approval request not found. It may have expired or been deleted.",
++          "VALIDATION_ERROR",
++          404
++        );
++      }
++
++      if (approval.pendingMessages) {
++        let baseHistory: ModelMessage[] = [];
++        try {
++          baseHistory = JSON.parse(approval.pendingMessages) as ModelMessage[];
++        } catch (parseError) {
++          console.error("[Chat] Failed to parse pendingMessages:", parseError);
++          return createErrorResponse(
++            "Failed to restore conversation state. Please start a new conversation.",
++            "VALIDATION_ERROR",
++            400,
++            { details: "Invalid pending messages data" }
++          );
++        }
++
++        let toolResultContent: string;
++        
++        if (approval.status === "APPROVED") {
++          try {
++            toolResultContent = await executeOpenAIToolCall(auth.userId, {
++              name: approval.toolName,
++              arguments: approval.toolArgs,
++            });
++          } catch (toolError) {
++            console.error("[Chat] Tool execution failed on resume:", toolError);
++            toolResultContent = JSON.stringify({
++              error: `Tool "${approval.toolName}" execution failed: ${toolError instanceof Error ? toolError.message : "Unknown error"}`
++            });
++          }
++        } else {
++          toolResultContent = JSON.stringify({
++            error: "User REJECTED this tool call. Do NOT attempt it again. Ask the user for alternative instructions."
++          });
++        }
+ 
+-        // Construct the result of the tool call that was paused
+         const toolResult: ModelMessage = {
+           role: "tool",
+-          content:
+-            approval.status === "APPROVED"
+-              ? await executeOpenAIToolCall(auth.userId, {
+-                name: approval.toolName,
+-                arguments: approval.toolArgs,
+-              })
+-              : JSON.stringify({
+-                error:
+-                  "User REJECTED this tool call. Do NOT attempt it again. Ask the user for alternative instructions.",
+-              }),
++          content: toolResultContent,
+           toolCallId: approval.toolCallId,
+         } as any;
+ 
+@@ -342,22 +373,71 @@ export async function POST(req: NextRequest) {
+     // For now, we return the standard Text stream.
+     return result.toUIMessageStreamResponse();
+ 
+-  } catch (error: any) {
+-    console.error("Main Chat Route Error:", error);
++  } catch (error: unknown) {
++    console.error("[Chat] Route error:", error);
++
++    // Handle specialized Approval Signal - improved parsing
++    if (error instanceof Error && error.message.startsWith("APPROVAL_REQUIRED|")) {
++      const { toolName, args } = parseApprovalRequiredError(error);
++
++      return createErrorResponse(
++        `Tool "${toolName}" requires your approval before executing.`,
++        "APPROVAL_REQUIRED",
++        202,
++        {
++          toolName,
++          toolArgs: args,
++          description: describeToolCall(toolName, JSON.stringify(args))
++        }
++      );
++    }
+ 
+-    // Handle specialized Approval Signal
+-    if (error.message?.startsWith("APPROVAL_REQUIRED|")) {
+-      const [_, toolName, argsJson] = error.message.split("|");
++    // Handle credit/agent call deduction failures - improved error message
++    if (error instanceof Error && error.message.includes("Insufficient credits")) {
++      return createErrorResponse(
++        "Insufficient credits to complete this request. Please add more credits to continue.",
++        "INSUFFICIENT_FUNDS",
++        402,
++        { details: error.message }
++      );
++    }
+ 
+-      return NextResponse.json({
+-        error: "Approval required",
+-        code: "APPROVAL_REQUIRED",
+-        toolName,
+-        args: JSON.parse(argsJson || "{}"),
+-        description: describeToolCall(toolName, argsJson)
+-      }, { status: 202 });
++    // Handle authentication errors with proper handling
++    if (isApiError(error)) {
++      return createErrorResponse(
++        error.error || "Authentication failed",
++        error.code || "AUTH_ERROR",
++        401
++      );
++    }
++
++    // Handle known error types with user-friendly messages
++    if (error instanceof Error) {
++      // Zod validation errors
++      if (error.message.includes("validation") || error.message.includes("ZodError")) {
++        return createErrorResponse(
++          "Invalid request data. Please check your input.",
++          "VALIDATION_ERROR",
++          400,
++          { details: error.message }
++        );
++      }
++
++      // Prisma not found errors
++      if (error.message.includes("NotFoundError") || error.message.includes("Record to update not found")) {
++        return createErrorResponse(
++          "The requested resource was not found.",
++          "SESSION_NOT_FOUND",
++          404
++        );
++      }
+     }
+ 
+-    return handleAuthError(error);
++    // Fallback to internal error - don't leak implementation details
++    return createErrorResponse(
++      "An unexpected error occurred. Please try again.",
++      "INTERNAL_ERROR",
++      500
++    );
+   }
+ }
+diff --git a/src/lib/chat/errors.test.ts b/src/lib/chat/errors.test.ts
+index a184585..1d08a87 100644
+--- a/src/lib/chat/errors.test.ts
++++ b/src/lib/chat/errors.test.ts
+@@ -13,7 +13,7 @@ import {
+   getErrorStatus,
+   type ApiError,
+   type ErrorCode,
+-} from "@/lib/chat/errors";
++} from "./errors";
+ 
+ test("isApiError returns true for valid ApiError object", () => {
+   const error: unknown = {
+diff --git a/src/lib/chat/errors.ts b/src/lib/chat/errors.ts
+index 648e0ee..e59529d 100644
+--- a/src/lib/chat/errors.ts
++++ b/src/lib/chat/errors.ts
+@@ -1,5 +1,3 @@
+-import { NextResponse } from "next/server";
+-
+ export type ErrorCode =
+   | "VALIDATION_ERROR"
+   | "AUTH_ERROR"
+@@ -117,15 +115,3 @@ export function getErrorStatus(code: ErrorCode): number {
+       return 500;
+   }
+ }
+-
+-export function createErrorResponse(
+-  message: string,
+-  code: ErrorCode,
+-  status: number,
+-  extras?: Partial<ApiError>
+-): NextResponse<ApiError> {
+-  return NextResponse.json(
+-    { error: message, code, ...extras },
+-    { status }
+-  );
+-}
+diff --git a/src/lib/orchestration/tools.test.ts b/src/lib/orchestration/tools.test.ts
+index de05852..5c4d4c6 100644
+--- a/src/lib/orchestration/tools.test.ts
++++ b/src/lib/orchestration/tools.test.ts
+@@ -5,6 +5,8 @@ import {
+   buildSpecialistDelegationPrompt,
+   parseSpecialistResponseEnvelope,
+   formatSpecialistResponse,
++  isOrchestrationTool,
++  ORCHESTRATION_TOOLS,
+   type DelegateToSpecialistArgs,
+   type SpecialistResponseEnvelope,
+ } from "@/lib/orchestration/tools";
+@@ -65,6 +67,53 @@ test("parseSpecialistResponseEnvelope marks unstructured text as unresolved raw
+   assert.match(envelope.unresolved[0], /unstructured/i);
+ });
+ 
++test("parseSpecialistResponseEnvelope handles empty string", () => {
++  const envelope = parseSpecialistResponseEnvelope("", baseArgs);
++
++  assert.equal(envelope.status, "failed");
++  assert.equal(envelope.output, "No response from specialist.");
++  assert.deepEqual(envelope.unresolved, ["Specialist returned no content."]);
++});
++
++test("parseSpecialistResponseEnvelope handles invalid JSON objects", () => {
++  const envelope = parseSpecialistResponseEnvelope(
++    JSON.stringify({ status: "unknown_status", output: "test" }),
++    baseArgs
++  );
++
++  assert.equal(envelope.status, "failed");
++});
++
++test("parseSpecialistResponseEnvelope handles malformed JSON gracefully", () => {
++  const envelope = parseSpecialistResponseEnvelope("not valid json {", baseArgs);
++
++  assert.equal(envelope.status, "failed");
++  assert.match(envelope.unresolved[0], /unstructured/i);
++});
++
++test("parseSpecialistResponseEnvelope filters out invalid evidence items", () => {
++  const envelope = parseSpecialistResponseEnvelope(
++    JSON.stringify({
++      status: "completed",
++      completedWork: ["Work done"],
++      output: "Output here",
++      evidence: [
++        { kind: "tool_call", detail: "Valid tool" },
++        { kind: "invalid_kind", detail: "Should be filtered" },
++        { detail: "Missing kind field" },
++        { kind: "url", detail: "" },
++        null,
++        "string instead of object"
++      ]
++    }),
++    baseArgs
++  );
++
++  assert.equal(envelope.evidence.length, 1);
++  assert.equal(envelope.evidence[0].kind, "tool_call");
++  assert.equal(envelope.evidence[0].detail, "Valid tool");
++});
++
+ test("formatSpecialistResponse returns human readable markdown", () => {
+   const envelope: SpecialistResponseEnvelope = {
+     specialistSlug: "token-launcher",
+@@ -109,3 +158,71 @@ test("formatSpecialistResponse handles blocked status with emoji", () => {
+   assert.match(formatted, /- Price remains unknown/);
+ });
+ 
++test("formatSpecialistResponse handles failed status", () => {
++  const envelope: SpecialistResponseEnvelope = {
++    specialistSlug: "code-assistant",
++    status: "failed",
++    role: "code specialist",
++    delegatedTask: "Fix bug in payment flow",
++    completedWork: [],
++    output: "Encountered an error during execution.",
++    evidence: [],
++    blockedBy: [],
++    unresolved: ["Unknown error occurred"],
++  };
++
++  const formatted = formatSpecialistResponse(envelope);
++
++  assert.match(formatted, /❌ \*CODE SPECIALIST REPORT\*/);
++  assert.match(formatted, /\*Unresolved Issues:\*/);
++});
++
++test("formatSpecialistResponse omits empty optional sections", () => {
++  const envelope: SpecialistResponseEnvelope = {
++    specialistSlug: "productivity-agent",
++    status: "completed",
++    role: "productivity specialist",
++    delegatedTask: "Send summary email",
++    completedWork: ["Email sent successfully"],
++    output: "Summary sent to inbox.",
++    evidence: [],
++    blockedBy: [],
++    unresolved: [],
++  };
++
++  const formatted = formatSpecialistResponse(envelope);
++
++  assert.doesNotMatch(formatted, /Blocked By:/);
++  assert.doesNotMatch(formatted, /Unresolved Issues:/);
++});
++
++test("isOrchestrationTool correctly identifies orchestration tools", () => {
++  assert.equal(isOrchestrationTool("delegate_to_specialist"), true);
++  assert.equal(isOrchestrationTool("spawn_autonomous_developer"), true);
++  assert.equal(isOrchestrationTool("browse_web"), true);
++  assert.equal(isOrchestrationTool("list_available_skills"), true);
++  assert.equal(isOrchestrationTool("load_skill_context"), true);
++  assert.equal(isOrchestrationTool("unknown_tool"), false);
++  assert.equal(isOrchestrationTool(""), false);
++});
++
++test("delegate_to_specialist tool has correct schema", () => {
++  const delegateTool = ORCHESTRATION_TOOLS.find(
++    (t: any) => t.type === "function" && t.function.name === "delegate_to_specialist"
++  );
++  
++  assert.ok(delegateTool, "delegate_to_specialist tool should exist");
++  assert.equal(delegateTool.function.name, "delegate_to_specialist");
++  assert.ok(delegateTool.function.description.includes("Delegates"));
++  
++  const params = delegateTool.function.parameters;
++  assert.equal(params.type, "object");
++  assert.ok(params.properties.specialistSlug);
++  assert.deepEqual(params.properties.specialistSlug.enum, [
++    "research-assistant",
++    "code-assistant", 
++    "productivity-agent",
++    "token-launcher"
++  ]);
++});
++
+diff --git a/src/lib/chat/errors.test.ts b/src/lib/chat/errors.test.ts
+new file mode 100644
+index 0000000..a184585
+--- /dev/null
++++ b/src/lib/chat/errors.test.ts
+@@ -0,0 +1,248 @@
++import test from "node:test";
++import assert from "node:assert/strict";
++
++import {
++  isApiError,
++  parseApprovalRequiredError,
++  isApprovalRequiredError,
++  isInsufficientCreditsError,
++  isValidationError,
++  isNotFoundError,
++  createUserSafeErrorMessage,
++  getErrorCode,
++  getErrorStatus,
++  type ApiError,
++  type ErrorCode,
++} from "@/lib/chat/errors";
++
++test("isApiError returns true for valid ApiError object", () => {
++  const error: unknown = {
++    error: "Something went wrong",
++    code: "INTERNAL_ERROR"
++  };
++  
++  assert.equal(isApiError(error), true);
++});
++
++test("isApiError returns false for objects missing required fields", () => {
++  assert.equal(isApiError({ error: "Only error" }), false);
++  assert.equal(isApiError({ code: "ERROR" }), false);
++  assert.equal(isApiError({}), false);
++  assert.equal(isApiError(null), false);
++  assert.equal(isApiError(undefined), false);
++  assert.equal(isApiError("string error"), false);
++  assert.equal(isApiError(123), false);
++});
++
++test("parseApprovalRequiredError extracts tool name and args", () => {
++  const error = new Error('APPROVAL_REQUIRED|github_create_issue|{"repo":"test","title":"bug report"}');
++  const result = parseApprovalRequiredError(error);
++  
++  assert.equal(result.toolName, "github_create_issue");
++  assert.deepEqual(result.args, { repo: "test", title: "bug report" });
++});
++
++test("parseApprovalRequiredError handles missing args", () => {
++  const error = new Error('APPROVAL_REQUIRED|send_email');
++  const result = parseApprovalRequiredError(error);
++  
++  assert.equal(result.toolName, "send_email");
++  assert.deepEqual(result.args, {});
++});
++
++test("parseApprovalRequiredError handles invalid JSON args gracefully", () => {
++  const error = new Error('APPROVAL_REQUIRED|test_tool|not valid json');
++  const result = parseApprovalRequiredError(error);
++  
++  assert.equal(result.toolName, "test_tool");
++  assert.deepEqual(result.args, { raw: "not valid json" });
++});
++
++test("parseApprovalRequiredError handles empty message parts", () => {
++  const error = new Error('APPROVAL_REQUIRED|');
++  const result = parseApprovalRequiredError(error);
++  
++  assert.equal(result.toolName, "unknown");
++  assert.deepEqual(result.args, {});
++});
++
++test("parseApprovalRequiredError handles arbitrary error message", () => {
++  const error = new Error('Some other error');
++  const result = parseApprovalRequiredError(error);
++  
++  assert.equal(result.toolName, "unknown");
++  assert.deepEqual(result.args, {});
++});
++
++test("isApiError handles all ErrorCode types", () => {
++  const errorCodes: Array<ApiError["code"]> = [
++    "VALIDATION_ERROR",
++    "AUTH_ERROR", 
++    "SESSION_NOT_FOUND",
++    "AGENT_NOT_FOUND",
++    "INSUFFICIENT_FUNDS",
++    "APPROVAL_REQUIRED",
++    "TOOL_EXECUTION_FAILED",
++    "MODEL_UNAVAILABLE",
++    "INTERNAL_ERROR"
++  ];
++
++  errorCodes.forEach((code) => {
++    const error: unknown = { error: "test", code };
++    assert.equal(isApiError(error), true, `Should recognize ${code} as ApiError`);
++  });
++});
++
++test("isApprovalRequiredError detects approval required errors", () => {
++  const approvalError = new Error("APPROVAL_REQUIRED|github_create_issue|{}");
++  assert.equal(isApprovalRequiredError(approvalError), true);
++  
++  const otherError = new Error("Some other error");
++  assert.equal(isApprovalRequiredError(otherError), false);
++  
++  const emptyError = new Error("");
++  assert.equal(isApprovalRequiredError(emptyError), false);
++});
++
++test("isInsufficientCreditsError detects credit errors", () => {
++  const creditError = new Error("Insufficient credits for this operation");
++  assert.equal(isInsufficientCreditsError(creditError), true);
++  
++  const otherError = new Error("Some other error");
++  assert.equal(isInsufficientCreditsError(otherError), false);
++});
++
++test("isValidationError detects validation errors", () => {
++  const zodError = new Error("ZodError: validation failed");
++  assert.equal(isValidationError(zodError), true);
++  
++  const validationError = new Error("validation error occurred");
++  assert.equal(isValidationError(validationError), true);
++  
++  const otherError = new Error("Some other error");
++  assert.equal(isValidationError(otherError), false);
++});
++
++test("isNotFoundError detects not found errors", () => {
++  const notFoundError = new Error("NotFoundError: Record not found");
++  assert.equal(isNotFoundError(notFoundError), true);
++  
++  const recordError = new Error("Record to update not found");
++  assert.equal(isNotFoundError(recordError), true);
++  
++  const otherError = new Error("Some other error");
++  assert.equal(isNotFoundError(otherError), false);
++});
++
++test("createUserSafeErrorMessage returns user-safe messages for known errors", () => {
++  const approvalError = new Error("APPROVAL_REQUIRED|send_email|{}");
++  const approvalMsg = createUserSafeErrorMessage(approvalError);
++  assert.equal(approvalMsg, 'Tool "send_email" requires your approval before executing.');
++  
++  const creditError = new Error("Insufficient credits for this operation");
++  const creditMsg = createUserSafeErrorMessage(creditError);
++  assert.equal(creditMsg, "Insufficient credits to complete this request. Please add more credits to continue.");
++  
++  const validationError = new Error("validation failed");
++  const validationMsg = createUserSafeErrorMessage(validationError);
++  assert.equal(validationMsg, "Invalid request data. Please check your input.");
++  
++  const notFoundError = new Error("NotFoundError: Record not found");
++  const notFoundMsg = createUserSafeErrorMessage(notFoundError);
++  assert.equal(notFoundMsg, "The requested resource was not found.");
++});
++
++test("createUserSafeErrorMessage returns generic message for unknown errors", () => {
++  const unknownError = new Error("Something completely unexpected");
++  const msg = createUserSafeErrorMessage(unknownError);
++  assert.equal(msg, "An unexpected error occurred. Please try again.");
++  
++  const nonError = createUserSafeErrorMessage("string error");
++  assert.equal(nonError, "An unexpected error occurred. Please try again.");
++  
++  const nullError = createUserSafeErrorMessage(null);
++  assert.equal(nullError, "An unexpected error occurred. Please try again.");
++});
++
++test("getErrorCode returns correct codes for different error types", () => {
++  const approvalError = new Error("APPROVAL_REQUIRED|test_tool|{}");
++  assert.equal(getErrorCode(approvalError), "APPROVAL_REQUIRED");
++  
++  const creditError = new Error("Insufficient credits");
++  assert.equal(getErrorCode(creditError), "INSUFFICIENT_FUNDS");
++  
++  const validationError = new Error("validation failed");
++  assert.equal(getErrorCode(validationError), "VALIDATION_ERROR");
++  
++  const notFoundError = new Error("NotFoundError");
++  assert.equal(getErrorCode(notFoundError), "SESSION_NOT_FOUND");
++  
++  const apiError: unknown = { error: "test", code: "AUTH_ERROR" };
++  assert.equal(getErrorCode(apiError), "AUTH_ERROR");
++  
++  const unknownError = new Error("Some unknown error");
++  assert.equal(getErrorCode(unknownError), "INTERNAL_ERROR");
++});
++
++test("getErrorStatus returns correct HTTP status codes", () => {
++  assert.equal(getErrorStatus("APPROVAL_REQUIRED"), 202);
++  assert.equal(getErrorStatus("INSUFFICIENT_FUNDS"), 402);
++  assert.equal(getErrorStatus("AUTH_ERROR"), 401);
++  assert.equal(getErrorStatus("VALIDATION_ERROR"), 400);
++  assert.equal(getErrorStatus("SESSION_NOT_FOUND"), 404);
++  assert.equal(getErrorStatus("AGENT_NOT_FOUND"), 404);
++  assert.equal(getErrorStatus("MODEL_UNAVAILABLE"), 404);
++  assert.equal(getErrorStatus("TOOL_EXECUTION_FAILED"), 500);
++  assert.equal(getErrorStatus("INTERNAL_ERROR"), 500);
++});
++
++test("error classification helpers work together for route error handling", () => {
++  const testCases = [
++    { 
++      error: new Error("APPROVAL_REQUIRED|github_create_issue|{}"),
++      expectedCode: "APPROVAL_REQUIRED",
++      expectedStatus: 202,
++      expectSafeMessage: true
++    },
++    { 
++      error: new Error("Insufficient credits for this request"),
++      expectedCode: "INSUFFICIENT_FUNDS",
++      expectedStatus: 402,
++      expectSafeMessage: true
++    },
++    { 
++      error: new Error("ZodError: Invalid input"),
++      expectedCode: "VALIDATION_ERROR",
++      expectedStatus: 400,
++      expectSafeMessage: true
++    },
++    { 
++      error: new Error("NotFoundError: Session not found"),
++      expectedCode: "SESSION_NOT_FOUND",
++      expectedStatus: 404,
++      expectSafeMessage: true
++    },
++    {
++      error: new Error("Unexpected internal error"),
++      expectedCode: "INTERNAL_ERROR",
++      expectedStatus: 500,
++      expectSafeMessage: true
++    }
++  ];
++
++  testCases.forEach((tc) => {
++    const code = getErrorCode(tc.error);
++    assert.equal(code, tc.expectedCode, `Code mismatch for: ${tc.error.message}`);
++    
++    const status = getErrorStatus(code);
++    assert.equal(status, tc.expectedStatus, `Status mismatch for: ${tc.error.message}`);
++    
++    const msg = createUserSafeErrorMessage(tc.error);
++    assert.equal(msg.includes("requires your approval") || 
++                 msg.includes("Insufficient credits") || 
++                 msg.includes("Invalid request") || 
++                 msg.includes("resource was not found") ||
++                 msg.includes("unexpected error"), true, 
++                 `Safe message check for: ${tc.error.message}`);
++  });
++});
+diff --git a/src/lib/chat/errors.ts b/src/lib/chat/errors.ts
+new file mode 100644
+index 0000000..648e0ee
+--- /dev/null
++++ b/src/lib/chat/errors.ts
+@@ -0,0 +1,131 @@
++import { NextResponse } from "next/server";
++
++export type ErrorCode =
++  | "VALIDATION_ERROR"
++  | "AUTH_ERROR"
++  | "SESSION_NOT_FOUND"
++  | "AGENT_NOT_FOUND"
++  | "INSUFFICIENT_FUNDS"
++  | "APPROVAL_REQUIRED"
++  | "TOOL_EXECUTION_FAILED"
++  | "MODEL_UNAVAILABLE"
++  | "INTERNAL_ERROR";
++
++export interface ApiError {
++  error: string;
++  code: ErrorCode;
++  details?: string;
++  toolName?: string;
++  toolArgs?: Record<string, unknown>;
++  description?: string;
++}
++
++export function isApiError(error: unknown): error is ApiError {
++  return (
++    typeof error === "object" &&
++    error !== null &&
++    "code" in error &&
++    "error" in error
++  );
++}
++
++export function parseApprovalRequiredError(error: Error): {
++  toolName: string;
++  args: Record<string, unknown>;
++} {
++  const parts = error.message.split("|");
++  const toolName = parts[1] || "unknown";
++  let args: Record<string, unknown> = {};
++  
++  try {
++    if (parts[2]) {
++      args = JSON.parse(parts[2]);
++    }
++  } catch {
++    args = { raw: parts[2] };
++  }
++
++  return { toolName, args };
++}
++
++export function isApprovalRequiredError(error: Error): boolean {
++  return error.message.startsWith("APPROVAL_REQUIRED|");
++}
++
++export function isInsufficientCreditsError(error: Error): boolean {
++  return error.message.includes("Insufficient credits");
++}
++
++export function isValidationError(error: Error): boolean {
++  return error.message.includes("validation") || error.message.includes("ZodError");
++}
++
++export function isNotFoundError(error: Error): boolean {
++  return error.message.includes("NotFoundError") || error.message.includes("Record to update not found");
++}
++
++export function createUserSafeErrorMessage(error: unknown): string {
++  if (error instanceof Error) {
++    if (isApprovalRequiredError(error)) {
++      const { toolName } = parseApprovalRequiredError(error);
++      return `Tool "${toolName}" requires your approval before executing.`;
++    }
++    if (isInsufficientCreditsError(error)) {
++      return "Insufficient credits to complete this request. Please add more credits to continue.";
++    }
++    if (isValidationError(error)) {
++      return "Invalid request data. Please check your input.";
++    }
++    if (isNotFoundError(error)) {
++      return "The requested resource was not found.";
++    }
++  }
++  return "An unexpected error occurred. Please try again.";
++}
++
++export function getErrorCode(error: unknown): ErrorCode {
++  if (isApiError(error)) {
++    return error.code;
++  }
++  if (error instanceof Error) {
++    if (isApprovalRequiredError(error)) return "APPROVAL_REQUIRED";
++    if (isInsufficientCreditsError(error)) return "INSUFFICIENT_FUNDS";
++    if (isValidationError(error)) return "VALIDATION_ERROR";
++    if (isNotFoundError(error)) return "SESSION_NOT_FOUND";
++  }
++  return "INTERNAL_ERROR";
++}
++
++export function getErrorStatus(code: ErrorCode): number {
++  switch (code) {
++    case "APPROVAL_REQUIRED":
++      return 202;
++    case "INSUFFICIENT_FUNDS":
++      return 402;
++    case "AUTH_ERROR":
++      return 401;
++    case "VALIDATION_ERROR":
++      return 400;
++    case "SESSION_NOT_FOUND":
++    case "AGENT_NOT_FOUND":
++    case "MODEL_UNAVAILABLE":
++      return 404;
++    case "TOOL_EXECUTION_FAILED":
++      return 500;
++    case "INTERNAL_ERROR":
++    default:
++      return 500;
++  }
++}
++
++export function createErrorResponse(
++  message: string,
++  code: ErrorCode,
++  status: number,
++  extras?: Partial<ApiError>
++): NextResponse<ApiError> {
++  return NextResponse.json(
++    { error: message, code, ...extras },
++    { status }
++  );
++}

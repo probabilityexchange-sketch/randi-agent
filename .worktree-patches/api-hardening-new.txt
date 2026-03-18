@@ -1,0 +1,45 @@
+=== NEW FILE: src/lib/utils/rate-limit.test.ts ===
+import test from "node:test";
+import assert from "node:assert/strict";
+import { checkRateLimit, RATE_LIMITS } from "@/lib/utils/rate-limit";
+
+test("rate limit allows requests within limit", async () => {
+  const result = await checkRateLimit(`test:${Date.now()}:allow`, {
+    maxRequests: 10,
+    windowMs: 60 * 1000,
+  });
+
+  assert.equal(result.allowed, true);
+  assert.equal(result.remaining, 9);
+});
+
+test("rate limit blocks requests over limit", async () => {
+  const key = `test:${Date.now()}:block`;
+  const config = { maxRequests: 2, windowMs: 60 * 1000 };
+
+  const first = await checkRateLimit(key, config);
+  assert.equal(first.allowed, true);
+
+  const second = await checkRateLimit(key, config);
+  assert.equal(second.allowed, true);
+
+  const third = await checkRateLimit(key, config);
+  assert.equal(third.allowed, false);
+  assert.equal(third.remaining, 0);
+});
+
+test("different keys have independent limits", async () => {
+  const config = { maxRequests: 1, windowMs: 60 * 1000 };
+
+  const resultA = await checkRateLimit(`test:key-a:${Date.now()}`, config);
+  const resultB = await checkRateLimit(`test:key-b:${Date.now()}`, config);
+
+  assert.equal(resultA.allowed, true);
+  assert.equal(resultB.allowed, true);
+});
+
+test("RATE_LIMITS constants are defined", () => {
+  assert.ok(RATE_LIMITS.general.maxRequests > 0);
+  assert.ok(RATE_LIMITS.purchase.maxRequests > 0);
+  assert.ok(RATE_LIMITS.chat.maxRequests > 0);
+});

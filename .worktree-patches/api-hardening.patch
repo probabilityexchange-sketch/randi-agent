@@ -1,0 +1,169 @@
+diff --git a/src/app/api/credits/packages/route.ts b/src/app/api/credits/packages/route.ts
+index 038f9fc..8cb4840 100644
+--- a/src/app/api/credits/packages/route.ts
++++ b/src/app/api/credits/packages/route.ts
+@@ -1,9 +1,16 @@
+-import { NextResponse } from "next/server";
+-import { getCreditPacks } from "@/lib/tokenomics";
+-
+-export async function GET() {
+-  return NextResponse.json({
+-    plan: { id: "free", name: "Free Tier", price: 0 },
+-    packages: getCreditPacks(),
+-  });
+-}
++import { NextRequest, NextResponse } from "next/server";
++import { getCreditPacks } from "@/lib/tokenomics";
++import { checkRateLimit, RATE_LIMITS } from "@/lib/utils/rate-limit";
++
++export async function GET(request: NextRequest) {
++  const ip = request.headers.get("x-forwarded-for") ?? "anon";
++  const { allowed } = await checkRateLimit(`credits-packages:${ip}`, RATE_LIMITS.general);
++  if (!allowed) {
++    return NextResponse.json({ error: "Too many requests" }, { status: 429 });
++  }
++
++  return NextResponse.json({
++    plan: { id: "free", name: "Free Tier", price: 0 },
++    packages: getCreditPacks(),
++  });
++}
+diff --git a/src/app/api/fleet/stats/route.ts b/src/app/api/fleet/stats/route.ts
+index b3c4af8..071f2d7 100644
+--- a/src/app/api/fleet/stats/route.ts
++++ b/src/app/api/fleet/stats/route.ts
+@@ -1,15 +1,22 @@
+-import { NextRequest, NextResponse } from "next/server";
+-import { prisma } from "@/lib/db/prisma";
+-
+-/**
+- * GET /api/fleet/stats
+- * Returns the latest fleet statistics for monitoring dashboard.
+- * Optional query params:
+- * - nodeId: Filter by specific node
+- * - since: ISO timestamp to get stats after a certain time
+- */
+-export async function GET(req: NextRequest) {
+-    try {
++import { NextRequest, NextResponse } from "next/server";
++import { prisma } from "@/lib/db/prisma";
++import { checkRateLimit, RATE_LIMITS } from "@/lib/utils/rate-limit";
++
++/**
++ * GET /api/fleet/stats
++ * Returns the latest fleet statistics for monitoring dashboard.
++ * Optional query params:
++ * - nodeId: Filter by specific node
++ * - since: ISO timestamp to get stats after a certain time
++ */
++export async function GET(req: NextRequest) {
++    const ip = req.headers.get("x-forwarded-for") ?? "anon";
++    const { allowed } = await checkRateLimit(`fleet-stats:${ip}`, RATE_LIMITS.general);
++    if (!allowed) {
++        return NextResponse.json({ error: "Too many requests" }, { status: 429 });
++    }
++
++    try {
+         const nodeId = req.nextUrl.searchParams.get("nodeId");
+         const since = req.nextUrl.searchParams.get("since");
+ 
+diff --git a/src/app/api/models/route.ts b/src/app/api/models/route.ts
+index daa10c7..0ffa392 100644
+--- a/src/app/api/models/route.ts
++++ b/src/app/api/models/route.ts
+@@ -1,6 +1,13 @@
+-import { NextResponse } from "next/server";
++import { NextRequest, NextResponse } from "next/server";
++import { checkRateLimit, RATE_LIMITS } from "@/lib/utils/rate-limit";
++
++export async function GET(request: NextRequest) {
++    const ip = request.headers.get("x-forwarded-for") ?? "anon";
++    const { allowed } = await checkRateLimit(`models:${ip}`, RATE_LIMITS.general);
++    if (!allowed) {
++        return NextResponse.json({ error: "Too many requests" }, { status: 429 });
++    }
+ 
+-export async function GET() {
+     try {
+         const kiloKey = process.env.KILO_API_KEY;
+         const openRouterKey = process.env.OPENROUTER_API_KEY;
+diff --git a/src/app/api/telegram/webhook/route.ts b/src/app/api/telegram/webhook/route.ts
+index 39b2f5b..8840b1f 100644
+--- a/src/app/api/telegram/webhook/route.ts
++++ b/src/app/api/telegram/webhook/route.ts
+@@ -1,26 +1,33 @@
+-import { NextRequest, NextResponse } from "next/server";
+-import { prisma } from "@/lib/db/prisma";
+-import { createChatCompletion } from "@/lib/openrouter/client";
+-import { executeOrchestrationToolCall, ORCHESTRATION_TOOLS, formatSpecialistResponse } from "@/lib/orchestration/tools";
+-import { getAgentToolsFromConfig, composioToolsToOpenAI, executeOpenAIToolCall } from "@/lib/composio/client";
+-import { getRandiContext } from "@/lib/randi/context";
+-import type OpenAI from "openai";
++import { NextRequest, NextResponse } from "next/server";
++import { prisma } from "@/lib/db/prisma";
++import { createChatCompletion } from "@/lib/openrouter/client";
++import { executeOrchestrationToolCall, ORCHESTRATION_TOOLS, formatSpecialistResponse } from "@/lib/orchestration/tools";
++import { getAgentToolsFromConfig, composioToolsToOpenAI, executeOpenAIToolCall } from "@/lib/composio/client";
++import { getRandiContext } from "@/lib/randi/context";
++import { checkRateLimit, RATE_LIMITS } from "@/lib/utils/rate-limit";
++import type OpenAI from "openai";
+ 
+ type ChatTool = OpenAI.Chat.Completions.ChatCompletionTool;
+ 
+-// This is a simple webhook handler for Telegram.
+-// In a production app, you'd want to verify the X-Telegram-Bot-Api-Secret-Token header.
+-export async function POST(req: NextRequest) {
+-    try {
+-        const { searchParams } = new URL(req.url);
+-        const token = searchParams.get("token");
+-
+-        if (!token) {
+-            console.error("[Telegram Webhook] Error: No token provided in URL");
+-            return NextResponse.json({ error: "No token" }, { status: 400 });
+-        }
+-
+-        const body = await req.json();
++// This is a simple webhook handler for Telegram.
++// In a production app, you'd want to verify the X-Telegram-Bot-Api-Secret-Token header.
++export async function POST(req: NextRequest) {
++    try {
++        const { searchParams } = new URL(req.url);
++        const token = searchParams.get("token");
++
++        if (!token) {
++            console.error("[Telegram Webhook] Error: No token provided in URL");
++            return NextResponse.json({ error: "No token" }, { status: 400 });
++        }
++
++        // Rate limit by token to prevent abuse
++        const { allowed } = await checkRateLimit(`telegram:${token}`, RATE_LIMITS.chat);
++        if (!allowed) {
++            return NextResponse.json({ error: "Too many requests" }, { status: 429 });
++        }
++
++        const body = await req.json();
+         const message = body.message;
+         if (!message || !message.text) {
+             return NextResponse.json({ ok: true });
+diff --git a/src/app/api/u/[username]/route.ts b/src/app/api/u/[username]/route.ts
+index 83edf04..3179065 100644
+--- a/src/app/api/u/[username]/route.ts
++++ b/src/app/api/u/[username]/route.ts
+@@ -1,10 +1,17 @@
+ import { NextRequest, NextResponse } from "next/server";
+ import { prisma } from "@/lib/db/prisma";
++import { checkRateLimit, RATE_LIMITS } from "@/lib/utils/rate-limit";
+ 
+ export async function GET(
+     request: NextRequest,
+     { params }: { params: Promise<{ username: string }> }
+ ) {
++    const ip = request.headers.get("x-forwarded-for") ?? "anon";
++    const { allowed } = await checkRateLimit(`user-profile:${ip}`, RATE_LIMITS.general);
++    if (!allowed) {
++        return NextResponse.json({ error: "Too many requests" }, { status: 429 });
++    }
++
+     const { username } = await params;
+ 
+     try {

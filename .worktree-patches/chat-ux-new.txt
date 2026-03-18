@@ -1,0 +1,23 @@
+=== NEW FILE: src/lib/chat/response.ts ===
+import { NextResponse } from "next/server";
+import {
+  type ErrorCode,
+  type ApiError,
+  isApiError,
+  parseApprovalRequiredError,
+} from "./errors";
+
+export { type ErrorCode, type ApiError } from "./errors";
+export { isApiError, parseApprovalRequiredError } from "./errors";
+
+export function createErrorResponse(
+  message: string,
+  code: ErrorCode,
+  status: number,
+  extras?: Partial<ApiError>
+): NextResponse<ApiError> {
+  return NextResponse.json(
+    { error: message, code, ...extras },
+    { status }
+  );
+}

@@ -1,6 +1,6 @@
-import { cookies } from "next/headers";
-import { NextResponse } from "next/server";
-import { verifyToken } from "./jwt";
+import { cookies } from 'next/headers';
+import { NextResponse } from 'next/server';
+import { verifyToken } from './jwt';
 
 export interface AuthedRequest {
   userId: string;
@@ -10,7 +10,7 @@ export interface AuthedRequest {
 
 export async function getAuthFromCookies(): Promise<AuthedRequest | null> {
   const cookieStore = await cookies();
-  const token = cookieStore.get("auth-token")?.value;
+  const token = cookieStore.get('auth-token')?.value;
 
   if (!token) return null;
 
@@ -28,7 +28,7 @@ export async function requireAuth(): Promise<AuthedRequest> {
   const auth = await getAuthFromCookies();
 
   if (!auth) {
-    throw new AuthError("Unauthorized");
+    throw new AuthError('Unauthorized');
   }
 
   return auth;
@@ -37,7 +37,7 @@ export async function requireAuth(): Promise<AuthedRequest> {
 export class AuthError extends Error {
   constructor(message: string) {
     super(message);
-    this.name = "AuthError";
+    this.name = 'AuthError';
   }
 }
 
@@ -47,23 +47,18 @@ export function handleAuthError(error: unknown): NextResponse {
   }
 
   // Handle common Prisma or validation errors if they have specific patterns
-  const errorMessage = error instanceof Error ? error.message : "Internal server error";
+  const errorMessage = error instanceof Error ? error.message : 'Internal server error';
 
-  if (process.env.NODE_ENV !== "production") {
-    console.error("API Error:", error);
+  if (process.env.NODE_ENV !== 'production') {
+    console.error('API Error:', error);
   } else if (error instanceof Error) {
-    console.error("API Error:", error.name);
+    console.error('API Error:', error.name);
   } else {
-    console.error("API Error: non-error thrown");
+    console.error('API Error: non-error thrown');
   }
 
   // Don't leak sensitive error details in production
-  const displayMessage = process.env.NODE_ENV === "production" && !(error instanceof AuthError)
-    ? "An unexpected error occurred"
-    : errorMessage;
+  const displayMessage = errorMessage; // Temporarily show full error for debugging
 
-  return NextResponse.json(
-    { error: displayMessage },
-    { status: 500 }
-  );
+  return NextResponse.json({ error: displayMessage }, { status: 500 });
 }

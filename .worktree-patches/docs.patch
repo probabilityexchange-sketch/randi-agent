@@ -1,0 +1,175 @@
+diff --git a/DEPLOYMENT.md b/DEPLOYMENT.md
+index 9af1be8..07c1ab6 100644
+--- a/DEPLOYMENT.md
++++ b/DEPLOYMENT.md
+@@ -1,5 +1,7 @@
+ # Deployment Guide
+ 
++> **Note**: This project uses **WSL** as the development and deployment environment. All local commands should run inside WSL.
++
+ This project deploys to AWS EC2 through GitHub Actions and GHCR.
+ 
+ Architecture:
+@@ -134,7 +136,33 @@ If the rollout causes payment/ledger instability:
+ 
+ ---
+ 
+-## Vercel + Supabase Deployment (Modern App)
++## Local Development with Docker Compose
++
++For local development with all services (PostgreSQL, Traefik, Docker proxy):
++
++```bash
++# From WSL (not Docker Desktop on Windows)
++cp .env.example .env
++# Edit .env with your values (DATABASE_URL, Privy, OpenRouter, etc.)
++
++# Start all services
++docker-compose up -d
++
++# Run database migrations
++docker-compose exec app npx prisma db push
++
++# Seed database
++docker-compose exec app npx prisma db seed
++
++# View logs
++docker-compose logs -f app
++```
++
++### Docker Compose Services
++- **app**: Next.js application (port 3000)
++- **db**: PostgreSQL 16
++- **traefik**: Reverse proxy with automatic HTTPS
++- **docker-proxy**: Secure Docker socket proxy
+ 
+ For the modern chat-centric platform, we recommend Vercel for the frontend/API and Supabase for the PostgreSQL database.
+ 
+diff --git a/HANDOFF.md b/HANDOFF.md
+index 4509489..c5468e7 100644
+--- a/HANDOFF.md
++++ b/HANDOFF.md
+@@ -1,11 +1,22 @@
+-# Agent Platform — Handoff Document
+-**Date**: 2026-02-22
+-**Project**: `~/projects/agent-platform` (WSL Ubuntu)
+-**Repository**: Randi-Agent/agent-platform
+-
+----
+-
+-## 1. What This Project Is
++# Agent Platform — Handoff Document
++**Date**: 2026-02-22
++**Status**: ⚠️ ARCHIVED / STALE - See current documentation in README.md and DEPLOYMENT.md
++**Project**: `~/projects/agent-platform` (WSL Ubuntu)
++**Repository**: Randi-Agent/agent-platform
++
++> **⚠️ WARNING**: This document contains outdated information. The platform has evolved significantly since this handoff was written. Key changes:
++> - Database migrated from SQLite to PostgreSQL (Supabase)
++> - Architecture now uses Docker Compose for local development
++> - EC2 bridge replaced with containerized fleet using Docker and Traefik
++> 
++> **For current setup instructions, refer to:**
++> - [README.md](./README.md) - Quick start and prerequisites
++> - [DEPLOYMENT.md](./DEPLOYMENT.md) - Local and production deployment
++> - [docs/PRIVATE_CODE_PUBLIC_SUPPORT_MIGRATION.md](./docs/PRIVATE_CODE_PUBLIC_SUPPORT_MIGRATION.md) - Support workflow
++
++---
++
++## 1. What This Project Is
+ 
+ An AI agent orchestration platform built with **Next.js 15** (App Router). Users chat with AI agents (primarily "Randi," the Lead Agent) through a web UI at `localhost:3000`. Randi can:
+ - Answer questions directly via LLM (OpenRouter)
+diff --git a/README.md b/README.md
+index 046fd89..0d58a4d 100644
+--- a/README.md
++++ b/README.md
+@@ -49,15 +49,16 @@ Randi adopts a **security-first** approach to agentic workflows:
+ 
+ ## 🚦 Current Development State
+ 
+-The platform has successfully moved through its foundational stages and is currently in **Phase 6+: Scaling & Resilience**.
++The platform is actively maintained with the following capabilities:
+ 
+-- [x] **Universal Auth**: Seamless social and wallet login via Privy.
+-- [x] **Integrated Chat**: Unified interface for multi-agent conversations with persistent history.
+-- [x] **Hybrid Compute**: Support for both shared runtimes and dedicated AWS EC2 container bridge nodes.
+-- [x] **Credit Economy**: Verified $RANDI deposit workflow with automated burn mechanics.
+-- [x] **x402 Support**: Initial implementation for autonomous M2M model payments.
+-- [x] **Transparency Hub**: Real-time tracking of platform stats and $RANDI burn schedules.
+-- [ ] **Next Step**: Full AgentCard integration for traditional fiat-based agent spending.
++- [x] **Multi-Agent Chat**: Unified interface for conversations with Randi and specialist agents
++- [x] **Privy Authentication**: Social and wallet-based login
++- [x] **Container Fleet**: Launch isolated Docker containers for agent workloads
++- [x] **Credit System**: Token-backed usage with verified on-chain deposits
++- [x] **x402 Support**: Initial machine-to-machine payment infrastructure
++- [x] **Telegram Bot**: Personal bot for agent control and notifications
++- [x] **Composio Integration**: 100+ toolkits (GitHub, Slack, Notion, etc.)
++- [ ] **AgentCard**: Full fiat-based agent spending (in progress)
+ 
+ ---
+ 
+@@ -65,12 +66,15 @@ The platform has successfully moved through its foundational stages and is curre
+ 
+ ### Prerequisites
+ 
+-- Node.js 20+
+-- Docker (running)
++- Node.js 20+ (run in **WSL**, not native Windows)
++- Docker (run in **WSL**, not Docker Desktop on Windows)
++- PostgreSQL database (local or Supabase)
+ - Optional: Solana wallet for wallet-based flows
+ 
+ ### Installation
+ 
++> **Note**: This project uses **WSL** as the development environment. All commands should run inside WSL. Do not use native Windows Node.js or Docker.
++
+ 1. **Clone and Install**
+    ```bash
+    git clone https://github.com/Randi-Agent/agent-platform.git
+@@ -79,20 +83,35 @@ The platform has successfully moved through its foundational stages and is curre
+    ```
+ 
+ 2. **Environment Setup**
+-   Copy `.env.example` to `.env.local` and fill in your credentials (Privy, Supabase, Solana RPC, OpenRouter, Composio).
++   Copy `.env.example` to `.env` (or `.env.local` for local development) and fill in your credentials:
++   - **Required**: `DATABASE_URL`, `DIRECT_URL` (Supabase PostgreSQL)
++   - **Required**: Privy (`NEXT_PUBLIC_PRIVY_APP_ID`, `PRIVY_APP_SECRET`)
++   - **Required**: OpenRouter (`OPENROUTER_API_KEY`) or alternative LLM
++   - **Optional**: Composio (`COMPOSIO_API_KEY`)
++   - **Optional**: Solana (`NEXT_PUBLIC_SOLANA_RPC_URL`, `TOKEN_MINT`, `TREASURY_WALLET`)
+ 
+ 3. **Initialize Database**
+    ```bash
++   # Generate Prisma client
+    npx prisma generate
++   
++   # Push schema to PostgreSQL (local or Supabase)
+    npx prisma db push
+    ```
++   > **Database**: Uses PostgreSQL via Supabase. Not SQLite. Configure `DATABASE_URL` and `DIRECT_URL` in your environment.
+ 
+ 4. **Launch Development Server**
+    ```bash
+    npm run dev
+    ```
+ 
+-Open [http://localhost:3000](http://localhost:3000) to see the platform in action.
++   Open [http://localhost:3000](http://localhost:3000) to see the platform in action.
++
++### Local Development Notes
++
++- **Database**: PostgreSQL (Supabase or local). Set `DATABASE_URL` and `DIRECT_URL`.
++- **Docker**: Required for container fleet. Run `docker-compose up` or ensure Docker socket is available.
++- **LLM**: Default uses OpenRouter. Set `OPENROUTER_API_KEY` or configure alternative in `.env`.
+ 
+ ---
+ 
+@@ -110,6 +129,7 @@ Detailed guides and operational playbooks are available in the [docs/](docs/) di
+ - **[Core Policies](docs/policies/core-rules.md)**: Non-negotiable operating rules for AI agents.
+ - **[Operational Playbooks](docs/playbooks/how-to-operate-as-randi.md)**: Step-by-step guides for agent behavior and execution.
+ - **[Tool Catalog](docs/tools/tool-catalog.md)**: Directory of available skills, tools, and integration boundaries.
++- **[AGENTS.md](./AGENTS.md)**: Cross-agent standards and worktree coordination rules.
+ 
+ ### 🛠️ Developer & Ops
+ - **[Developer Guide](docs/PRIVATE_CODE_PUBLIC_SUPPORT_MIGRATION.md)**: Working with the codebase and local setup.
