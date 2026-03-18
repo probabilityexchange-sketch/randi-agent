@@ -1,9 +1,11 @@
 import { CodeAnalyzer } from './analyzer';
 import type { AnalysisResult } from './analyzer';
 import { ImprovementGenerator } from './improvement-generator';
+import type { Improvement } from './improvement-generator';
 import { ImprovementExecutor } from './executor';
+import type { ExecutionResult } from './executor';
 
-export { CodeAnalyzer, AnalysisResult, ImprovementGenerator, ImprovementExecutor };
+export { CodeAnalyzer, AnalysisResult, ImprovementGenerator, ImprovementExecutor, type Improvement, type ExecutionResult };
 
 // Export a convenient facade for use in skills
 export class SelfMaintenanceService {
@@ -34,7 +36,7 @@ export class SelfMaintenanceService {
   /**
    * Execute a specific improvement
    */
-  async execute(improvement: Parameters<this['executor']['execute']>[0]) {
+  async execute(improvement: Improvement) {
     return await this.executor.execute(improvement);
   }
 

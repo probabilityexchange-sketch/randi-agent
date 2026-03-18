@@ -3,7 +3,7 @@ import { execSync, spawn } from 'child_process';
 import { join, resolve } from 'path';
 import type { Improvement } from './improvement-generator';
 
-interface ExecutionResult {
+export interface ExecutionResult {
   success: boolean;
   output: string;
   error?: string;
