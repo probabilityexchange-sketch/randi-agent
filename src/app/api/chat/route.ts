@@ -238,7 +238,13 @@ export async function POST(req: NextRequest) {
       (tools as any)[ot.function.name] = tool({
         description: ot.function.description,
         inputSchema: z.any(),
-        execute: async (args: any) => executeOrchestrationToolCall(auth.userId, ot.function.name, args, sessionId || "internal"),
+        execute: async (args: any) =>
+          executeOrchestrationToolCall(
+            auth.userId,
+            ot.function.name,
+            args,
+            sessionId || 'internal'
+          ),
       });
     });
 
@@ -259,7 +265,6 @@ export async function POST(req: NextRequest) {
         inputSchema: z.any(),
         execute: async (args: any) => executeAgentCardTool(at.function.name, args),
       });
-    });
     });
 
     CLAWNCH_TOOLS.forEach(ct => {
