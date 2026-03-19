@@ -35,7 +35,17 @@ const config = [
   },
   eslintConfigPrettier,
   {
-    ignores: ['.next/**', 'out/**', 'build/**', 'node_modules/**', 'coverage/**'],
+    ignores: [
+      '.next/**',
+      'out/**',
+      'build/**',
+      'node_modules/**',
+      'coverage/**',
+      'bridge/**',
+      'supabase/**',
+      'scripts/**',
+      'skills/**',
+    ],
   },
 ];
 
