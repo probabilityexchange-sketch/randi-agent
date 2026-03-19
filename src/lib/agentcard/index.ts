@@ -30,7 +30,9 @@ export class AgentCardService {
         sessionId: response.sessionId,
       };
     } catch (error) {
-      throw new Error(`Failed to create card: ${error.message}`);
+      throw new Error(
+        `Failed to create card: ${error instanceof Error ? error.message : String(error)}`
+      );
     }
   }
 
@@ -50,7 +52,9 @@ export class AgentCardService {
         cardId: response.cardId,
       };
     } catch (error) {
-      throw new Error(`Failed to check funding status: ${error.message}`);
+      throw new Error(
+        `Failed to check funding status: ${error instanceof Error ? error.message : String(error)}`
+      );
     }
   }
 
@@ -74,7 +78,9 @@ export class AgentCardService {
         cardholderName: response.cardholderName,
       };
     } catch (error) {
-      throw new Error(`Failed to get card details: ${error.message}`);
+      throw new Error(
+        `Failed to get card details: ${error instanceof Error ? error.message : String(error)}`
+      );
     }
   }
 
@@ -90,7 +96,9 @@ export class AgentCardService {
         balanceCents: response.balanceCents,
       };
     } catch (error) {
-      throw new Error(`Failed to get balance: ${error.message}`);
+      throw new Error(
+        `Failed to get balance: ${error instanceof Error ? error.message : String(error)}`
+      );
     }
   }
 }
