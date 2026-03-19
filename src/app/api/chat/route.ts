@@ -1,34 +1,32 @@
-import { aiOpenRouter } from "@/lib/ai/openrouter";
-import { streamText, tool, stepCountIs, type ToolSet, type ModelMessage } from "ai";
-import { handleNonStandardChat } from "@/lib/ai/resilience";
-import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/db/prisma";
-import { requireAuth, handleAuthError } from "@/lib/auth/middleware";
-import { z } from "zod";
+import { aiOpenRouter } from '@/lib/ai/openrouter';
+import { streamText, tool, stepCountIs, type ToolSet, type ModelMessage } from 'ai';
+import { handleNonStandardChat } from '@/lib/ai/resilience';
+import { NextRequest, NextResponse } from 'next/server';
+import { prisma } from '@/lib/db/prisma';
+import { requireAuth, handleAuthError } from '@/lib/auth/middleware';
+import { z } from 'zod';
 import {
   ORCHESTRATION_TOOLS,
   executeOrchestrationToolCall,
-  isOrchestrationTool
-} from "@/lib/orchestration/tools";
+  isOrchestrationTool,
+} from '@/lib/orchestration/tools';
+import { CLAWNCH_TOOLS, executeClawnchTool, isClawnchTool } from '@/lib/skills/clawnch-tools';
+import { AGENTCARD_TOOLS, executeAgentCardTool, isAgentCardTool } from '@/lib/agentcard/tools';
 import {
-  CLAWNCH_TOOLS,
-  executeClawnchTool,
-  isClawnchTool
-} from "@/lib/skills/clawnch-tools";
-import { getComposioClient, executeOpenAIToolCall, resolveComposioUserId, getAgentToolsFromConfig } from "@/lib/composio/client";
-import { VercelProvider } from "@composio/vercel";
-import { getRandiContext } from "@/lib/randi/context";
-import { DEFAULT_MODEL, isUnmeteredModel } from "@/lib/openrouter/client";
-import { deductForAgentCall } from "@/lib/credits/engine";
-import {
-  validateModelAccess,
-  isPremiumModel,
-  type StakingLevel
-} from "@/lib/token-gating";
-import { requiresApproval, describeToolCall } from "@/lib/composio/approval-rules";
-import { parseAgentSkills, buildSkillsContext } from "@/lib/skills/loader";
-import { KILO_COMPOSIO_CHEAT_SHEET } from "@/lib/skills/tool-cheat-sheet";
-import { checkRateLimit, RATE_LIMITS } from "@/lib/utils/rate-limit";
+  getComposioClient,
+  executeOpenAIToolCall,
+  resolveComposioUserId,
+  getAgentToolsFromConfig,
+} from '@/lib/composio/client';
+import { VercelProvider } from '@composio/vercel';
+import { getRandiContext } from '@/lib/randi/context';
+import { DEFAULT_MODEL, isUnmeteredModel } from '@/lib/openrouter/client';
+import { deductForAgentCall } from '@/lib/credits/engine';
+import { validateModelAccess, isPremiumModel, type StakingLevel } from '@/lib/token-gating';
+import { requiresApproval, describeToolCall } from '@/lib/composio/approval-rules';
+import { parseAgentSkills, buildSkillsContext } from '@/lib/skills/loader';
+import { KILO_COMPOSIO_CHEAT_SHEET } from '@/lib/skills/tool-cheat-sheet';
+import { checkRateLimit, RATE_LIMITS } from '@/lib/utils/rate-limit';
 
 // ---------------------------------------------------------------------------
 // CONFIG & SCHEMAS
@@ -47,7 +45,8 @@ const schema = z.object({
 });
 
 const TOOL_USAGE_SYSTEM_INSTRUCTION =
-  "You have access to tools for external services. If the user's request requires a tool (e.g. GitHub, Slack, Gmail), call the matching tool. If a tool returns an error, DO NOT retry the same call—explain the issue. For general knowledge or conversational requests, do NOT attempt to use tools. Never simulate tool results.\n\n" + KILO_COMPOSIO_CHEAT_SHEET;
+  "You have access to tools for external services. If the user's request requires a tool (e.g. GitHub, Slack, Gmail), call the matching tool. If a tool returns an error, DO NOT retry the same call—explain the issue. For general knowledge or conversational requests, do NOT attempt to use tools. Never simulate tool results.\n\n" +
+  KILO_COMPOSIO_CHEAT_SHEET;
 
 // ---------------------------------------------------------------------------
 // UTILS
@@ -55,8 +54,14 @@ const TOOL_USAGE_SYSTEM_INSTRUCTION =
 
 function shouldForceToolCall(message: string): boolean {
   const normalized = message.toLowerCase();
-  const mentionsService = /\b(github|git|repo|repository|slack|chat|notion|doc|page|gmail|email|mail|inbox|mailbox|google sheets|googlesheets|sheets|spreadsheet|excel|calendar|google calendar|gcal|supabase|db|database|vercel|deploy|hacker ?news|hn|prompmate|promptmate|coinmarketcap|coin market cap|cmc|telegram|tg)\b/.test(normalized);
-  const mentionsAction = /\b(connect|list|show|get|find|search|create|update|delete|send|post|write|read|use|check|sync|pull|push|commit|deploy|add|remove)\b/.test(normalized);
+  const mentionsService =
+    /\b(github|git|repo|repository|slack|chat|notion|doc|page|gmail|email|mail|inbox|mailbox|google sheets|googlesheets|sheets|spreadsheet|excel|calendar|google calendar|gcal|supabase|db|database|vercel|deploy|hacker ?news|hn|prompmate|promptmate|coinmarketcap|coin market cap|cmc|telegram|tg)\b/.test(
+      normalized
+    );
+  const mentionsAction =
+    /\b(connect|list|show|get|find|search|create|update|delete|send|post|write|read|use|check|sync|pull|push|commit|deploy|add|remove)\b/.test(
+      normalized
+    );
   return mentionsService && mentionsAction;
 }
 
@@ -70,7 +75,7 @@ export async function POST(req: NextRequest) {
 
     const { allowed } = await checkRateLimit(`chat:${auth.userId}`, RATE_LIMITS.chat);
     if (!allowed) {
-      return NextResponse.json({ error: "Too many requests" }, { status: 429 });
+      return NextResponse.json({ error: 'Too many requests' }, { status: 429 });
     }
 
     const body = await req.json();
@@ -82,24 +87,27 @@ export async function POST(req: NextRequest) {
     const { agentId, sessionId, model, resumeApprovalId } = parsed.data;
 
     // Extract message content from either 'message' or 'messages' array
-    let message = parsed.data.message || "";
+    let message = parsed.data.message || '';
     if (!message && parsed.data.messages && parsed.data.messages.length > 0) {
       const lastMsg = parsed.data.messages[parsed.data.messages.length - 1];
-      if (lastMsg.role === "user") {
-        if (typeof lastMsg.content === "string") {
+      if (lastMsg.role === 'user') {
+        if (typeof lastMsg.content === 'string') {
           message = lastMsg.content;
         } else if (Array.isArray(lastMsg.parts)) {
           message = lastMsg.parts
-            .filter((p: any) => p.type === "text")
+            .filter((p: any) => p.type === 'text')
             .map((p: any) => p.text)
-            .join("");
+            .join('');
         }
       }
     }
 
     if (!message && !resumeApprovalId) {
-      console.warn("[Chat] 400 Bad Request: Empty message in body:", JSON.stringify(body).substring(0, 500));
-      return NextResponse.json({ error: "Message is required" }, { status: 400 });
+      console.warn(
+        '[Chat] 400 Bad Request: Empty message in body:',
+        JSON.stringify(body).substring(0, 500)
+      );
+      return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
 
     // 1. Billing & Access Checks
@@ -107,9 +115,17 @@ export async function POST(req: NextRequest) {
     const resolvedModel = model || DEFAULT_MODEL;
     const hasKiloApiKey = Boolean(process.env.KILO_API_KEY);
     if (!isUnmeteredModel(resolvedModel) && !hasKiloApiKey) {
-      const deduction = await deductForAgentCall(auth.userId, resolvedModel, `Chat: ${message.substring(0, 50)}`, sessionId);
+      const deduction = await deductForAgentCall(
+        auth.userId,
+        resolvedModel,
+        `Chat: ${message.substring(0, 50)}`,
+        sessionId
+      );
       if (!deduction.success) {
-        return NextResponse.json({ error: deduction.error || "Insufficient credits.", code: "INSUFFICIENT_FUNDS" }, { status: 402 });
+        return NextResponse.json(
+          { error: deduction.error || 'Insufficient credits.', code: 'INSUFFICIENT_FUNDS' },
+          { status: 402 }
+        );
       }
     }
 
@@ -118,25 +134,23 @@ export async function POST(req: NextRequest) {
     if (sessionId) {
       existingSession = await prisma.chatSession.findUnique({
         where: { id: sessionId },
-        select: { id: true, agentId: true, userId: true }
+        select: { id: true, agentId: true, userId: true },
       });
       if (!existingSession || existingSession.userId !== auth.userId) {
-        return NextResponse.json({ error: "Session not found" }, { status: 404 });
+        return NextResponse.json({ error: 'Session not found' }, { status: 404 });
       }
     }
 
-    const resolvedAgentSelector = existingSession?.agentId || agentId || "randi-lead";
+    const resolvedAgentSelector = existingSession?.agentId || agentId || 'randi-lead';
     const agent = await prisma.agentConfig.findFirst({
       where: {
-        OR: [
-          { id: resolvedAgentSelector },
-          { slug: resolvedAgentSelector }
-        ]
+        OR: [{ id: resolvedAgentSelector }, { slug: resolvedAgentSelector }],
       },
       select: { id: true, slug: true, systemPrompt: true, active: true, tools: true },
     });
 
-    if (!agent || !agent.active) return NextResponse.json({ error: "Agent not found" }, { status: 404 });
+    if (!agent || !agent.active)
+      return NextResponse.json({ error: 'Agent not found' }, { status: 404 });
 
     // 3. Prepare Tools
     const tools: ToolSet = {};
@@ -149,11 +163,11 @@ export async function POST(req: NextRequest) {
       const composioTools = await getAgentToolsFromConfig(agent.tools, auth.userId);
       console.log(`[Chat] Composio returned ${composioTools.length} tools`);
       if (composioTools.length > 0) {
-        console.log(`[Chat] Tool names: ${composioTools.map((t) => t.slug).join(', ')}`);
+        console.log(`[Chat] Tool names: ${composioTools.map(t => t.slug).join(', ')}`);
       }
       const activeRuntime = await prisma.container.findFirst({
         where: { userId: auth.userId, agentId: agent.id, expiresAt: { gt: new Date() } },
-        select: { url: true }
+        select: { url: true },
       });
 
       const vercelProvider = new VercelProvider();
@@ -166,10 +180,14 @@ export async function POST(req: NextRequest) {
             throw new Error(`APPROVAL_REQUIRED|${toolSlug}|${JSON.stringify(args)}`);
           }
 
-          const resultStr = await executeOpenAIToolCall(auth.userId, {
-            name: toolSlug,
-            arguments: args,
-          }, activeRuntime?.url || undefined);
+          const resultStr = await executeOpenAIToolCall(
+            auth.userId,
+            {
+              name: toolSlug,
+              arguments: args,
+            },
+            activeRuntime?.url || undefined
+          );
 
           let parsed: any;
           try {
@@ -184,13 +202,16 @@ export async function POST(req: NextRequest) {
             if (Array.isArray(data.messages)) {
               data.messages = data.messages.map((msg: any) => ({
                 id: msg.messageId || msg.id,
-                from: msg.from || (msg.payload?.headers?.find((h: any) => h.name === 'From')?.value),
-                subject: msg.subject || (msg.payload?.headers?.find((h: any) => h.name === 'Subject')?.value),
+                from: msg.from || msg.payload?.headers?.find((h: any) => h.name === 'From')?.value,
+                subject:
+                  msg.subject ||
+                  msg.payload?.headers?.find((h: any) => h.name === 'Subject')?.value,
                 date: msg.messageTimestamp || msg.date,
                 snippet: msg.snippet || msg.messageText?.substring(0, 300),
               }));
             }
-            if (Array.isArray(data.items)) { // Calendar items
+            if (Array.isArray(data.items)) {
+              // Calendar items
               data.items = data.items.map((item: any) => ({
                 id: item.id,
                 summary: item.summary,
@@ -205,7 +226,9 @@ export async function POST(req: NextRequest) {
           return parsed;
         }
       );
-      console.log(`[Chat] Wrapped Composio tools: ${Object.keys(wrappedComposioTools).length} -> ${Object.keys(wrappedComposioTools).join(', ')}`);
+      console.log(
+        `[Chat] Wrapped Composio tools: ${Object.keys(wrappedComposioTools).length} -> ${Object.keys(wrappedComposioTools).join(', ')}`
+      );
       Object.assign(tools, wrappedComposioTools);
     }
 
@@ -228,6 +251,26 @@ export async function POST(req: NextRequest) {
       });
     });
 
+    // Add AgentCard Tools
+    AGENTCARD_TOOLS.forEach(at => {
+      if (at.type !== 'function') return;
+      (tools as any)[at.function.name] = tool({
+        description: at.function.description,
+        inputSchema: z.any(),
+        execute: async (args: any) => executeAgentCardTool(at.function.name, args),
+      });
+    });
+    });
+
+    CLAWNCH_TOOLS.forEach(ct => {
+      if (ct.type !== 'function') return;
+      (tools as any)[ct.function.name] = tool({
+        description: ct.function.description,
+        inputSchema: z.any(),
+        execute: async (args: any) => executeClawnchTool(ct.function.name, args),
+      });
+    });
+
     // 4. Load History or Resume Approval
     let history: ModelMessage[] = [];
     if (resumeApprovalId) {
@@ -239,17 +282,17 @@ export async function POST(req: NextRequest) {
 
         // Construct the result of the tool call that was paused
         const toolResult: ModelMessage = {
-          role: "tool",
+          role: 'tool',
           content:
-            approval.status === "APPROVED"
+            approval.status === 'APPROVED'
               ? await executeOpenAIToolCall(auth.userId, {
-                name: approval.toolName,
-                arguments: approval.toolArgs,
-              })
+                  name: approval.toolName,
+                  arguments: approval.toolArgs,
+                })
               : JSON.stringify({
-                error:
-                  "User REJECTED this tool call. Do NOT attempt it again. Ask the user for alternative instructions.",
-              }),
+                  error:
+                    'User REJECTED this tool call. Do NOT attempt it again. Ask the user for alternative instructions.',
+                }),
           toolCallId: approval.toolCallId,
         } as any;
 
@@ -260,7 +303,7 @@ export async function POST(req: NextRequest) {
         where: { sessionId: existingSession.id },
         orderBy: { createdAt: 'desc' },
         take: MAX_HISTORY,
-        select: { role: true, content: true, toolCalls: true }
+        select: { role: true, content: true, toolCalls: true },
       });
       stored.reverse().forEach(m => {
         if (m.role === 'tool' && m.toolCalls) {
@@ -269,7 +312,7 @@ export async function POST(req: NextRequest) {
           history.push({
             role: 'assistant',
             content: m.content,
-            toolCalls: m.toolCalls ? JSON.parse(m.toolCalls) : undefined
+            toolCalls: m.toolCalls ? JSON.parse(m.toolCalls) : undefined,
           } as any);
         } else if (m.role === 'user' || m.role === 'system') {
           history.push({ role: m.role as any, content: m.content });
@@ -281,29 +324,43 @@ export async function POST(req: NextRequest) {
     const randiContext = await getRandiContext();
 
     // Fetch User-specific agent preferences
-    const userPreference = await prisma.userAgentPreference.findUnique({
-      where: {
-        userId_agentSlug: {
-          userId: auth.userId,
-          agentSlug: agent.slug,
+    const userPreference = await prisma.userAgentPreference
+      .findUnique({
+        where: {
+          userId_agentSlug: {
+            userId: auth.userId,
+            agentSlug: agent.slug,
+          },
         },
-      },
-    }).catch(() => null);
+      })
+      .catch(() => null);
 
-    let userCustomContext = "";
+    let userCustomContext = '';
     if (userPreference) {
-      if (userPreference.personality) userCustomContext += `\n\n# USER CUSTOM PERSONALITY\n${userPreference.personality}\n`;
-      if (userPreference.rules) userCustomContext += `\n\n# USER CUSTOM RULES\n${userPreference.rules}\n`;
-      if (userPreference.skills) userCustomContext += `\n\n# USER CUSTOM SKILLS\n${userPreference.skills}\n`;
+      if (userPreference.personality)
+        userCustomContext += `\n\n# USER CUSTOM PERSONALITY\n${userPreference.personality}\n`;
+      if (userPreference.rules)
+        userCustomContext += `\n\n# USER CUSTOM RULES\n${userPreference.rules}\n`;
+      if (userPreference.skills)
+        userCustomContext += `\n\n# USER CUSTOM SKILLS\n${userPreference.skills}\n`;
     }
 
-    console.log(`[Chat] FINAL tool count: ${Object.keys(tools).length} -> ${Object.keys(tools).join(', ')}`);
-    let finalSystemPrompt = agent.systemPrompt + "\n\n" + randiContext + userCustomContext + "\n\n" + skillsContext + (tools ? "\n\n" + TOOL_USAGE_SYSTEM_INSTRUCTION : "");
+    console.log(
+      `[Chat] FINAL tool count: ${Object.keys(tools).length} -> ${Object.keys(tools).join(', ')}`
+    );
+    let finalSystemPrompt =
+      agent.systemPrompt +
+      '\n\n' +
+      randiContext +
+      userCustomContext +
+      '\n\n' +
+      skillsContext +
+      (tools ? '\n\n' + TOOL_USAGE_SYSTEM_INSTRUCTION : '');
 
     // Minimax-specific model hardening:
-    // Some gateways/models like minimax-m2.5 default to XML for tool calls, 
+    // Some gateways/models like minimax-m2.5 default to XML for tool calls,
     // which streamText does NOT yet handle automatically. We use our Resilience Loop.
-    if (resolvedModel.toLowerCase().includes("minimax")) {
+    if (resolvedModel.toLowerCase().includes('minimax')) {
       return handleNonStandardChat({
         auth,
         model: resolvedModel,
@@ -318,10 +375,7 @@ export async function POST(req: NextRequest) {
     const result = streamText({
       model: aiOpenRouter(resolvedModel),
       system: finalSystemPrompt,
-      messages: [
-        ...history,
-        { role: 'user', content: message }
-      ],
+      messages: [...history, { role: 'user', content: message }],
       tools,
       stopWhen: stepCountIs(MAX_STEPS),
       onFinish: async ({ text, toolCalls }) => {
@@ -332,8 +386,8 @@ export async function POST(req: NextRequest) {
             data: {
               userId: auth.userId,
               agentId: agent.id,
-              title: message.substring(0, 50)
-            }
+              title: message.substring(0, 50),
+            },
           });
           currentSessionId = newSession.id;
         }
@@ -341,30 +395,37 @@ export async function POST(req: NextRequest) {
         await prisma.chatMessage.createMany({
           data: [
             { sessionId: currentSessionId, role: 'user', content: message },
-            { sessionId: currentSessionId, role: 'assistant', content: text, toolCalls: toolCalls.length > 0 ? JSON.stringify(toolCalls) : null }
-          ]
+            {
+              sessionId: currentSessionId,
+              role: 'assistant',
+              content: text,
+              toolCalls: toolCalls.length > 0 ? JSON.stringify(toolCalls) : null,
+            },
+          ],
         });
-      }
+      },
     });
 
     // Custom stream wrapper to handle HITL and special events if needed.
     // For now, we return the standard Text stream.
     return result.toUIMessageStreamResponse();
-
   } catch (error: any) {
-    console.error("Main Chat Route Error:", error);
+    console.error('Main Chat Route Error:', error);
 
     // Handle specialized Approval Signal
-    if (error.message?.startsWith("APPROVAL_REQUIRED|")) {
-      const [_, toolName, argsJson] = error.message.split("|");
+    if (error.message?.startsWith('APPROVAL_REQUIRED|')) {
+      const [_, toolName, argsJson] = error.message.split('|');
 
-      return NextResponse.json({
-        error: "Approval required",
-        code: "APPROVAL_REQUIRED",
-        toolName,
-        args: JSON.parse(argsJson || "{}"),
-        description: describeToolCall(toolName, argsJson)
-      }, { status: 202 });
+      return NextResponse.json(
+        {
+          error: 'Approval required',
+          code: 'APPROVAL_REQUIRED',
+          toolName,
+          args: JSON.parse(argsJson || '{}'),
+          description: describeToolCall(toolName, argsJson),
+        },
+        { status: 202 }
+      );
     }
 
     return handleAuthError(error);
