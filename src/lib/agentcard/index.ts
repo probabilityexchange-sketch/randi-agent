@@ -1,5 +1,3 @@
-import { AgentCardAPI } from './api';
-
 export class AgentCardService {
   private api: AgentCardAPI;
 
