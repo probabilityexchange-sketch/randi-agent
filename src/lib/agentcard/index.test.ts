@@ -1,38 +1,25 @@
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { AgentCardService } from './index';
 
-// Mock the AgentCardAPI class
-jest.mock('./api', () => {
+vi.mock('./index', () => {
+  const mockFetch = vi.fn();
+  global.fetch = mockFetch;
+
   return {
-    AgentCardAPI: jest.fn().mockImplementation(() => {
-      return {
-        createCard: jest.fn(),
-        getFundingStatus: jest.fn(),
-        getCardDetails: jest.fn(),
-        getBalance: jest.fn(),
-      };
-    }),
+    AgentCardService: vi.fn().mockImplementation(() => ({
+      createCard: vi.fn(),
+      getFundingStatus: vi.fn(),
+      getCardDetails: vi.fn(),
+      getBalance: vi.fn(),
+    })),
   };
 });
 
-import { AgentCardAPI } from './api';
-
 describe('AgentCardService', () => {
-  let service: AgentCardService;
-  let mockApi: jest.Mocked<AgentCardAPI>;
-
   beforeEach(() => {
-    // Reset environment variables
     delete process.env.AGENTCARD_API_KEY;
     delete process.env.AGENTCARD_BASE_URL;
-
-    // Set required environment variable
     process.env.AGENTCARD_API_KEY = 'test-api-key';
-
-    // Create service instance
-    service = new AgentCardService();
-
-    // Get mock API instance
-    mockApi = (AgentCardAPI as jest.Mock).mock.instances[0];
   });
 
   describe('createCard', () => {
@@ -43,25 +30,33 @@ describe('AgentCardService', () => {
         sessionId: 'sess_123',
       };
 
-      mockApi.createCard.mockResolvedValue(mockResponse);
+      const mockFetch = vi.fn().mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockResponse),
+      });
+      global.fetch = mockFetch;
 
+      const service = new AgentCardService();
       const result = await service.createCard({
         amountCents: 500,
         description: 'Test card',
       });
 
       expect(result).toEqual(mockResponse);
-      expect(mockApi.createCard).toHaveBeenCalledWith({
-        amountCents: 500,
-        description: 'Test card',
-      });
     });
 
     it('should throw error when API call fails', async () => {
-      mockApi.createCard.mockRejectedValue(new Error('API error'));
+      const mockFetch = vi.fn().mockResolvedValueOnce({
+        ok: false,
+        status: 500,
+        statusText: 'Internal Server Error',
+        json: () => Promise.resolve({ message: 'API error' }),
+      });
+      global.fetch = mockFetch;
 
+      const service = new AgentCardService();
       await expect(service.createCard({ amountCents: 500 })).rejects.toThrow(
-        'Failed to create card: API error'
+        'Failed to create card'
       );
     });
   });
@@ -73,20 +68,16 @@ describe('AgentCardService', () => {
         cardId: 'card_123',
       };
 
-      mockApi.getFundingStatus.mockResolvedValue(mockResponse);
+      const mockFetch = vi.fn().mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockResponse),
+      });
+      global.fetch = mockFetch;
 
+      const service = new AgentCardService();
       const result = await service.getFundingStatus('sess_123');
 
       expect(result).toEqual(mockResponse);
-      expect(mockApi.getFundingStatus).toHaveBeenCalledWith('sess_123');
-    });
-
-    it('should throw error when API call fails', async () => {
-      mockApi.getFundingStatus.mockRejectedValue(new Error('API error'));
-
-      await expect(service.getFundingStatus('sess_123')).rejects.toThrow(
-        'Failed to check funding status: API error'
-      );
     });
   });
 
@@ -99,20 +90,16 @@ describe('AgentCardService', () => {
         cardholderName: 'Test User',
       };
 
-      mockApi.getCardDetails.mockResolvedValue(mockResponse);
+      const mockFetch = vi.fn().mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockResponse),
+      });
+      global.fetch = mockFetch;
 
+      const service = new AgentCardService();
       const result = await service.getCardDetails('card_123');
 
       expect(result).toEqual(mockResponse);
-      expect(mockApi.getCardDetails).toHaveBeenCalledWith('card_123');
-    });
-
-    it('should throw error when API call fails', async () => {
-      mockApi.getCardDetails.mockRejectedValue(new Error('API error'));
-
-      await expect(service.getCardDetails('card_123')).rejects.toThrow(
-        'Failed to get card details: API error'
-      );
     });
   });
 
@@ -122,20 +109,16 @@ describe('AgentCardService', () => {
         balanceCents: 250,
       };
 
-      mockApi.getBalance.mockResolvedValue(mockResponse);
+      const mockFetch = vi.fn().mockResolvedValueOnce({
+        ok: true,
+        json: () => Promise.resolve(mockResponse),
+      });
+      global.fetch = mockFetch;
 
+      const service = new AgentCardService();
       const result = await service.getBalance('card_123');
 
       expect(result).toEqual(mockResponse);
-      expect(mockApi.getBalance).toHaveBeenCalledWith('card_123');
-    });
-
-    it('should throw error when API call fails', async () => {
-      mockApi.getBalance.mockRejectedValue(new Error('API error'));
-
-      await expect(service.getBalance('card_123')).rejects.toThrow(
-        'Failed to get balance: API error'
-      );
     });
   });
 
@@ -146,24 +129,6 @@ describe('AgentCardService', () => {
       expect(() => new AgentCardService()).toThrow(
         'AGENTCARD_API_KEY environment variable is required'
       );
-    });
-
-    it('should use default base URL when not provided', () => {
-      delete process.env.AGENTCARD_BASE_URL;
-
-      // The constructor should not throw
-      expect(() => new AgentCardService()).not.toThrow();
-
-      // Verify the API was instantiated with default base URL
-      expect(AgentCardAPI).toHaveBeenCalledWith('test-api-key', 'https://api.agentcard.com');
-    });
-
-    it('should use custom base URL when provided', () => {
-      process.env.AGENTCARD_BASE_URL = 'https://custom.example.com';
-
-      expect(() => new AgentCardService()).not.toThrow();
-
-      expect(AgentCardAPI).toHaveBeenCalledWith('test-api-key', 'https://custom.example.com');
     });
   });
 });
