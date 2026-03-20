@@ -12,6 +12,7 @@ import {
 } from '@/lib/orchestration/tools';
 import { CLAWNCH_TOOLS, executeClawnchTool, isClawnchTool } from '@/lib/skills/clawnch-tools';
 import { AGENTCARD_TOOLS, executeAgentCardTool, isAgentCardTool } from '@/lib/agentcard/tools';
+import { RESEARCH_TOOLS, executeResearchTool, isResearchTool } from '@/lib/research/tools';
 import {
   getComposioClient,
   executeOpenAIToolCall,
@@ -264,6 +265,16 @@ export async function POST(req: NextRequest) {
         description: at.function.description,
         inputSchema: z.any(),
         execute: async (args: any) => executeAgentCardTool(at.function.name, args),
+      });
+    });
+
+    // Add Research Tools (AutoResearch engine)
+    RESEARCH_TOOLS.forEach(rt => {
+      if (rt.type !== 'function') return;
+      (tools as any)[rt.function.name] = tool({
+        description: rt.function.description,
+        inputSchema: z.any(),
+        execute: async (args: any) => executeResearchTool(rt.function.name, args),
       });
     });
 
