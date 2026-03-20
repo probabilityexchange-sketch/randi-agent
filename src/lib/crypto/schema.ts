@@ -1,48 +1,36 @@
-import { z } from "zod";
+import { z } from 'zod';
 
-export const cryptoGuardrailDecisionTypeSchema = z.enum([
-  "allow",
-  "approve",
-  "deny",
-  "simulate",
-]);
-export const cryptoGuardrailSubjectTypeSchema = z.enum([
-  "tool_call",
-  "workflow_run",
-]);
+export const cryptoGuardrailDecisionTypeSchema = z.enum(['allow', 'approve', 'deny', 'simulate']);
+export const cryptoGuardrailSubjectTypeSchema = z.enum(['tool_call', 'workflow_run']);
 export const cryptoGuardrailActionTypeSchema = z.enum([
-  "none",
-  "wallet_read",
-  "wallet_transfer",
-  "wallet_write",
-  "payment",
-  "trading",
-  "swap",
-  "approval",
-  "unknown",
+  'none',
+  'wallet_read',
+  'wallet_transfer',
+  'wallet_write',
+  'payment',
+  'trading',
+  'swap',
+  'approval',
+  'unknown',
 ]);
 export const cryptoCapStatusSchema = z.enum([
-  "not_applicable",
-  "within_cap",
-  "over_cap",
-  "missing_amount",
-  "missing_config",
+  'not_applicable',
+  'within_cap',
+  'over_cap',
+  'missing_amount',
+  'missing_config',
 ]);
 export const cryptoAllowlistStatusSchema = z.enum([
-  "not_applicable",
-  "allowlisted",
-  "not_allowlisted",
-  "missing_destination",
-]);
-export const cryptoRiskLevelSchema = z.enum([
-  "low",
-  "medium",
-  "high",
-  "critical",
+  'not_applicable',
+  'allowlisted',
+  'not_allowlisted',
+  'missing_destination',
 ]);
 
+export const cryptoRiskLevelSchema = z.enum(['low', 'medium', 'high', 'critical']);
+
 export const cryptoGuardrailConfigSchema = z.object({
-  defaultDecision: z.enum(["simulate", "deny"]).default("simulate"),
+  defaultDecision: z.enum(['simulate', 'deny']).default('simulate'),
   perTransactionUsdCapCents: z.number().int().nonnegative(),
   dailyUsdCapCents: z.number().int().nonnegative(),
   enforceDestinationAllowlist: z.boolean(),
@@ -71,27 +59,19 @@ export const cryptoWorkflowContextSchema = z.object({
     requiresTransactionCaps: z.boolean(),
     requiresAuditLog: z.boolean(),
     simulateOnlyByDefault: z.boolean(),
-    riskLevel: z.enum(["low", "medium", "high"]),
-    approvalState: z.enum(["not_required", "required", "approved", "rejected"]),
+    riskLevel: z.enum(['low', 'medium', 'high']),
+    approvalState: z.enum(['not_required', 'required', 'approved', 'rejected']),
     schedulePreference: z.enum([
-      "github_actions_when_possible",
-      "interactive_runtime_if_stateful",
-      "manual_only",
+      'github_actions_when_possible',
+      'interactive_runtime_if_stateful',
+      'manual_only',
     ]),
   }),
 });
 
 export const cryptoGuardrailEvaluationInputSchema = z.object({
   subjectType: cryptoGuardrailSubjectTypeSchema,
-  triggerSource: z.enum([
-    "manual",
-    "api",
-    "schedule",
-    "event",
-    "system",
-    "chat",
-    "orchestration",
-  ]),
+  triggerSource: z.enum(['manual', 'api', 'schedule', 'event', 'system', 'chat', 'orchestration']),
   actor: z.object({
     userId: z.string().min(1),
     sessionId: z.string().min(1).optional(),
@@ -123,12 +103,6 @@ export const cryptoGuardrailDecisionSchema = z.object({
 });
 
 export type CryptoGuardrailConfig = z.infer<typeof cryptoGuardrailConfigSchema>;
-export type CryptoDestinationAllowlistEntry = z.infer<
-  typeof cryptoDestinationAllowlistEntrySchema
->;
-export type CryptoGuardrailEvaluationInput = z.infer<
-  typeof cryptoGuardrailEvaluationInputSchema
->;
-export type CryptoGuardrailDecision = z.infer<
-  typeof cryptoGuardrailDecisionSchema
->;
+export type CryptoDestinationAllowlistEntry = z.infer<typeof cryptoDestinationAllowlistEntrySchema>;
+export type CryptoGuardrailEvaluationInput = z.infer<typeof cryptoGuardrailEvaluationInputSchema>;
+export type CryptoGuardrailDecision = z.infer<typeof cryptoGuardrailDecisionSchema>;

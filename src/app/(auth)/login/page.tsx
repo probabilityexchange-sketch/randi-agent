@@ -1,30 +1,41 @@
-"use client";
+'use client';
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { Header } from "@/components/layout/Header";
-import { RandiLogo } from "@/components/branding/RandiLogo";
-import { useAuth } from "@/hooks/useAuth";
+import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { Header } from '@/components/layout/Header';
+import { RandiLogo } from '@/components/branding/RandiLogo';
+import { useAuth } from '@/hooks/useAuth';
 
 export default function LoginPage() {
-  const {
-    signIn,
-    loading,
-    isAuthenticated,
-    sessionReady,
-    sessionError,
-    retrySessionSync,
-  } = useAuth();
+  const { signIn, loading, isAuthenticated, sessionReady, sessionError, retrySessionSync } =
+    useAuth();
   const router = useRouter();
   const [showRetry, setShowRetry] = useState(false);
 
   useEffect(() => {
     if (isAuthenticated && sessionReady) {
-      // Use replace instead of push to prevent the middleware redirect race:
-      // push creates a new navigation that the middleware may intercept before
-      // the auth cookie is visible, bouncing the user back to /login.
-      // replace also avoids a back-button loop.
-      router.replace("/dashboard");
+      // Poll /api/auth/me to verify the cookie is actually visible to the server
+      // before redirecting. The Set-Cookie from syncSession() might not be
+      // committed to the browser's cookie jar immediately, causing the middleware
+      // to redirect back to /login in a race condition.
+      const verifyAndRedirect = async () => {
+        const maxAttempts = 10;
+        for (let i = 0; i < maxAttempts; i++) {
+          try {
+            const res = await fetch('/api/auth/me', { credentials: 'include' });
+            if (res.ok && !res.redirected) {
+              router.replace('/dashboard');
+              return;
+            }
+          } catch {
+            // Continue polling
+          }
+          await new Promise(r => setTimeout(r, 200));
+        }
+        // Fallback: redirect anyway after polling exhausts
+        router.replace('/dashboard');
+      };
+      verifyAndRedirect();
     }
   }, [isAuthenticated, sessionReady, router]);
 
@@ -50,8 +61,8 @@ export default function LoginPage() {
           Sign In to <span className="text-primary">Randi</span>
         </h1>
         <p className="text-muted-foreground mb-8">
-          Sign in or create an account with just a few clicks.
-          Use your social accounts or connect any wallet.
+          Sign in or create an account with just a few clicks. Use your social accounts or connect
+          any wallet.
         </p>
         <div className="bg-card border border-border rounded-xl p-8 flex flex-col items-center gap-4">
           <button
@@ -59,11 +70,7 @@ export default function LoginPage() {
             disabled={loading || isFinalizing}
             className="w-full bg-primary hover:bg-primary/90 text-white font-bold py-3 px-6 rounded-lg transition-colors disabled:opacity-60"
           >
-            {loading
-              ? "Loading..."
-              : isFinalizing
-                ? "Finalizing sign in..."
-                : "Sign In"}
+            {loading ? 'Loading...' : isFinalizing ? 'Finalizing sign in...' : 'Sign In'}
           </button>
 
           {isFinalizing && !sessionError && (
@@ -97,12 +104,9 @@ export default function LoginPage() {
             </div>
           )}
 
-          <p className="text-xs text-muted-foreground">
-            Sign in with Solana wallet or Email
-          </p>
+          <p className="text-xs text-muted-foreground">Sign in with Solana wallet or Email</p>
         </div>
       </main>
     </div>
   );
 }
-
