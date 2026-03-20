@@ -19,9 +19,12 @@ import {
 
 const PRISMA_CLIENT_PATH = '@/lib/db/prisma';
 
+const MAX_ITERATIONS = 3;
+
 const SAFETY_GUARDRAILS: SafetyGuardrails = {
   maxWallClockMinutes: 10,
   maxTokenBudget: 500000,
+  maxIterations: MAX_ITERATIONS,
   allowedMutationTypes: ['system_prompt_refine', 'tool_description_update', 'parameter_tweak'],
   blockedPaths: ['credentials', 'secrets', 'auth', '.env', 'password', 'token', 'key'],
   requireHumanApproval: false,

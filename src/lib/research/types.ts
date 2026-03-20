@@ -153,6 +153,7 @@ export interface PersistEvolutionResult {
 export interface SafetyGuardrails {
   maxWallClockMinutes: number; // Hard limit on wall-clock time
   maxTokenBudget: number; // Max tokens to spend
+  maxIterations: number; // Max iterations per experiment
   allowedMutationTypes: MutationType[];
   blockedPaths: string[]; // File paths that cannot be mutated
   requireHumanApproval: boolean; // Require approval before persistence
