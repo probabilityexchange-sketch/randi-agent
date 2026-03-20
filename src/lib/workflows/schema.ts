@@ -1,22 +1,31 @@
-import { z } from "zod";
+import { z } from 'zod';
 
 export const workflowTriggerSchema = z.object({
-  type: z.enum(["manual", "schedule", "event", "monitor", "unknown"]),
+  type: z.enum(['manual', 'schedule', 'event', 'monitor', 'unknown']),
   description: z.string().min(1),
   schedule: z.string().optional(),
-  preferredRunner: z.enum(["github_actions", "interactive_runtime", "manual", "unknown"]),
+  preferredRunner: z.enum(['github_actions', 'interactive_runtime', 'manual', 'unknown']),
 });
 
 export const workflowStepSchema = z.object({
   id: z.string().min(1),
-  kind: z.enum(["research", "monitor", "decision", "action", "notify", "financial", "report", "unknown"]),
+  kind: z.enum([
+    'research',
+    'monitor',
+    'decision',
+    'action',
+    'notify',
+    'financial',
+    'report',
+    'unknown',
+  ]),
   description: z.string().min(1),
   toolHints: z.array(z.string()).default([]),
   requiresApproval: z.boolean().default(false),
 });
 
 export const workflowApprovalSchema = z.object({
-  type: z.enum(["required", "recommended"]),
+  type: z.enum(['required', 'recommended']),
   reason: z.string().min(1),
   appliesToStepIds: z.array(z.string()).default([]),
 });
@@ -33,13 +42,17 @@ export const workflowGuardrailsSchema = z.object({
   requiresAuditLog: z.boolean(),
   requiresExplicitScopes: z.boolean(),
   simulateOnlyByDefault: z.boolean(),
-  schedulingPreference: z.enum(["github_actions_when_possible", "interactive_runtime_if_stateful", "manual_only"]),
+  schedulingPreference: z.enum([
+    'github_actions_when_possible',
+    'interactive_runtime_if_stateful',
+    'manual_only',
+  ]),
 });
 
 export const workflowPlanSchema = z.object({
-  version: z.literal("1"),
-  status: z.literal("draft"),
-  readiness: z.enum(["draft_only", "needs_policy_confirmation"]),
+  version: z.literal('1'),
+  status: z.literal('draft'),
+  readiness: z.enum(['draft_only', 'needs_policy_confirmation']),
   sourceRequest: z.string().min(1),
   title: z.string().min(1),
   objective: z.string().min(1),
@@ -51,32 +64,37 @@ export const workflowPlanSchema = z.object({
   guardrails: workflowGuardrailsSchema,
   openQuestions: z.array(z.string()),
   riskNotes: z.array(z.string()),
-  nextActions: z.array(z.enum(["edit", "confirm"])).min(1),
+  nextActions: z.array(z.enum(['edit', 'confirm'])).min(1),
 });
 
-export const workflowStoredStatusSchema = z.enum(["draft", "ready", "archived"]);
+export const workflowStoredStatusSchema = z.enum(['draft', 'ready', 'archived']);
 
-export const workflowRiskLevelSchema = z.enum(["low", "medium", "high"]);
+export const workflowRiskLevelSchema = z.enum(['low', 'medium', 'high']);
 
-export const workflowApprovalStateSchema = z.enum(["not_required", "required", "approved", "rejected"]);
-
-export const workflowRunStatusSchema = z.enum([
-  "pending",
-  "ready",
-  "blocked",
-  "running",
-  "failed",
-  "completed",
-  "cancelled",
+export const workflowApprovalStateSchema = z.enum([
+  'not_required',
+  'required',
+  'approved',
+  'rejected',
 ]);
 
-export const workflowScheduleStatusSchema = z.enum(["draft", "active", "paused", "blocked"]);
+export const workflowRunStatusSchema = z.enum([
+  'pending',
+  'ready',
+  'blocked',
+  'running',
+  'failed',
+  'completed',
+  'cancelled',
+]);
+
+export const workflowScheduleStatusSchema = z.enum(['draft', 'active', 'paused', 'blocked']);
 
 export const workflowScheduleDeploymentStateSchema = z.enum([
-  "pending_manual_sync",
-  "synced",
-  "needs_resync",
-  "blocked",
+  'pending_manual_sync',
+  'synced',
+  'needs_resync',
+  'blocked',
 ]);
 
 export const workflowScheduleSecretRequirementSchema = z.object({
@@ -94,19 +112,19 @@ export const workflowScheduleDeploymentBundleSchema = z.object({
   filePath: z.string().min(1),
   content: z.string().min(1),
   secrets: z.array(workflowScheduleSecretRequirementSchema),
-  envVars: z.record(z.string()),
+  envVars: z.record(z.string(), z.string()),
   dispatchUrl: z.string().min(1),
   syncStatus: workflowScheduleDeploymentStateSchema,
   instructions: z.array(z.string()),
 });
 
 export const workflowSchedulerTargetSchema = z.enum([
-  "github_actions",
-  "interactive_runtime",
-  "manual_only",
+  'github_actions',
+  'interactive_runtime',
+  'manual_only',
 ]);
 
-export const workflowScopeModeSchema = z.enum(["read", "write"]);
+export const workflowScopeModeSchema = z.enum(['read', 'write']);
 
 export const workflowScopeSchema = z.object({
   tool: z.string().min(1),
@@ -125,7 +143,11 @@ export const workflowSafetyMetadataSchema = z.object({
   approvalState: workflowApprovalStateSchema,
   explicitScopesRequired: z.boolean(),
   scopes: z.array(workflowScopeSchema),
-  schedulePreference: z.enum(["github_actions_when_possible", "interactive_runtime_if_stateful", "manual_only"]),
+  schedulePreference: z.enum([
+    'github_actions_when_possible',
+    'interactive_runtime_if_stateful',
+    'manual_only',
+  ]),
 });
 
 export const workflowRunRetrySchema = z.object({
@@ -138,7 +160,7 @@ export const workflowRunErrorSchema = z.object({
   message: z.string().min(1),
   code: z.string().min(1).optional(),
   stepId: z.string().min(1).optional(),
-  details: z.record(z.unknown()).optional(),
+  details: z.record(z.string(), z.unknown()).optional(),
   occurredAt: z.string().datetime(),
 });
 
@@ -195,7 +217,7 @@ export const workflowRunRecordSchema = z.object({
   userId: z.string().min(1),
   status: workflowRunStatusSchema,
   attemptNumber: z.number().int().min(1),
-  triggerSource: z.enum(["manual", "api", "schedule", "event", "system"]),
+  triggerSource: z.enum(['manual', 'api', 'schedule', 'event', 'system']),
   blockedReason: z.string().nullable(),
   startedAt: z.string().datetime().nullable(),
   finishedAt: z.string().datetime().nullable(),
@@ -203,7 +225,10 @@ export const workflowRunRecordSchema = z.object({
   retryHistory: z.array(workflowRunRetrySchema),
   estimatedTokens: z.number().int().nullable(),
   actualTokens: z.number().int().nullable(),
-  costAttributionMethod: z.enum(["exact", "time_window_attributed", "unavailable"]).nullable().optional(),
+  costAttributionMethod: z
+    .enum(['exact', 'time_window_attributed', 'unavailable'])
+    .nullable()
+    .optional(),
   createdAt: z.string().datetime(),
   updatedAt: z.string().datetime(),
 });
@@ -221,7 +246,11 @@ export type WorkflowRunError = z.infer<typeof workflowRunErrorSchema>;
 export type WorkflowRunRetry = z.infer<typeof workflowRunRetrySchema>;
 export type WorkflowSchedule = z.infer<typeof workflowScheduleSchema>;
 export type WorkflowSchedulePreview = z.infer<typeof workflowSchedulePreviewSchema>;
-export type WorkflowScheduleDeploymentBundle = z.infer<typeof workflowScheduleDeploymentBundleSchema>;
-export type WorkflowScheduleSecretRequirement = z.infer<typeof workflowScheduleSecretRequirementSchema>;
+export type WorkflowScheduleDeploymentBundle = z.infer<
+  typeof workflowScheduleDeploymentBundleSchema
+>;
+export type WorkflowScheduleSecretRequirement = z.infer<
+  typeof workflowScheduleSecretRequirementSchema
+>;
 export type SavedWorkflow = z.infer<typeof savedWorkflowSchema>;
 export type WorkflowRunRecord = z.infer<typeof workflowRunRecordSchema>;
