@@ -77,6 +77,7 @@ This roadmap outlines the strategic phases for evolving the Randi Agent Platform
 **Objective**: Transform from a chatbot to a fully autonomous, self-funded identity.
 
 - [ ] **Self-Maintenance Loop**: Randi can inspect its own codebase, identify drift or improvement opportunities, and launch bounded remote coding sessions that return review-ready changes.
+- [ ] **Autonomous Research (AutoResearch)**: Integrate [Karpathy's AutoResearch](https://github.com/karpathy/autoresearch) pattern—autonomous AI agents running experiments on LLM training with fixed time budgets, self-modifying code, and overnight experimentation cycles. Randi could research improvements to its own prompts, models, or strategies.
 - [ ] **Autonomous Feature Execution**: Randi can turn roadmap items and maintenance requests into scoped implementation tasks with progress reporting, diff summaries, and branch-ready output.
 - [ ] **Brand Growth Pack**: Autonomous X and Farcaster monitoring/engagement skills.
 - [ ] **Infinite Memory Vault**: Persistent, personalized RAG storage for every user.
