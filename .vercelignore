@@ -14,6 +14,7 @@ docker-compose*.yml
 Dockerfile
 *.md
 !README.md
+!ROADMAP.md
 
 # Temp files
 *.tmp
