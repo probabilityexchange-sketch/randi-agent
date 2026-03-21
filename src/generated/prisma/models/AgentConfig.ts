@@ -944,6 +944,7 @@ export type AgentConfigCreateOrConnectWithoutOwnerInput = {
 
 export type AgentConfigCreateManyOwnerInputEnvelope = {
   data: Prisma.AgentConfigCreateManyOwnerInput | Prisma.AgentConfigCreateManyOwnerInput[]
+  skipDuplicates?: boolean
 }
 
 export type AgentConfigUpsertWithWhereUniqueWithoutOwnerInput = {
@@ -2344,6 +2345,7 @@ export type AgentConfigCreateManyArgs<ExtArgs extends runtime.Types.Extensions.I
    * The data used to create many AgentConfigs.
    */
   data: Prisma.AgentConfigCreateManyInput | Prisma.AgentConfigCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -2362,6 +2364,7 @@ export type AgentConfigCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Ext
    * The data used to create many AgentConfigs.
    */
   data: Prisma.AgentConfigCreateManyInput | Prisma.AgentConfigCreateManyInput[]
+  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */

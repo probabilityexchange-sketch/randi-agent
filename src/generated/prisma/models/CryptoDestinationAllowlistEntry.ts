@@ -508,6 +508,7 @@ export type CryptoDestinationAllowlistEntryCreateOrConnectWithoutUserInput = {
 
 export type CryptoDestinationAllowlistEntryCreateManyUserInputEnvelope = {
   data: Prisma.CryptoDestinationAllowlistEntryCreateManyUserInput | Prisma.CryptoDestinationAllowlistEntryCreateManyUserInput[]
+  skipDuplicates?: boolean
 }
 
 export type CryptoDestinationAllowlistEntryUpsertWithWhereUniqueWithoutUserInput = {
@@ -1337,6 +1338,7 @@ export type CryptoDestinationAllowlistEntryCreateManyArgs<ExtArgs extends runtim
    * The data used to create many CryptoDestinationAllowlistEntries.
    */
   data: Prisma.CryptoDestinationAllowlistEntryCreateManyInput | Prisma.CryptoDestinationAllowlistEntryCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1355,6 +1357,7 @@ export type CryptoDestinationAllowlistEntryCreateManyAndReturnArgs<ExtArgs exten
    * The data used to create many CryptoDestinationAllowlistEntries.
    */
   data: Prisma.CryptoDestinationAllowlistEntryCreateManyInput | Prisma.CryptoDestinationAllowlistEntryCreateManyInput[]
+  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */

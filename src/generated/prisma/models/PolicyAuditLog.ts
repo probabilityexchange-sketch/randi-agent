@@ -588,6 +588,7 @@ export type PolicyAuditLogCreateOrConnectWithoutUserInput = {
 
 export type PolicyAuditLogCreateManyUserInputEnvelope = {
   data: Prisma.PolicyAuditLogCreateManyUserInput | Prisma.PolicyAuditLogCreateManyUserInput[]
+  skipDuplicates?: boolean
 }
 
 export type PolicyAuditLogUpsertWithWhereUniqueWithoutUserInput = {
@@ -653,6 +654,7 @@ export type PolicyAuditLogCreateOrConnectWithoutSessionInput = {
 
 export type PolicyAuditLogCreateManySessionInputEnvelope = {
   data: Prisma.PolicyAuditLogCreateManySessionInput | Prisma.PolicyAuditLogCreateManySessionInput[]
+  skipDuplicates?: boolean
 }
 
 export type PolicyAuditLogUpsertWithWhereUniqueWithoutSessionInput = {
@@ -702,6 +704,7 @@ export type PolicyAuditLogCreateOrConnectWithoutWorkflowInput = {
 
 export type PolicyAuditLogCreateManyWorkflowInputEnvelope = {
   data: Prisma.PolicyAuditLogCreateManyWorkflowInput | Prisma.PolicyAuditLogCreateManyWorkflowInput[]
+  skipDuplicates?: boolean
 }
 
 export type PolicyAuditLogUpsertWithWhereUniqueWithoutWorkflowInput = {
@@ -1627,6 +1630,7 @@ export type PolicyAuditLogCreateManyArgs<ExtArgs extends runtime.Types.Extension
    * The data used to create many PolicyAuditLogs.
    */
   data: Prisma.PolicyAuditLogCreateManyInput | Prisma.PolicyAuditLogCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1645,6 +1649,7 @@ export type PolicyAuditLogCreateManyAndReturnArgs<ExtArgs extends runtime.Types.
    * The data used to create many PolicyAuditLogs.
    */
   data: Prisma.PolicyAuditLogCreateManyInput | Prisma.PolicyAuditLogCreateManyInput[]
+  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */

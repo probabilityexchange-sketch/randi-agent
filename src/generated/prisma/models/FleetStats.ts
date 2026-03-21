@@ -1233,6 +1233,7 @@ export type FleetStatsCreateManyArgs<ExtArgs extends runtime.Types.Extensions.In
    * The data used to create many FleetStats.
    */
   data: Prisma.FleetStatsCreateManyInput | Prisma.FleetStatsCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1251,6 +1252,7 @@ export type FleetStatsCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Exte
    * The data used to create many FleetStats.
    */
   data: Prisma.FleetStatsCreateManyInput | Prisma.FleetStatsCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**

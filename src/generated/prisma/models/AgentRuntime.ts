@@ -606,6 +606,7 @@ export type AgentRuntimeCreateOrConnectWithoutUserInput = {
 
 export type AgentRuntimeCreateManyUserInputEnvelope = {
   data: Prisma.AgentRuntimeCreateManyUserInput | Prisma.AgentRuntimeCreateManyUserInput[]
+  skipDuplicates?: boolean
 }
 
 export type AgentRuntimeUpsertWithWhereUniqueWithoutUserInput = {
@@ -1457,6 +1458,7 @@ export type AgentRuntimeCreateManyArgs<ExtArgs extends runtime.Types.Extensions.
    * The data used to create many AgentRuntimes.
    */
   data: Prisma.AgentRuntimeCreateManyInput | Prisma.AgentRuntimeCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1475,6 +1477,7 @@ export type AgentRuntimeCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Ex
    * The data used to create many AgentRuntimes.
    */
   data: Prisma.AgentRuntimeCreateManyInput | Prisma.AgentRuntimeCreateManyInput[]
+  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */

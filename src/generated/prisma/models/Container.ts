@@ -684,6 +684,7 @@ export type ContainerCreateOrConnectWithoutUserInput = {
 
 export type ContainerCreateManyUserInputEnvelope = {
   data: Prisma.ContainerCreateManyUserInput | Prisma.ContainerCreateManyUserInput[]
+  skipDuplicates?: boolean
 }
 
 export type ContainerUpsertWithWhereUniqueWithoutUserInput = {
@@ -761,6 +762,7 @@ export type ContainerCreateOrConnectWithoutAgentInput = {
 
 export type ContainerCreateManyAgentInputEnvelope = {
   data: Prisma.ContainerCreateManyAgentInput | Prisma.ContainerCreateManyAgentInput[]
+  skipDuplicates?: boolean
 }
 
 export type ContainerUpsertWithWhereUniqueWithoutAgentInput = {
@@ -1686,6 +1688,7 @@ export type ContainerCreateManyArgs<ExtArgs extends runtime.Types.Extensions.Int
    * The data used to create many Containers.
    */
   data: Prisma.ContainerCreateManyInput | Prisma.ContainerCreateManyInput[]
+  skipDuplicates?: boolean
 }
 
 /**
@@ -1704,6 +1707,7 @@ export type ContainerCreateManyAndReturnArgs<ExtArgs extends runtime.Types.Exten
    * The data used to create many Containers.
    */
   data: Prisma.ContainerCreateManyInput | Prisma.ContainerCreateManyInput[]
+  skipDuplicates?: boolean
   /**
    * Choose, which related nodes to fetch as well
    */
