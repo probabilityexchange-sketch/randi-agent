@@ -186,7 +186,7 @@ _Note: This is a living document and will be updated as the Randi ecosystem evol
             >
               <div className="absolute left-[-4px] top-2 w-2 h-2 rounded-full bg-primary border border-background shadow-[0_0_8px_rgba(109,40,217,0.5)]" />
 
-              <div className="bg-card/50 border border-border rounded-xl p-6 transition-all duration-200 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
+              <div className="bg-card/50 border border-border rounded-xl p-6 transition_all duration-200 hover:border-primary/30 hover:shadow-lg hover:shadow-primary/5">
                 <h2 className="text-xl font-bold mb-2 flex items-center gap-2">
                   <span className="text-primary/70 font-mono text-sm">
                     {String(idx + 1).padStart(2, '0')}
