@@ -374,6 +374,16 @@ export const SUPPORTED_COMPOSIO_TOOLKITS: readonly ComposioToolkitDef[] = [
     capabilities: ["Gather web context", "Extract source material", "Website crawling"],
     suggestedPrompt: "Research this topic and summarize the best sources via Firecrawl.",
   },
+  {
+    slug: "firehose",
+    label: "Firehose",
+    category: "Data & Analytics",
+    icon: "🔥",
+    description: "Monitor the web in real-time. Stream page changes matching your Lucene filter rules via SSE.",
+    envKey: "COMPOSIO_AUTH_CONFIG_FIREHOSE",
+    capabilities: ["Monitor brand mentions", "Track competitor pages", "Stream real-time web changes"],
+    suggestedPrompt: "Set up a Firehose rule to monitor mentions of 'AI overview' in local business news.",
+  },
 
   // ── Finance ───────────────────────────────────────────────────────────────
   {
