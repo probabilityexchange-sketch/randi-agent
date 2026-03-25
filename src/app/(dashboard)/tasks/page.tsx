@@ -69,6 +69,45 @@ export default function TasksPage() {
         </p>
       </div>
 
+      {/* Active Employees Status */}
+      <div className="bg-card border border-border rounded-xl p-6">
+        <h2 className="text-xl font-semibold mb-4">Background Employees</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <div className="bg-background/50 border border-border rounded-lg p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              <div>
+                <p className="text-sm font-medium">Code Auditor</p>
+                <p className="text-[10px] text-muted-foreground">Monitoring Google Sheet</p>
+              </div>
+            </div>
+            <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-mono uppercase">Active</span>
+          </div>
+          
+          <div className="bg-background/50 border border-border rounded-lg p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              <div>
+                <p className="text-sm font-medium">Lead Gen</p>
+                <p className="text-[10px] text-muted-foreground">Monitoring Twitter/X</p>
+              </div>
+            </div>
+            <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-mono uppercase">Active</span>
+          </div>
+
+          <div className="bg-background/50 border border-border rounded-lg p-4 flex items-center justify-between">
+            <div className="flex items-center gap-3">
+              <div className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              <div>
+                <p className="text-sm font-medium">SEO Scout</p>
+                <p className="text-[10px] text-muted-foreground">Monitoring Randi.agency</p>
+              </div>
+            </div>
+            <span className="text-[10px] bg-primary/10 text-primary px-2 py-0.5 rounded-full font-mono uppercase">Active</span>
+          </div>
+        </div>
+      </div>
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div className="bg-card border border-border rounded-xl p-6">
           <h2 className="text-xl font-semibold mb-4">Spawn Developer</h2>

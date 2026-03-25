@@ -21,6 +21,9 @@
     "test:e2e": "playwright test",
     "prepare": "husky",
     "validate:skills": "tsx scripts/validate-skills.ts",
+    "employee:auditor": "tsx scripts/employee-auditor.ts",
+    "employee:leadgen": "tsx scripts/employee-lead-gen.ts",
+    "employee:seo": "tsx scripts/employee-seo-scout.ts",
     "self-maintenance": "tsx src/lib/self-maintenance/index.ts"
   },
   "prisma": {
