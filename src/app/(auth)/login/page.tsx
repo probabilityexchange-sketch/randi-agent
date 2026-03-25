@@ -5,18 +5,17 @@ import { useRouter } from 'next/navigation';
 import { Header } from '@/components/layout/Header';
 import { RandiLogo } from '@/components/branding/RandiLogo';
 import { useAuth } from '@/hooks/useAuth';
+import { fetchApi } from '@/lib/utils/api';
 
 export default function LoginPage() {
   const { signIn, loading, isAuthenticated, sessionReady, sessionError, retrySessionSync } =
     useAuth();
   const router = useRouter();
   const [showRetry, setShowRetry] = useState(false);
+  const [debugInfo, setDebugInfo] = useState<string | null>(null);
 
   useEffect(() => {
     if (isAuthenticated && sessionReady) {
-      // The useAuth hook has already verified the session via polling.
-      // We do a final short delay before redirecting to ensure the next
-      // navigation sees the browser's updated cookie jar.
       const redirect = async () => {
         await new Promise(r => setTimeout(r, 300));
         router.replace('/dashboard');
@@ -25,7 +24,6 @@ export default function LoginPage() {
     }
   }, [isAuthenticated, sessionReady, router]);
 
-  // Auto-show retry after 10s of "Finalizing"
   useEffect(() => {
     if (isAuthenticated && !sessionReady) {
       const timer = window.setTimeout(() => setShowRetry(true), 10000);
@@ -33,6 +31,20 @@ export default function LoginPage() {
     }
     setShowRetry(false);
   }, [isAuthenticated, sessionReady]);
+
+  const checkSession = async () => {
+    try {
+      const res = await fetchApi('/api/auth/me', { method: 'GET', credentials: 'include' });
+      if (res.ok) {
+        setDebugInfo('Session exists! Manual redirect...');
+        router.replace('/dashboard');
+      } else {
+        setDebugInfo(`Session check failed: ${res.status}`);
+      }
+    } catch (e) {
+      setDebugInfo(`Session check error: ${e}`);
+    }
+  };
 
   const isFinalizing = isAuthenticated && !sessionReady;
 
@@ -81,12 +93,21 @@ export default function LoginPage() {
           {sessionError && isFinalizing && (
             <div className="w-full rounded-lg border border-red-500/30 bg-red-500/10 p-3 text-xs text-red-200">
               <p>{sessionError}</p>
-              <button
-                onClick={retrySessionSync}
-                className="mt-2 inline-flex rounded-md bg-red-500/20 px-2 py-1 text-red-100 hover:bg-red-500/30"
-              >
-                Retry
-              </button>
+              <div className="mt-2 flex gap-2">
+                <button
+                  onClick={retrySessionSync}
+                  className="inline-flex rounded-md bg-red-500/20 px-2 py-1 text-red-100 hover:bg-red-500/30"
+                >
+                  Retry
+                </button>
+                <button
+                  onClick={checkSession}
+                  className="inline-flex rounded-md bg-red-500/20 px-2 py-1 text-red-100 hover:bg-red-500/30"
+                >
+                  Debug Check Session
+                </button>
+              </div>
+              {debugInfo && <p className="mt-2 text-yellow-200">{debugInfo}</p>}
             </div>
           )}
 

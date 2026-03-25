@@ -36,7 +36,10 @@
       "Bash(git commit:*)",
       "Bash(which vercel 2>/dev/null || npx vercel --version 2>/dev/null)",
       "Bash(npx vercel:*)",
-      "WebFetch(domain:www.randi.chat)"
+      "WebFetch(domain:www.randi.chat)",
+      "Bash(pnpm typecheck:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run:*)"
     ]
   }
 }

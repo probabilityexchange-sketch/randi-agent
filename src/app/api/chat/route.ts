@@ -394,6 +394,7 @@ export async function POST(req: NextRequest) {
       messages: [...history, { role: 'user', content: message }],
       tools,
       stopWhen: stepCountIs(MAX_STEPS),
+      abortSignal: AbortSignal.timeout(120_000), // 2-minute max execution limit
       onFinish: async ({ text, toolCalls }) => {
         // Background persistence
         let currentSessionId = existingSession?.id;
