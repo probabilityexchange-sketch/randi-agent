@@ -1,0 +1,26 @@
+<svg viewBox="0 0 1500 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1500" height="500" fill="#0f172a"/>
+  
+  <!-- Subtle Grid Background -->
+  <path d="M0 100H1500M0 200H1500M0 300H1500M0 400H1500" stroke="#1e293b" stroke-width="1"/>
+  <path d="M100 0V500M200 0V500M300 0V500M400 0V500M500 0V500M600 0V500M700 0V500M800 0V500M900 0V500M1000 0V500M1100 0V500M1200 0V500M1300 0V500M1400 0V500" stroke="#1e293b" stroke-width="1"/>
+  
+  <!-- Logo Section -->
+  <g transform="translate(150, 150) scale(4)">
+    <rect x="3" y="11" width="18" height="10" rx="2" stroke="#3b82f6" stroke-width="2" fill="#0f172a"/>
+    <circle cx="12" cy="5" r="2" stroke="#3b82f6" stroke-width="2" fill="#0f172a"/>
+    <path d="M12 7v4" stroke="#3b82f6" stroke-width="2"/>
+    <circle cx="8" cy="16" r="0.5" fill="#3b82f6"/>
+    <circle cx="16" cy="16" r="0.5" fill="#3b82f6"/>
+  </g>
+  
+  <!-- Text Section -->
+  <text x="300" y="270" fill="white" font-family="sans-serif" font-weight="bold" font-size="80">Randi</text>
+  <text x="300" y="340" fill="#94a3b8" font-family="sans-serif" font-size="30">Enterprise-Grade AI Agent Orchestration</text>
+  
+  <!-- Tagline / Features -->
+  <rect x="800" y="180" width="400" height="140" rx="12" fill="#1e293b" stroke="#334155" stroke-width="2"/>
+  <text x="830" y="220" fill="#3b82f6" font-family="sans-serif" font-weight="bold" font-size="20">CORE CAPABILITIES</text>
+  <text x="830" y="255" fill="#cbd5e1" font-family="sans-serif" font-size="18">✓ Autonomous Task Delegation</text>
+  <text x="830" y="285" fill="#cbd5e1" font-family="sans-serif" font-size="18">✓ Hardened Compute Sandboxing</text>
+</svg>
