@@ -71,7 +71,9 @@
       "Bash(.agents/skills/gstack/bin/gstack-review-read)",
       "Bash(git fetch:*)",
       "Bash(git merge:*)",
-      "Bash(tee /tmp/ship_vitest.txt)"
+      "Bash(tee /tmp/ship_vitest.txt)",
+      "Bash(npx vitest:*)",
+      "Bash(apt list:*)"
     ]
   }
 }
