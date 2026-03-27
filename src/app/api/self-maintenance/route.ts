@@ -1,16 +1,14 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
 import { SelfMaintenanceService } from "@/lib/self-maintenance";
 import type { AnalysisResult } from "@/lib/self-maintenance/analyzer";
-import { requireAuth } from "@/lib/auth/middleware";
+import { requireAuth, handleAuthError } from "@/lib/auth/middleware";
 import { resolve, join } from "path";
 
 export const runtime = "nodejs";
 
-export async function POST(request: NextRequest) {
-  const authResult = await requireAuth(request);
-  if (authResult instanceof NextResponse) return authResult;
-
+export async function POST(request: Request) {
   try {
+    await requireAuth();
     const { targetPath, autoFix } = await request.json();
 
     // Prevent path traversal: ensure resolved path stays within cwd
@@ -45,21 +43,13 @@ export async function POST(request: NextRequest) {
     });
   } catch (error) {
     console.error("Self-maintenance error:", error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Unknown error" },
-      { status: 500 }
-    );
+    return handleAuthError(error);
   }
 }
 
-export async function GET(request: NextRequest) {
-  const authResult = await requireAuth(request);
-  if (authResult instanceof NextResponse) return authResult;
-
+export async function GET() {
   try {
-    const service = new SelfMaintenanceService();
-    void service; // Satisfy linter — service info is static
-    // Return service info
+    await requireAuth();
     return NextResponse.json({
       service: "self-maintenance",
       version: "1.0.0",
@@ -69,9 +59,6 @@ export async function GET(request: NextRequest) {
       }
     });
   } catch (error) {
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : "Unknown error" },
-      { status: 500 }
-    );
+    return handleAuthError(error);
   }
 }
