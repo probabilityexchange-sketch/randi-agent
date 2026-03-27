@@ -75,7 +75,10 @@ export const ModelName = {
   ResearchExperiment: 'ResearchExperiment',
   FleetStats: 'FleetStats',
   BridgeNode: 'BridgeNode',
-  CleanupLock: 'CleanupLock'
+  CleanupLock: 'CleanupLock',
+  CreditPackage: 'CreditPackage',
+  PurchaseIntent: 'PurchaseIntent',
+  CreditLedger: 'CreditLedger'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -548,6 +551,49 @@ export const CleanupLockScalarFieldEnum = {
 } as const
 
 export type CleanupLockScalarFieldEnum = (typeof CleanupLockScalarFieldEnum)[keyof typeof CleanupLockScalarFieldEnum]
+
+
+export const CreditPackageScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  credits: 'credits',
+  priceTokens: 'priceTokens',
+  mint: 'mint',
+  enabled: 'enabled',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CreditPackageScalarFieldEnum = (typeof CreditPackageScalarFieldEnum)[keyof typeof CreditPackageScalarFieldEnum]
+
+
+export const PurchaseIntentScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  packageId: 'packageId',
+  expectedAmount: 'expectedAmount',
+  mint: 'mint',
+  treasury: 'treasury',
+  status: 'status',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  confirmedAt: 'confirmedAt',
+  txSig: 'txSig'
+} as const
+
+export type PurchaseIntentScalarFieldEnum = (typeof PurchaseIntentScalarFieldEnum)[keyof typeof PurchaseIntentScalarFieldEnum]
+
+
+export const CreditLedgerScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  intentId: 'intentId',
+  delta: 'delta',
+  reason: 'reason',
+  createdAt: 'createdAt'
+} as const
+
+export type CreditLedgerScalarFieldEnum = (typeof CreditLedgerScalarFieldEnum)[keyof typeof CreditLedgerScalarFieldEnum]
 
 
 export const SortOrder = {

@@ -1,90 +1,43 @@
-# Payments Runbook
+# Token Payments → Credits
 
-This document is the operator guide for token purchase-intent and credits-ledger flows in production. For a high-level conceptual overview of how Randi handles different types of payments, see the **[Payments Explainer](docs/PAYMENTS_EXPLAINER.md)**.
+This repository now uses a purchase-intent based flow to credit user balances after verified SPL token payment.
 
-## Scope
+## Flow
 
-Applies to:
-- Purchase intent creation and verification
-- Credit grants and balance updates
-- Ledger reconciliation and incident handling
+1. **Create purchase intent**
+   - `POST /api/purchase-intents` with `{ "packageCode": "small|medium|large" }`.
+   - Server stores immutable expectation fields: `expectedAmount`, `mint`, `treasury`, `expiresAt`.
+2. **User sends SPL transfer**
+   - Client sends exact `expectedAmount` of `mint` to treasury associated token account.
+   - Client includes `intentId` in memo/reference.
+3. **Verify and credit**
+   - `POST /api/purchase-intents/:id/verify` with `{ "txSig": "..." }`.
+   - Server verifies transaction on-chain and then confirms in one DB transaction.
 
-## Normal Flow
+## Invariants (enforced)
 
-1. Client creates purchase intent.
-2. Client submits on-chain transfer.
-3. Client calls verify endpoint with intent and tx.
-4. Server verifies transaction and records ledger mutation.
-5. Credits balance reflects confirmed transaction.
+- Credits are issued only if on-chain transfer matches:
+  - mint equals intent mint
+  - destination equals treasury ATA
+  - amount exactly equals expected amount
+  - memo/reference includes intent id
+- Replay prevention:
+  - each `PurchaseIntent` can be confirmed once
+  - each `txSig` can be attached once (`UNIQUE` on `PurchaseIntent.txSig`)
+  - each intent can issue one ledger entry (`UNIQUE` on `CreditLedger.intentId`)
+- Confirmation writes are atomic:
+  - row lock `SELECT ... FOR UPDATE` on the intent
+  - intent update + ledger append + balance increment in one DB transaction
 
-## Operator Checklist (Deploy Day)
+## Operational notes
 
-Before deploy:
-- [ ] Confirm production token mint and treasury wallet are correct.
-- [ ] Confirm DB migration and seed are included in rollout sequence.
-- [ ] Take DB snapshot.
+- Configure these env vars:
+  - `SOLANA_RPC_URL`
+  - `SOLANA_CLUSTER` (optional metadata)
+  - `CONFIRMATION_LEVEL` (`confirmed` default)
+  - `TREASURY_WALLET`
+  - `TOKEN_MINT`
+- Seed default packages with:
+  - `npm run db:seed`
+- Expired intents are marked `EXPIRED` when verify is attempted after expiration.
 
-After deploy:
-- [ ] Create a test purchase intent.
-- [ ] Verify with a known valid tx path.
-- [ ] Confirm expected credit increment.
-- [ ] Confirm duplicate verify requests do not double-credit.
-- [ ] Check route logs for `purchase-intents` and `credits`.
-
-## Incident Response Quick Path
-
-Use this when users report missing or duplicated credits.
-
-1. Triage
-- Identify affected user(s), wallet(s), tx signature(s), intent id(s), and timestamp window.
-- Confirm whether issue is single-user or widespread.
-
-2. Contain
-- If duplication is active, temporarily gate verify traffic path.
-- If verification is failing globally, pause frontend verification retries.
-
-3. Diagnose
-- Check app logs around:
-  - purchase intent create
-  - purchase intent verify
-  - credits ledger writes
-- Determine one of:
-  - tx invalid/rejected
-  - tx valid but ledger write failed
-  - duplicate verify race/idempotency failure
-  - stale pending intent
-
-4. Recover
-- For missing credits with valid tx: perform controlled manual reconciliation adjustment.
-- For duplicate credits: reverse excess credits with audit note.
-- Re-enable normal traffic only after smoke test passes.
-
-5. Closeout
-- Record root cause, affected users, corrective action, and prevention action.
-
-## Reconciliation Workflow
-
-Run this after each production rollout and during payment incidents.
-
-1. Compare totals:
-- Verified purchase intents vs confirmed credit transactions
-- Sum of expected credits vs applied credits
-
-2. Check anomalies:
-- Duplicate tx signatures
-- Intents stuck in `PENDING` beyond SLA
-- Failed verifications with eventually successful tx
-- Unexpected negative user balances
-
-3. Resolve:
-- Open reconciliation ticket with user ids + tx signatures + intent ids.
-- Apply manual corrections with explicit audit notes.
-- Re-run checks to confirm zero drift.
-
-## Rollback Safety
-
-If credits integrity is uncertain:
-1. Pause verification path.
-2. Roll application back to known-good image.
-3. Restore DB snapshot if mismatch cannot be safely repaired forward.
-4. Reconcile and verify before re-opening payment flow.

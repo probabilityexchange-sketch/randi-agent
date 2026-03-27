@@ -9,7 +9,7 @@ import { CreditPack } from "@/lib/tokenomics";
 type Step = "plan" | "paying" | "verifying" | "done" | "error";
 
 export function PurchaseForm() {
-  const { verifyPurchase } = useCredits();
+  const { purchasePackage, verifyPurchase } = useCredits();
   const { priceUsd, loading: priceLoading } = useTokenPrice();
   const { transfer, sending: walletBusy } = useSPLTransfer();
 
@@ -43,32 +43,18 @@ export function PurchaseForm() {
       setError(null);
       setStep("paying");
 
-      const res = await fetch("/api/credits/purchase", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ packageId: selectedItemId }),
-      });
-
-      if (!res.ok) {
-        const errData = await res.json();
-        throw new Error(errData.error || "Failed to initiate purchase");
-      }
-
-      const intent = await res.json();
+      const intent = await purchasePackage(selectedItemId);
 
       const txSignature = await transfer({
-        recipient: intent.treasuryWallet,
-        mint: intent.tokenMint,
-        amount: intent.tokenAmount,
-        burnAmount: intent.burnAmount,
-        burnRecipient: intent.burnWallet,
-        memo: intent.memo,
-        decimals: intent.decimals,
-        paymentAsset: intent.paymentAsset,
+        recipient: intent.treasury,
+        mint: intent.mint,
+        amount: intent.expectedAmount,
+        memo: intent.intentId,
+        decimals: Number(process.env.NEXT_PUBLIC_TOKEN_DECIMALS ?? 9),
       });
 
       setStep("verifying");
-      await verifyPurchase(txSignature, intent.memo, intent.transactionId);
+      await verifyPurchase(intent.intentId, txSignature);
       setStep("done");
     } catch (err) {
       console.error("Purchase error:", err);

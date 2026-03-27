@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import type { TokenTransaction } from "@/types/credits";
+import type { TokenTransaction, PurchaseIntentResponse } from "@/types/credits";
 import { fetchApi } from "@/lib/utils/api";
 
 const VERIFY_RETRYABLE_STATUS = new Set([503, 404]); // Allow retry on 404 for indexed lag
@@ -71,11 +71,11 @@ export function useCredits() {
     return res.json();
   };
 
-  const purchasePackage = async (packageId: string) => {
-    const res = await fetchApi("/api/credits/purchase", {
+  const purchasePackage = async (packageCode: string): Promise<PurchaseIntentResponse> => {
+    const res = await fetchApi("/api/purchase-intents", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ packageId }),
+      body: JSON.stringify({ packageCode }),
     });
     if (!res.ok) {
       const err = await res.json();
@@ -85,28 +85,21 @@ export function useCredits() {
   };
 
   const verifyPurchase = async (
-    txSignature: string,
-    memo: string,
-    transactionId: string
+    intentId: string,
+    txSig: string,
   ) => {
     let lastError = "Verification failed";
 
     for (let attempt = 1; attempt <= VERIFY_MAX_ATTEMPTS; attempt += 1) {
-      const res = await fetchApi("/api/credits/verify", {
+      const res = await fetchApi(`/api/purchase-intents/${intentId}/verify`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ txSignature, memo, transactionId }),
+        body: JSON.stringify({ txSig }),
       });
 
       if (res.ok) {
         const data = await res.json();
-        setBalance(data.newBalance);
-        if (data.subscriptionStatus) {
-          setSubscription({
-            status: data.subscriptionStatus,
-            expiresAt: data.subscriptionExpiresAt || null,
-          });
-        }
+        setBalance(data.balance);
         await fetchBalance();
         return data;
       }

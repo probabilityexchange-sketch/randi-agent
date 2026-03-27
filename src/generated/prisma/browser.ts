@@ -142,3 +142,18 @@ export type BridgeNode = Prisma.BridgeNodeModel
  * 
  */
 export type CleanupLock = Prisma.CleanupLockModel
+/**
+ * Model CreditPackage
+ * 
+ */
+export type CreditPackage = Prisma.CreditPackageModel
+/**
+ * Model PurchaseIntent
+ * 
+ */
+export type PurchaseIntent = Prisma.PurchaseIntentModel
+/**
+ * Model CreditLedger
+ * 
+ */
+export type CreditLedger = Prisma.CreditLedgerModel

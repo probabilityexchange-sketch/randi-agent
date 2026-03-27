@@ -351,6 +351,8 @@ export type UserWhereInput = {
   ownedAgents?: Prisma.AgentConfigListRelationFilter
   rentalsAsRenter?: Prisma.AgentRentalListRelationFilter
   researchExperiments?: Prisma.ResearchExperimentListRelationFilter
+  purchaseIntents?: Prisma.PurchaseIntentListRelationFilter
+  creditLedger?: Prisma.CreditLedgerListRelationFilter
 }
 
 export type UserOrderByWithRelationInput = {
@@ -392,6 +394,8 @@ export type UserOrderByWithRelationInput = {
   ownedAgents?: Prisma.AgentConfigOrderByRelationAggregateInput
   rentalsAsRenter?: Prisma.AgentRentalOrderByRelationAggregateInput
   researchExperiments?: Prisma.ResearchExperimentOrderByRelationAggregateInput
+  purchaseIntents?: Prisma.PurchaseIntentOrderByRelationAggregateInput
+  creditLedger?: Prisma.CreditLedgerOrderByRelationAggregateInput
 }
 
 export type UserWhereUniqueInput = Prisma.AtLeast<{
@@ -436,6 +440,8 @@ export type UserWhereUniqueInput = Prisma.AtLeast<{
   ownedAgents?: Prisma.AgentConfigListRelationFilter
   rentalsAsRenter?: Prisma.AgentRentalListRelationFilter
   researchExperiments?: Prisma.ResearchExperimentListRelationFilter
+  purchaseIntents?: Prisma.PurchaseIntentListRelationFilter
+  creditLedger?: Prisma.CreditLedgerListRelationFilter
 }, "id" | "email" | "walletAddress" | "username" | "telegramId" | "telegramBotToken">
 
 export type UserOrderByWithAggregationInput = {
@@ -529,6 +535,8 @@ export type UserCreateInput = {
   ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateInput = {
@@ -570,6 +578,8 @@ export type UserUncheckedCreateInput = {
   ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserUpdateInput = {
@@ -611,6 +621,8 @@ export type UserUpdateInput = {
   ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateInput = {
@@ -652,6 +664,8 @@ export type UserUncheckedUpdateInput = {
   ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateManyInput = {
@@ -1091,6 +1105,34 @@ export type UserUpdateOneRequiredWithoutResearchExperimentsNestedInput = {
   update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutResearchExperimentsInput, Prisma.UserUpdateWithoutResearchExperimentsInput>, Prisma.UserUncheckedUpdateWithoutResearchExperimentsInput>
 }
 
+export type UserCreateNestedOneWithoutPurchaseIntentsInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPurchaseIntentsInput, Prisma.UserUncheckedCreateWithoutPurchaseIntentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPurchaseIntentsInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutPurchaseIntentsNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutPurchaseIntentsInput, Prisma.UserUncheckedCreateWithoutPurchaseIntentsInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutPurchaseIntentsInput
+  upsert?: Prisma.UserUpsertWithoutPurchaseIntentsInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutPurchaseIntentsInput, Prisma.UserUpdateWithoutPurchaseIntentsInput>, Prisma.UserUncheckedUpdateWithoutPurchaseIntentsInput>
+}
+
+export type UserCreateNestedOneWithoutCreditLedgerInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreditLedgerInput, Prisma.UserUncheckedCreateWithoutCreditLedgerInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreditLedgerInput
+  connect?: Prisma.UserWhereUniqueInput
+}
+
+export type UserUpdateOneRequiredWithoutCreditLedgerNestedInput = {
+  create?: Prisma.XOR<Prisma.UserCreateWithoutCreditLedgerInput, Prisma.UserUncheckedCreateWithoutCreditLedgerInput>
+  connectOrCreate?: Prisma.UserCreateOrConnectWithoutCreditLedgerInput
+  upsert?: Prisma.UserUpsertWithoutCreditLedgerInput
+  connect?: Prisma.UserWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.UserUpdateToOneWithWhereWithoutCreditLedgerInput, Prisma.UserUpdateWithoutCreditLedgerInput>, Prisma.UserUncheckedUpdateWithoutCreditLedgerInput>
+}
+
 export type UserCreateWithoutSessionsInput = {
   id?: string
   email?: string | null
@@ -1129,6 +1171,8 @@ export type UserCreateWithoutSessionsInput = {
   ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutSessionsInput = {
@@ -1169,6 +1213,8 @@ export type UserUncheckedCreateWithoutSessionsInput = {
   ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutSessionsInput = {
@@ -1225,6 +1271,8 @@ export type UserUpdateWithoutSessionsInput = {
   ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutSessionsInput = {
@@ -1265,6 +1313,8 @@ export type UserUncheckedUpdateWithoutSessionsInput = {
   ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutContainersInput = {
@@ -1305,6 +1355,8 @@ export type UserCreateWithoutContainersInput = {
   ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutContainersInput = {
@@ -1345,6 +1397,8 @@ export type UserUncheckedCreateWithoutContainersInput = {
   ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutContainersInput = {
@@ -1401,6 +1455,8 @@ export type UserUpdateWithoutContainersInput = {
   ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutContainersInput = {
@@ -1441,6 +1497,8 @@ export type UserUncheckedUpdateWithoutContainersInput = {
   ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutChatSessionsInput = {
@@ -1481,6 +1539,8 @@ export type UserCreateWithoutChatSessionsInput = {
   ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutChatSessionsInput = {
@@ -1521,6 +1581,8 @@ export type UserUncheckedCreateWithoutChatSessionsInput = {
   ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutChatSessionsInput = {
@@ -1577,6 +1639,8 @@ export type UserUpdateWithoutChatSessionsInput = {
   ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutChatSessionsInput = {
@@ -1617,6 +1681,8 @@ export type UserUncheckedUpdateWithoutChatSessionsInput = {
   ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAgentRuntimesInput = {
@@ -1657,6 +1723,8 @@ export type UserCreateWithoutAgentRuntimesInput = {
   ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAgentRuntimesInput = {
@@ -1697,6 +1765,8 @@ export type UserUncheckedCreateWithoutAgentRuntimesInput = {
   ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAgentRuntimesInput = {
@@ -1753,6 +1823,8 @@ export type UserUpdateWithoutAgentRuntimesInput = {
   ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAgentRuntimesInput = {
@@ -1793,6 +1865,8 @@ export type UserUncheckedUpdateWithoutAgentRuntimesInput = {
   ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutTokenTransactionsInput = {
@@ -1833,6 +1907,8 @@ export type UserCreateWithoutTokenTransactionsInput = {
   ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutTokenTransactionsInput = {
@@ -1873,6 +1949,8 @@ export type UserUncheckedCreateWithoutTokenTransactionsInput = {
   ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutTokenTransactionsInput = {
@@ -1929,6 +2007,8 @@ export type UserUpdateWithoutTokenTransactionsInput = {
   ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutTokenTransactionsInput = {
@@ -1969,6 +2049,8 @@ export type UserUncheckedUpdateWithoutTokenTransactionsInput = {
   ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutOwnedAgentsInput = {
@@ -2009,6 +2091,8 @@ export type UserCreateWithoutOwnedAgentsInput = {
   cryptoAuditLogs?: Prisma.CryptoAuditLogCreateNestedManyWithoutUserInput
   rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutOwnedAgentsInput = {
@@ -2049,6 +2133,8 @@ export type UserUncheckedCreateWithoutOwnedAgentsInput = {
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedCreateNestedManyWithoutUserInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutOwnedAgentsInput = {
@@ -2105,6 +2191,8 @@ export type UserUpdateWithoutOwnedAgentsInput = {
   cryptoAuditLogs?: Prisma.CryptoAuditLogUpdateManyWithoutUserNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutOwnedAgentsInput = {
@@ -2145,6 +2233,8 @@ export type UserUncheckedUpdateWithoutOwnedAgentsInput = {
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedUpdateManyWithoutUserNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutRentalsAsRenterInput = {
@@ -2185,6 +2275,8 @@ export type UserCreateWithoutRentalsAsRenterInput = {
   cryptoAuditLogs?: Prisma.CryptoAuditLogCreateNestedManyWithoutUserInput
   ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
   researchExperiments?: Prisma.ResearchExperimentCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutRentalsAsRenterInput = {
@@ -2225,6 +2317,8 @@ export type UserUncheckedCreateWithoutRentalsAsRenterInput = {
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedCreateNestedManyWithoutUserInput
   ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutRentalsAsRenterInput = {
@@ -2281,6 +2375,8 @@ export type UserUpdateWithoutRentalsAsRenterInput = {
   cryptoAuditLogs?: Prisma.CryptoAuditLogUpdateManyWithoutUserNestedInput
   ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
   researchExperiments?: Prisma.ResearchExperimentUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutRentalsAsRenterInput = {
@@ -2321,6 +2417,8 @@ export type UserUncheckedUpdateWithoutRentalsAsRenterInput = {
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedUpdateManyWithoutUserNestedInput
   ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutAgentPreferencesInput = {
@@ -2361,6 +2459,8 @@ export type UserCreateWithoutAgentPreferencesInput = {
   ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutAgentPreferencesInput = {
@@ -2401,6 +2501,8 @@ export type UserUncheckedCreateWithoutAgentPreferencesInput = {
   ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutAgentPreferencesInput = {
@@ -2457,6 +2559,8 @@ export type UserUpdateWithoutAgentPreferencesInput = {
   ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutAgentPreferencesInput = {
@@ -2497,6 +2601,8 @@ export type UserUncheckedUpdateWithoutAgentPreferencesInput = {
   ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutWorkflowsInput = {
@@ -2537,6 +2643,8 @@ export type UserCreateWithoutWorkflowsInput = {
   ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutWorkflowsInput = {
@@ -2577,6 +2685,8 @@ export type UserUncheckedCreateWithoutWorkflowsInput = {
   ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutWorkflowsInput = {
@@ -2633,6 +2743,8 @@ export type UserUpdateWithoutWorkflowsInput = {
   ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutWorkflowsInput = {
@@ -2673,6 +2785,8 @@ export type UserUncheckedUpdateWithoutWorkflowsInput = {
   ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutWorkflowRunsInput = {
@@ -2713,6 +2827,8 @@ export type UserCreateWithoutWorkflowRunsInput = {
   ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutWorkflowRunsInput = {
@@ -2753,6 +2869,8 @@ export type UserUncheckedCreateWithoutWorkflowRunsInput = {
   ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutWorkflowRunsInput = {
@@ -2809,6 +2927,8 @@ export type UserUpdateWithoutWorkflowRunsInput = {
   ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutWorkflowRunsInput = {
@@ -2849,6 +2969,8 @@ export type UserUncheckedUpdateWithoutWorkflowRunsInput = {
   ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutWorkflowSchedulesInput = {
@@ -2889,6 +3011,8 @@ export type UserCreateWithoutWorkflowSchedulesInput = {
   ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutWorkflowSchedulesInput = {
@@ -2929,6 +3053,8 @@ export type UserUncheckedCreateWithoutWorkflowSchedulesInput = {
   ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutWorkflowSchedulesInput = {
@@ -2985,6 +3111,8 @@ export type UserUpdateWithoutWorkflowSchedulesInput = {
   ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutWorkflowSchedulesInput = {
@@ -3025,6 +3153,8 @@ export type UserUncheckedUpdateWithoutWorkflowSchedulesInput = {
   ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPolicyDecisionsInput = {
@@ -3065,6 +3195,8 @@ export type UserCreateWithoutPolicyDecisionsInput = {
   ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPolicyDecisionsInput = {
@@ -3105,6 +3237,8 @@ export type UserUncheckedCreateWithoutPolicyDecisionsInput = {
   ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPolicyDecisionsInput = {
@@ -3161,6 +3295,8 @@ export type UserUpdateWithoutPolicyDecisionsInput = {
   ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPolicyDecisionsInput = {
@@ -3201,6 +3337,8 @@ export type UserUncheckedUpdateWithoutPolicyDecisionsInput = {
   ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutApprovalRequestsInput = {
@@ -3241,6 +3379,8 @@ export type UserCreateWithoutApprovalRequestsInput = {
   ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutApprovalRequestsInput = {
@@ -3281,6 +3421,8 @@ export type UserUncheckedCreateWithoutApprovalRequestsInput = {
   ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutApprovalRequestsInput = {
@@ -3337,6 +3479,8 @@ export type UserUpdateWithoutApprovalRequestsInput = {
   ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutApprovalRequestsInput = {
@@ -3377,6 +3521,8 @@ export type UserUncheckedUpdateWithoutApprovalRequestsInput = {
   ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutPolicyAuditLogsInput = {
@@ -3417,6 +3563,8 @@ export type UserCreateWithoutPolicyAuditLogsInput = {
   ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutPolicyAuditLogsInput = {
@@ -3457,6 +3605,8 @@ export type UserUncheckedCreateWithoutPolicyAuditLogsInput = {
   ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutPolicyAuditLogsInput = {
@@ -3513,6 +3663,8 @@ export type UserUpdateWithoutPolicyAuditLogsInput = {
   ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutPolicyAuditLogsInput = {
@@ -3553,6 +3705,8 @@ export type UserUncheckedUpdateWithoutPolicyAuditLogsInput = {
   ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCryptoGuardrailConfigInput = {
@@ -3593,6 +3747,8 @@ export type UserCreateWithoutCryptoGuardrailConfigInput = {
   ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCryptoGuardrailConfigInput = {
@@ -3633,6 +3789,8 @@ export type UserUncheckedCreateWithoutCryptoGuardrailConfigInput = {
   ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCryptoGuardrailConfigInput = {
@@ -3689,6 +3847,8 @@ export type UserUpdateWithoutCryptoGuardrailConfigInput = {
   ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCryptoGuardrailConfigInput = {
@@ -3729,6 +3889,8 @@ export type UserUncheckedUpdateWithoutCryptoGuardrailConfigInput = {
   ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCryptoDestinationAllowlistEntriesInput = {
@@ -3769,6 +3931,8 @@ export type UserCreateWithoutCryptoDestinationAllowlistEntriesInput = {
   ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCryptoDestinationAllowlistEntriesInput = {
@@ -3809,6 +3973,8 @@ export type UserUncheckedCreateWithoutCryptoDestinationAllowlistEntriesInput = {
   ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCryptoDestinationAllowlistEntriesInput = {
@@ -3865,6 +4031,8 @@ export type UserUpdateWithoutCryptoDestinationAllowlistEntriesInput = {
   ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCryptoDestinationAllowlistEntriesInput = {
@@ -3905,6 +4073,8 @@ export type UserUncheckedUpdateWithoutCryptoDestinationAllowlistEntriesInput = {
   ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutCryptoAuditLogsInput = {
@@ -3945,6 +4115,8 @@ export type UserCreateWithoutCryptoAuditLogsInput = {
   ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutCryptoAuditLogsInput = {
@@ -3985,6 +4157,8 @@ export type UserUncheckedCreateWithoutCryptoAuditLogsInput = {
   ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutCryptoAuditLogsInput = {
@@ -4041,6 +4215,8 @@ export type UserUpdateWithoutCryptoAuditLogsInput = {
   ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutCryptoAuditLogsInput = {
@@ -4081,6 +4257,8 @@ export type UserUncheckedUpdateWithoutCryptoAuditLogsInput = {
   ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutStorageVolumesInput = {
@@ -4121,6 +4299,8 @@ export type UserCreateWithoutStorageVolumesInput = {
   ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutStorageVolumesInput = {
@@ -4161,6 +4341,8 @@ export type UserUncheckedCreateWithoutStorageVolumesInput = {
   ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutStorageVolumesInput = {
@@ -4217,6 +4399,8 @@ export type UserUpdateWithoutStorageVolumesInput = {
   ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutStorageVolumesInput = {
@@ -4257,6 +4441,8 @@ export type UserUncheckedUpdateWithoutStorageVolumesInput = {
   ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
   researchExperiments?: Prisma.ResearchExperimentUncheckedUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUncheckedUpdateManyWithoutUserNestedInput
 }
 
 export type UserCreateWithoutResearchExperimentsInput = {
@@ -4297,6 +4483,8 @@ export type UserCreateWithoutResearchExperimentsInput = {
   cryptoAuditLogs?: Prisma.CryptoAuditLogCreateNestedManyWithoutUserInput
   ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
+  purchaseIntents?: Prisma.PurchaseIntentCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerCreateNestedManyWithoutUserInput
 }
 
 export type UserUncheckedCreateWithoutResearchExperimentsInput = {
@@ -4337,6 +4525,8 @@ export type UserUncheckedCreateWithoutResearchExperimentsInput = {
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedCreateNestedManyWithoutUserInput
   ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerUncheckedCreateNestedManyWithoutUserInput
 }
 
 export type UserCreateOrConnectWithoutResearchExperimentsInput = {
@@ -4393,6 +4583,8 @@ export type UserUpdateWithoutResearchExperimentsInput = {
   cryptoAuditLogs?: Prisma.CryptoAuditLogUpdateManyWithoutUserNestedInput
   ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUpdateManyWithoutUserNestedInput
 }
 
 export type UserUncheckedUpdateWithoutResearchExperimentsInput = {
@@ -4433,6 +4625,376 @@ export type UserUncheckedUpdateWithoutResearchExperimentsInput = {
   cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedUpdateManyWithoutUserNestedInput
   ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
   rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutPurchaseIntentsInput = {
+  id?: string
+  email?: string | null
+  walletAddress?: string | null
+  username?: string | null
+  telegramId?: string | null
+  telegramBotToken?: string | null
+  telegramBotUsername?: string | null
+  tier?: string
+  tokenBalance?: number
+  subscriptionStatus?: string
+  subscriptionExpiresAt?: Date | string | null
+  nonce?: string | null
+  nonceExpiresAt?: Date | string | null
+  stakedAmount?: number
+  stakingLevel?: string
+  unstakedAt?: Date | string | null
+  lastYieldClaimAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  containers?: Prisma.ContainerCreateNestedManyWithoutUserInput
+  tokenTransactions?: Prisma.TokenTransactionCreateNestedManyWithoutUserInput
+  chatSessions?: Prisma.ChatSessionCreateNestedManyWithoutUserInput
+  agentRuntimes?: Prisma.AgentRuntimeCreateNestedManyWithoutUserInput
+  storageVolumes?: Prisma.StorageVolumeCreateNestedManyWithoutUserInput
+  agentPreferences?: Prisma.UserAgentPreferenceCreateNestedManyWithoutUserInput
+  workflows?: Prisma.WorkflowCreateNestedManyWithoutUserInput
+  workflowRuns?: Prisma.WorkflowRunCreateNestedManyWithoutUserInput
+  workflowSchedules?: Prisma.WorkflowScheduleCreateNestedManyWithoutUserInput
+  policyDecisions?: Prisma.PolicyDecisionCreateNestedManyWithoutUserInput
+  approvalRequests?: Prisma.ApprovalRequestCreateNestedManyWithoutUserInput
+  policyAuditLogs?: Prisma.PolicyAuditLogCreateNestedManyWithoutUserInput
+  cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigCreateNestedOneWithoutUserInput
+  cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryCreateNestedManyWithoutUserInput
+  cryptoAuditLogs?: Prisma.CryptoAuditLogCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
+  researchExperiments?: Prisma.ResearchExperimentCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutPurchaseIntentsInput = {
+  id?: string
+  email?: string | null
+  walletAddress?: string | null
+  username?: string | null
+  telegramId?: string | null
+  telegramBotToken?: string | null
+  telegramBotUsername?: string | null
+  tier?: string
+  tokenBalance?: number
+  subscriptionStatus?: string
+  subscriptionExpiresAt?: Date | string | null
+  nonce?: string | null
+  nonceExpiresAt?: Date | string | null
+  stakedAmount?: number
+  stakingLevel?: string
+  unstakedAt?: Date | string | null
+  lastYieldClaimAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  containers?: Prisma.ContainerUncheckedCreateNestedManyWithoutUserInput
+  tokenTransactions?: Prisma.TokenTransactionUncheckedCreateNestedManyWithoutUserInput
+  chatSessions?: Prisma.ChatSessionUncheckedCreateNestedManyWithoutUserInput
+  agentRuntimes?: Prisma.AgentRuntimeUncheckedCreateNestedManyWithoutUserInput
+  storageVolumes?: Prisma.StorageVolumeUncheckedCreateNestedManyWithoutUserInput
+  agentPreferences?: Prisma.UserAgentPreferenceUncheckedCreateNestedManyWithoutUserInput
+  workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutUserInput
+  workflowRuns?: Prisma.WorkflowRunUncheckedCreateNestedManyWithoutUserInput
+  workflowSchedules?: Prisma.WorkflowScheduleUncheckedCreateNestedManyWithoutUserInput
+  policyDecisions?: Prisma.PolicyDecisionUncheckedCreateNestedManyWithoutUserInput
+  approvalRequests?: Prisma.ApprovalRequestUncheckedCreateNestedManyWithoutUserInput
+  policyAuditLogs?: Prisma.PolicyAuditLogUncheckedCreateNestedManyWithoutUserInput
+  cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedCreateNestedOneWithoutUserInput
+  cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedCreateNestedManyWithoutUserInput
+  cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
+  researchExperiments?: Prisma.ResearchExperimentUncheckedCreateNestedManyWithoutUserInput
+  creditLedger?: Prisma.CreditLedgerUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutPurchaseIntentsInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutPurchaseIntentsInput, Prisma.UserUncheckedCreateWithoutPurchaseIntentsInput>
+}
+
+export type UserUpsertWithoutPurchaseIntentsInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutPurchaseIntentsInput, Prisma.UserUncheckedUpdateWithoutPurchaseIntentsInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutPurchaseIntentsInput, Prisma.UserUncheckedCreateWithoutPurchaseIntentsInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutPurchaseIntentsInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutPurchaseIntentsInput, Prisma.UserUncheckedUpdateWithoutPurchaseIntentsInput>
+}
+
+export type UserUpdateWithoutPurchaseIntentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramBotToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramBotUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tier?: Prisma.StringFieldUpdateOperationsInput | string
+  tokenBalance?: Prisma.IntFieldUpdateOperationsInput | number
+  subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  subscriptionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  nonce?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nonceExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stakedAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  stakingLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  unstakedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastYieldClaimAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  containers?: Prisma.ContainerUpdateManyWithoutUserNestedInput
+  tokenTransactions?: Prisma.TokenTransactionUpdateManyWithoutUserNestedInput
+  chatSessions?: Prisma.ChatSessionUpdateManyWithoutUserNestedInput
+  agentRuntimes?: Prisma.AgentRuntimeUpdateManyWithoutUserNestedInput
+  storageVolumes?: Prisma.StorageVolumeUpdateManyWithoutUserNestedInput
+  agentPreferences?: Prisma.UserAgentPreferenceUpdateManyWithoutUserNestedInput
+  workflows?: Prisma.WorkflowUpdateManyWithoutUserNestedInput
+  workflowRuns?: Prisma.WorkflowRunUpdateManyWithoutUserNestedInput
+  workflowSchedules?: Prisma.WorkflowScheduleUpdateManyWithoutUserNestedInput
+  policyDecisions?: Prisma.PolicyDecisionUpdateManyWithoutUserNestedInput
+  approvalRequests?: Prisma.ApprovalRequestUpdateManyWithoutUserNestedInput
+  policyAuditLogs?: Prisma.PolicyAuditLogUpdateManyWithoutUserNestedInput
+  cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUpdateOneWithoutUserNestedInput
+  cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUpdateManyWithoutUserNestedInput
+  cryptoAuditLogs?: Prisma.CryptoAuditLogUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
+  researchExperiments?: Prisma.ResearchExperimentUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutPurchaseIntentsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramBotToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramBotUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tier?: Prisma.StringFieldUpdateOperationsInput | string
+  tokenBalance?: Prisma.IntFieldUpdateOperationsInput | number
+  subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  subscriptionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  nonce?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nonceExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stakedAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  stakingLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  unstakedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastYieldClaimAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  containers?: Prisma.ContainerUncheckedUpdateManyWithoutUserNestedInput
+  tokenTransactions?: Prisma.TokenTransactionUncheckedUpdateManyWithoutUserNestedInput
+  chatSessions?: Prisma.ChatSessionUncheckedUpdateManyWithoutUserNestedInput
+  agentRuntimes?: Prisma.AgentRuntimeUncheckedUpdateManyWithoutUserNestedInput
+  storageVolumes?: Prisma.StorageVolumeUncheckedUpdateManyWithoutUserNestedInput
+  agentPreferences?: Prisma.UserAgentPreferenceUncheckedUpdateManyWithoutUserNestedInput
+  workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutUserNestedInput
+  workflowRuns?: Prisma.WorkflowRunUncheckedUpdateManyWithoutUserNestedInput
+  workflowSchedules?: Prisma.WorkflowScheduleUncheckedUpdateManyWithoutUserNestedInput
+  policyDecisions?: Prisma.PolicyDecisionUncheckedUpdateManyWithoutUserNestedInput
+  approvalRequests?: Prisma.ApprovalRequestUncheckedUpdateManyWithoutUserNestedInput
+  policyAuditLogs?: Prisma.PolicyAuditLogUncheckedUpdateManyWithoutUserNestedInput
+  cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedUpdateOneWithoutUserNestedInput
+  cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedUpdateManyWithoutUserNestedInput
+  cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
+  researchExperiments?: Prisma.ResearchExperimentUncheckedUpdateManyWithoutUserNestedInput
+  creditLedger?: Prisma.CreditLedgerUncheckedUpdateManyWithoutUserNestedInput
+}
+
+export type UserCreateWithoutCreditLedgerInput = {
+  id?: string
+  email?: string | null
+  walletAddress?: string | null
+  username?: string | null
+  telegramId?: string | null
+  telegramBotToken?: string | null
+  telegramBotUsername?: string | null
+  tier?: string
+  tokenBalance?: number
+  subscriptionStatus?: string
+  subscriptionExpiresAt?: Date | string | null
+  nonce?: string | null
+  nonceExpiresAt?: Date | string | null
+  stakedAmount?: number
+  stakingLevel?: string
+  unstakedAt?: Date | string | null
+  lastYieldClaimAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionCreateNestedManyWithoutUserInput
+  containers?: Prisma.ContainerCreateNestedManyWithoutUserInput
+  tokenTransactions?: Prisma.TokenTransactionCreateNestedManyWithoutUserInput
+  chatSessions?: Prisma.ChatSessionCreateNestedManyWithoutUserInput
+  agentRuntimes?: Prisma.AgentRuntimeCreateNestedManyWithoutUserInput
+  storageVolumes?: Prisma.StorageVolumeCreateNestedManyWithoutUserInput
+  agentPreferences?: Prisma.UserAgentPreferenceCreateNestedManyWithoutUserInput
+  workflows?: Prisma.WorkflowCreateNestedManyWithoutUserInput
+  workflowRuns?: Prisma.WorkflowRunCreateNestedManyWithoutUserInput
+  workflowSchedules?: Prisma.WorkflowScheduleCreateNestedManyWithoutUserInput
+  policyDecisions?: Prisma.PolicyDecisionCreateNestedManyWithoutUserInput
+  approvalRequests?: Prisma.ApprovalRequestCreateNestedManyWithoutUserInput
+  policyAuditLogs?: Prisma.PolicyAuditLogCreateNestedManyWithoutUserInput
+  cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigCreateNestedOneWithoutUserInput
+  cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryCreateNestedManyWithoutUserInput
+  cryptoAuditLogs?: Prisma.CryptoAuditLogCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalCreateNestedManyWithoutRenterInput
+  researchExperiments?: Prisma.ResearchExperimentCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentCreateNestedManyWithoutUserInput
+}
+
+export type UserUncheckedCreateWithoutCreditLedgerInput = {
+  id?: string
+  email?: string | null
+  walletAddress?: string | null
+  username?: string | null
+  telegramId?: string | null
+  telegramBotToken?: string | null
+  telegramBotUsername?: string | null
+  tier?: string
+  tokenBalance?: number
+  subscriptionStatus?: string
+  subscriptionExpiresAt?: Date | string | null
+  nonce?: string | null
+  nonceExpiresAt?: Date | string | null
+  stakedAmount?: number
+  stakingLevel?: string
+  unstakedAt?: Date | string | null
+  lastYieldClaimAt?: Date | string | null
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  sessions?: Prisma.SessionUncheckedCreateNestedManyWithoutUserInput
+  containers?: Prisma.ContainerUncheckedCreateNestedManyWithoutUserInput
+  tokenTransactions?: Prisma.TokenTransactionUncheckedCreateNestedManyWithoutUserInput
+  chatSessions?: Prisma.ChatSessionUncheckedCreateNestedManyWithoutUserInput
+  agentRuntimes?: Prisma.AgentRuntimeUncheckedCreateNestedManyWithoutUserInput
+  storageVolumes?: Prisma.StorageVolumeUncheckedCreateNestedManyWithoutUserInput
+  agentPreferences?: Prisma.UserAgentPreferenceUncheckedCreateNestedManyWithoutUserInput
+  workflows?: Prisma.WorkflowUncheckedCreateNestedManyWithoutUserInput
+  workflowRuns?: Prisma.WorkflowRunUncheckedCreateNestedManyWithoutUserInput
+  workflowSchedules?: Prisma.WorkflowScheduleUncheckedCreateNestedManyWithoutUserInput
+  policyDecisions?: Prisma.PolicyDecisionUncheckedCreateNestedManyWithoutUserInput
+  approvalRequests?: Prisma.ApprovalRequestUncheckedCreateNestedManyWithoutUserInput
+  policyAuditLogs?: Prisma.PolicyAuditLogUncheckedCreateNestedManyWithoutUserInput
+  cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedCreateNestedOneWithoutUserInput
+  cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedCreateNestedManyWithoutUserInput
+  cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedCreateNestedManyWithoutUserInput
+  ownedAgents?: Prisma.AgentConfigUncheckedCreateNestedManyWithoutOwnerInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedCreateNestedManyWithoutRenterInput
+  researchExperiments?: Prisma.ResearchExperimentUncheckedCreateNestedManyWithoutUserInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedCreateNestedManyWithoutUserInput
+}
+
+export type UserCreateOrConnectWithoutCreditLedgerInput = {
+  where: Prisma.UserWhereUniqueInput
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreditLedgerInput, Prisma.UserUncheckedCreateWithoutCreditLedgerInput>
+}
+
+export type UserUpsertWithoutCreditLedgerInput = {
+  update: Prisma.XOR<Prisma.UserUpdateWithoutCreditLedgerInput, Prisma.UserUncheckedUpdateWithoutCreditLedgerInput>
+  create: Prisma.XOR<Prisma.UserCreateWithoutCreditLedgerInput, Prisma.UserUncheckedCreateWithoutCreditLedgerInput>
+  where?: Prisma.UserWhereInput
+}
+
+export type UserUpdateToOneWithWhereWithoutCreditLedgerInput = {
+  where?: Prisma.UserWhereInput
+  data: Prisma.XOR<Prisma.UserUpdateWithoutCreditLedgerInput, Prisma.UserUncheckedUpdateWithoutCreditLedgerInput>
+}
+
+export type UserUpdateWithoutCreditLedgerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramBotToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramBotUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tier?: Prisma.StringFieldUpdateOperationsInput | string
+  tokenBalance?: Prisma.IntFieldUpdateOperationsInput | number
+  subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  subscriptionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  nonce?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nonceExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stakedAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  stakingLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  unstakedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastYieldClaimAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUpdateManyWithoutUserNestedInput
+  containers?: Prisma.ContainerUpdateManyWithoutUserNestedInput
+  tokenTransactions?: Prisma.TokenTransactionUpdateManyWithoutUserNestedInput
+  chatSessions?: Prisma.ChatSessionUpdateManyWithoutUserNestedInput
+  agentRuntimes?: Prisma.AgentRuntimeUpdateManyWithoutUserNestedInput
+  storageVolumes?: Prisma.StorageVolumeUpdateManyWithoutUserNestedInput
+  agentPreferences?: Prisma.UserAgentPreferenceUpdateManyWithoutUserNestedInput
+  workflows?: Prisma.WorkflowUpdateManyWithoutUserNestedInput
+  workflowRuns?: Prisma.WorkflowRunUpdateManyWithoutUserNestedInput
+  workflowSchedules?: Prisma.WorkflowScheduleUpdateManyWithoutUserNestedInput
+  policyDecisions?: Prisma.PolicyDecisionUpdateManyWithoutUserNestedInput
+  approvalRequests?: Prisma.ApprovalRequestUpdateManyWithoutUserNestedInput
+  policyAuditLogs?: Prisma.PolicyAuditLogUpdateManyWithoutUserNestedInput
+  cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUpdateOneWithoutUserNestedInput
+  cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUpdateManyWithoutUserNestedInput
+  cryptoAuditLogs?: Prisma.CryptoAuditLogUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUpdateManyWithoutRenterNestedInput
+  researchExperiments?: Prisma.ResearchExperimentUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUpdateManyWithoutUserNestedInput
+}
+
+export type UserUncheckedUpdateWithoutCreditLedgerInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  email?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  walletAddress?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  username?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramId?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramBotToken?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  telegramBotUsername?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  tier?: Prisma.StringFieldUpdateOperationsInput | string
+  tokenBalance?: Prisma.IntFieldUpdateOperationsInput | number
+  subscriptionStatus?: Prisma.StringFieldUpdateOperationsInput | string
+  subscriptionExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  nonce?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  nonceExpiresAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  stakedAmount?: Prisma.IntFieldUpdateOperationsInput | number
+  stakingLevel?: Prisma.StringFieldUpdateOperationsInput | string
+  unstakedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  lastYieldClaimAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  sessions?: Prisma.SessionUncheckedUpdateManyWithoutUserNestedInput
+  containers?: Prisma.ContainerUncheckedUpdateManyWithoutUserNestedInput
+  tokenTransactions?: Prisma.TokenTransactionUncheckedUpdateManyWithoutUserNestedInput
+  chatSessions?: Prisma.ChatSessionUncheckedUpdateManyWithoutUserNestedInput
+  agentRuntimes?: Prisma.AgentRuntimeUncheckedUpdateManyWithoutUserNestedInput
+  storageVolumes?: Prisma.StorageVolumeUncheckedUpdateManyWithoutUserNestedInput
+  agentPreferences?: Prisma.UserAgentPreferenceUncheckedUpdateManyWithoutUserNestedInput
+  workflows?: Prisma.WorkflowUncheckedUpdateManyWithoutUserNestedInput
+  workflowRuns?: Prisma.WorkflowRunUncheckedUpdateManyWithoutUserNestedInput
+  workflowSchedules?: Prisma.WorkflowScheduleUncheckedUpdateManyWithoutUserNestedInput
+  policyDecisions?: Prisma.PolicyDecisionUncheckedUpdateManyWithoutUserNestedInput
+  approvalRequests?: Prisma.ApprovalRequestUncheckedUpdateManyWithoutUserNestedInput
+  policyAuditLogs?: Prisma.PolicyAuditLogUncheckedUpdateManyWithoutUserNestedInput
+  cryptoGuardrailConfig?: Prisma.CryptoGuardrailConfigUncheckedUpdateOneWithoutUserNestedInput
+  cryptoDestinationAllowlistEntries?: Prisma.CryptoDestinationAllowlistEntryUncheckedUpdateManyWithoutUserNestedInput
+  cryptoAuditLogs?: Prisma.CryptoAuditLogUncheckedUpdateManyWithoutUserNestedInput
+  ownedAgents?: Prisma.AgentConfigUncheckedUpdateManyWithoutOwnerNestedInput
+  rentalsAsRenter?: Prisma.AgentRentalUncheckedUpdateManyWithoutRenterNestedInput
+  researchExperiments?: Prisma.ResearchExperimentUncheckedUpdateManyWithoutUserNestedInput
+  purchaseIntents?: Prisma.PurchaseIntentUncheckedUpdateManyWithoutUserNestedInput
 }
 
 
@@ -4459,6 +5021,8 @@ export type UserCountOutputType = {
   ownedAgents: number
   rentalsAsRenter: number
   researchExperiments: number
+  purchaseIntents: number
+  creditLedger: number
 }
 
 export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
@@ -4480,6 +5044,8 @@ export type UserCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.I
   ownedAgents?: boolean | UserCountOutputTypeCountOwnedAgentsArgs
   rentalsAsRenter?: boolean | UserCountOutputTypeCountRentalsAsRenterArgs
   researchExperiments?: boolean | UserCountOutputTypeCountResearchExperimentsArgs
+  purchaseIntents?: boolean | UserCountOutputTypeCountPurchaseIntentsArgs
+  creditLedger?: boolean | UserCountOutputTypeCountCreditLedgerArgs
 }
 
 /**
@@ -4618,6 +5184,20 @@ export type UserCountOutputTypeCountResearchExperimentsArgs<ExtArgs extends runt
   where?: Prisma.ResearchExperimentWhereInput
 }
 
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountPurchaseIntentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.PurchaseIntentWhereInput
+}
+
+/**
+ * UserCountOutputType without action
+ */
+export type UserCountOutputTypeCountCreditLedgerArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.CreditLedgerWhereInput
+}
+
 
 export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -4658,6 +5238,8 @@ export type UserSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = r
   ownedAgents?: boolean | Prisma.User$ownedAgentsArgs<ExtArgs>
   rentalsAsRenter?: boolean | Prisma.User$rentalsAsRenterArgs<ExtArgs>
   researchExperiments?: boolean | Prisma.User$researchExperimentsArgs<ExtArgs>
+  purchaseIntents?: boolean | Prisma.User$purchaseIntentsArgs<ExtArgs>
+  creditLedger?: boolean | Prisma.User$creditLedgerArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["user"]>
 
@@ -4748,6 +5330,8 @@ export type UserInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = 
   ownedAgents?: boolean | Prisma.User$ownedAgentsArgs<ExtArgs>
   rentalsAsRenter?: boolean | Prisma.User$rentalsAsRenterArgs<ExtArgs>
   researchExperiments?: boolean | Prisma.User$researchExperimentsArgs<ExtArgs>
+  purchaseIntents?: boolean | Prisma.User$purchaseIntentsArgs<ExtArgs>
+  creditLedger?: boolean | Prisma.User$creditLedgerArgs<ExtArgs>
   _count?: boolean | Prisma.UserCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type UserIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {}
@@ -4775,6 +5359,8 @@ export type $UserPayload<ExtArgs extends runtime.Types.Extensions.InternalArgs =
     ownedAgents: Prisma.$AgentConfigPayload<ExtArgs>[]
     rentalsAsRenter: Prisma.$AgentRentalPayload<ExtArgs>[]
     researchExperiments: Prisma.$ResearchExperimentPayload<ExtArgs>[]
+    purchaseIntents: Prisma.$PurchaseIntentPayload<ExtArgs>[]
+    creditLedger: Prisma.$CreditLedgerPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -5209,6 +5795,8 @@ export interface Prisma__UserClient<T, Null = never, ExtArgs extends runtime.Typ
   ownedAgents<T extends Prisma.User$ownedAgentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$ownedAgentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AgentConfigPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   rentalsAsRenter<T extends Prisma.User$rentalsAsRenterArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$rentalsAsRenterArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$AgentRentalPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   researchExperiments<T extends Prisma.User$researchExperimentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$researchExperimentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ResearchExperimentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  purchaseIntents<T extends Prisma.User$purchaseIntentsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$purchaseIntentsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$PurchaseIntentPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
+  creditLedger<T extends Prisma.User$creditLedgerArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.User$creditLedgerArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$CreditLedgerPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -6098,6 +6686,54 @@ export type User$researchExperimentsArgs<ExtArgs extends runtime.Types.Extension
   take?: number
   skip?: number
   distinct?: Prisma.ResearchExperimentScalarFieldEnum | Prisma.ResearchExperimentScalarFieldEnum[]
+}
+
+/**
+ * User.purchaseIntents
+ */
+export type User$purchaseIntentsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the PurchaseIntent
+   */
+  select?: Prisma.PurchaseIntentSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the PurchaseIntent
+   */
+  omit?: Prisma.PurchaseIntentOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.PurchaseIntentInclude<ExtArgs> | null
+  where?: Prisma.PurchaseIntentWhereInput
+  orderBy?: Prisma.PurchaseIntentOrderByWithRelationInput | Prisma.PurchaseIntentOrderByWithRelationInput[]
+  cursor?: Prisma.PurchaseIntentWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.PurchaseIntentScalarFieldEnum | Prisma.PurchaseIntentScalarFieldEnum[]
+}
+
+/**
+ * User.creditLedger
+ */
+export type User$creditLedgerArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the CreditLedger
+   */
+  select?: Prisma.CreditLedgerSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the CreditLedger
+   */
+  omit?: Prisma.CreditLedgerOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.CreditLedgerInclude<ExtArgs> | null
+  where?: Prisma.CreditLedgerWhereInput
+  orderBy?: Prisma.CreditLedgerOrderByWithRelationInput | Prisma.CreditLedgerOrderByWithRelationInput[]
+  cursor?: Prisma.CreditLedgerWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.CreditLedgerScalarFieldEnum | Prisma.CreditLedgerScalarFieldEnum[]
 }
 
 /**

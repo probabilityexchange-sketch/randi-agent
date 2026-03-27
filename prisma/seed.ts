@@ -2,7 +2,26 @@ import 'dotenv/config';
 import { prisma } from '../src/lib/db/prisma';
 
 async function main() {
-  // 0. Ensure a System User exists to own the default agents
+  // 0. Seed credit packages
+  const tokenMint = process.env.TOKEN_MINT || process.env.NEXT_PUBLIC_TOKEN_MINT || "So11111111111111111111111111111111111111112";
+
+  await prisma.creditPackage.upsert({
+    where: { code: "small" },
+    update: { credits: 100, priceTokens: BigInt("1000000000"), mint: tokenMint, enabled: true },
+    create: { code: "small", credits: 100, priceTokens: BigInt("1000000000"), mint: tokenMint, enabled: true },
+  });
+  await prisma.creditPackage.upsert({
+    where: { code: "medium" },
+    update: { credits: 500, priceTokens: BigInt("4500000000"), mint: tokenMint, enabled: true },
+    create: { code: "medium", credits: 500, priceTokens: BigInt("4500000000"), mint: tokenMint, enabled: true },
+  });
+  await prisma.creditPackage.upsert({
+    where: { code: "large" },
+    update: { credits: 1200, priceTokens: BigInt("10000000000"), mint: tokenMint, enabled: true },
+    create: { code: "large", credits: 1200, priceTokens: BigInt("10000000000"), mint: tokenMint, enabled: true },
+  });
+
+  // 1. Ensure a System User exists to own the default agents
   const systemUser = await prisma.user.upsert({
     where: { id: 'system-user' },
     update: {},

@@ -408,7 +408,10 @@ export const ModelName = {
   ResearchExperiment: 'ResearchExperiment',
   FleetStats: 'FleetStats',
   BridgeNode: 'BridgeNode',
-  CleanupLock: 'CleanupLock'
+  CleanupLock: 'CleanupLock',
+  CreditPackage: 'CreditPackage',
+  PurchaseIntent: 'PurchaseIntent',
+  CreditLedger: 'CreditLedger'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -424,7 +427,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "container" | "chatSession" | "agentRuntime" | "chatMessage" | "tokenTransaction" | "agentConfig" | "agentRental" | "userAgentPreference" | "toolApproval" | "workflow" | "workflowRun" | "workflowSchedule" | "policyDecision" | "approvalRequest" | "policyAuditLog" | "cryptoGuardrailConfig" | "cryptoDestinationAllowlistEntry" | "cryptoAuditLog" | "storageVolume" | "researchExperiment" | "fleetStats" | "bridgeNode" | "cleanupLock"
+    modelProps: "user" | "session" | "container" | "chatSession" | "agentRuntime" | "chatMessage" | "tokenTransaction" | "agentConfig" | "agentRental" | "userAgentPreference" | "toolApproval" | "workflow" | "workflowRun" | "workflowSchedule" | "policyDecision" | "approvalRequest" | "policyAuditLog" | "cryptoGuardrailConfig" | "cryptoDestinationAllowlistEntry" | "cryptoAuditLog" | "storageVolume" | "researchExperiment" | "fleetStats" | "bridgeNode" | "cleanupLock" | "creditPackage" | "purchaseIntent" | "creditLedger"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2278,6 +2281,228 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    CreditPackage: {
+      payload: Prisma.$CreditPackagePayload<ExtArgs>
+      fields: Prisma.CreditPackageFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CreditPackageFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CreditPackagePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CreditPackageFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CreditPackagePayload>
+        }
+        findFirst: {
+          args: Prisma.CreditPackageFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CreditPackagePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CreditPackageFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CreditPackagePayload>
+        }
+        findMany: {
+          args: Prisma.CreditPackageFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CreditPackagePayload>[]
+        }
+        create: {
+          args: Prisma.CreditPackageCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CreditPackagePayload>
+        }
+        createMany: {
+          args: Prisma.CreditPackageCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CreditPackageCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CreditPackagePayload>[]
+        }
+        delete: {
+          args: Prisma.CreditPackageDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CreditPackagePayload>
+        }
+        update: {
+          args: Prisma.CreditPackageUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CreditPackagePayload>
+        }
+        deleteMany: {
+          args: Prisma.CreditPackageDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CreditPackageUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CreditPackageUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CreditPackagePayload>[]
+        }
+        upsert: {
+          args: Prisma.CreditPackageUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CreditPackagePayload>
+        }
+        aggregate: {
+          args: Prisma.CreditPackageAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCreditPackage>
+        }
+        groupBy: {
+          args: Prisma.CreditPackageGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CreditPackageGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CreditPackageCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CreditPackageCountAggregateOutputType> | number
+        }
+      }
+    }
+    PurchaseIntent: {
+      payload: Prisma.$PurchaseIntentPayload<ExtArgs>
+      fields: Prisma.PurchaseIntentFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.PurchaseIntentFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PurchaseIntentPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.PurchaseIntentFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PurchaseIntentPayload>
+        }
+        findFirst: {
+          args: Prisma.PurchaseIntentFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PurchaseIntentPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.PurchaseIntentFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PurchaseIntentPayload>
+        }
+        findMany: {
+          args: Prisma.PurchaseIntentFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PurchaseIntentPayload>[]
+        }
+        create: {
+          args: Prisma.PurchaseIntentCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PurchaseIntentPayload>
+        }
+        createMany: {
+          args: Prisma.PurchaseIntentCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.PurchaseIntentCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PurchaseIntentPayload>[]
+        }
+        delete: {
+          args: Prisma.PurchaseIntentDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PurchaseIntentPayload>
+        }
+        update: {
+          args: Prisma.PurchaseIntentUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PurchaseIntentPayload>
+        }
+        deleteMany: {
+          args: Prisma.PurchaseIntentDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.PurchaseIntentUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.PurchaseIntentUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PurchaseIntentPayload>[]
+        }
+        upsert: {
+          args: Prisma.PurchaseIntentUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$PurchaseIntentPayload>
+        }
+        aggregate: {
+          args: Prisma.PurchaseIntentAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregatePurchaseIntent>
+        }
+        groupBy: {
+          args: Prisma.PurchaseIntentGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PurchaseIntentGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.PurchaseIntentCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.PurchaseIntentCountAggregateOutputType> | number
+        }
+      }
+    }
+    CreditLedger: {
+      payload: Prisma.$CreditLedgerPayload<ExtArgs>
+      fields: Prisma.CreditLedgerFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CreditLedgerFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CreditLedgerPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CreditLedgerFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CreditLedgerPayload>
+        }
+        findFirst: {
+          args: Prisma.CreditLedgerFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CreditLedgerPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CreditLedgerFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CreditLedgerPayload>
+        }
+        findMany: {
+          args: Prisma.CreditLedgerFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CreditLedgerPayload>[]
+        }
+        create: {
+          args: Prisma.CreditLedgerCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CreditLedgerPayload>
+        }
+        createMany: {
+          args: Prisma.CreditLedgerCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CreditLedgerCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CreditLedgerPayload>[]
+        }
+        delete: {
+          args: Prisma.CreditLedgerDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CreditLedgerPayload>
+        }
+        update: {
+          args: Prisma.CreditLedgerUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CreditLedgerPayload>
+        }
+        deleteMany: {
+          args: Prisma.CreditLedgerDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CreditLedgerUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CreditLedgerUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CreditLedgerPayload>[]
+        }
+        upsert: {
+          args: Prisma.CreditLedgerUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CreditLedgerPayload>
+        }
+        aggregate: {
+          args: Prisma.CreditLedgerAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCreditLedger>
+        }
+        groupBy: {
+          args: Prisma.CreditLedgerGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CreditLedgerGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CreditLedgerCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CreditLedgerCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2773,6 +2998,49 @@ export const CleanupLockScalarFieldEnum = {
 export type CleanupLockScalarFieldEnum = (typeof CleanupLockScalarFieldEnum)[keyof typeof CleanupLockScalarFieldEnum]
 
 
+export const CreditPackageScalarFieldEnum = {
+  id: 'id',
+  code: 'code',
+  credits: 'credits',
+  priceTokens: 'priceTokens',
+  mint: 'mint',
+  enabled: 'enabled',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type CreditPackageScalarFieldEnum = (typeof CreditPackageScalarFieldEnum)[keyof typeof CreditPackageScalarFieldEnum]
+
+
+export const PurchaseIntentScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  packageId: 'packageId',
+  expectedAmount: 'expectedAmount',
+  mint: 'mint',
+  treasury: 'treasury',
+  status: 'status',
+  expiresAt: 'expiresAt',
+  createdAt: 'createdAt',
+  confirmedAt: 'confirmedAt',
+  txSig: 'txSig'
+} as const
+
+export type PurchaseIntentScalarFieldEnum = (typeof PurchaseIntentScalarFieldEnum)[keyof typeof PurchaseIntentScalarFieldEnum]
+
+
+export const CreditLedgerScalarFieldEnum = {
+  id: 'id',
+  userId: 'userId',
+  intentId: 'intentId',
+  delta: 'delta',
+  reason: 'reason',
+  createdAt: 'createdAt'
+} as const
+
+export type CreditLedgerScalarFieldEnum = (typeof CreditLedgerScalarFieldEnum)[keyof typeof CreditLedgerScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -2999,6 +3267,9 @@ export type GlobalOmitConfig = {
   fleetStats?: Prisma.FleetStatsOmit
   bridgeNode?: Prisma.BridgeNodeOmit
   cleanupLock?: Prisma.CleanupLockOmit
+  creditPackage?: Prisma.CreditPackageOmit
+  purchaseIntent?: Prisma.PurchaseIntentOmit
+  creditLedger?: Prisma.CreditLedgerOmit
 }
 
 /* Types for Logging */

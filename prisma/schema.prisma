@@ -50,6 +50,9 @@ model User {
   rentalsAsRenter    AgentRental[] @relation("AgentRentalRenter")
   // Research relations
   researchExperiments ResearchExperiment[]
+  // Payments
+  purchaseIntents     PurchaseIntent[]
+  creditLedger        CreditLedger[]
 }
 
 model Session {
@@ -561,4 +564,52 @@ model CleanupLock {
   lockedAt  DateTime @default(now())
 
   @@index([lockedAt])
+}
+
+model CreditPackage {
+  id          String   @id @default(cuid())
+  code        String   @unique
+  credits     Int
+  priceTokens BigInt
+  mint        String
+  enabled     Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  purchaseIntents PurchaseIntent[]
+}
+
+model PurchaseIntent {
+  id             String   @id @default(uuid()) @db.Uuid
+  userId         String
+  packageId      String
+  expectedAmount BigInt
+  mint           String
+  treasury       String
+  status         String   @default("PENDING") // PENDING, CONFIRMED, EXPIRED, FAILED
+  expiresAt      DateTime
+  createdAt      DateTime @default(now())
+  confirmedAt    DateTime?
+  txSig          String?  @unique
+
+  user    User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  package CreditPackage @relation(fields: [packageId], references: [id])
+  ledger  CreditLedger?
+
+  @@index([userId, status])
+  @@index([expiresAt])
+}
+
+model CreditLedger {
+  id        String   @id @default(cuid())
+  userId    String
+  intentId  String   @unique @db.Uuid
+  delta     Int
+  reason    String
+  createdAt DateTime @default(now())
+
+  user   User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  intent PurchaseIntent @relation(fields: [intentId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
 }

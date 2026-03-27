@@ -8,6 +8,14 @@ export interface TokenPackage {
   usdAmount: string;
 }
 
+export interface PurchaseIntentResponse {
+  intentId: string;
+  expectedAmount: string;
+  mint: string;
+  treasury: string;
+  expiresAt: string;
+}
+
 export interface PurchaseInitResponse {
   transactionId: string;
   paymentAsset: "spl" | "sol";
