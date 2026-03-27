@@ -126,3 +126,8 @@ body {
 .prose table { @apply w-full border-collapse mb-8; }
 .prose th { @apply text-left p-3 border-b border-white/10 text-white/60 text-xs uppercase tracking-widest font-black; }
 .prose td { @apply p-3 border-b border-white/5 text-sm text-muted-foreground; }
+
+@keyframes progress-slide {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(300%); }
+}

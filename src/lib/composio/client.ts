@@ -1,6 +1,5 @@
-import type { Composio as ComposioClient, Tool as ComposioTool } from "@composio/core";
+import type { Composio as ComposioClient, Tool as ComposioTool } from '@composio/core';
 
-const apiKey = process.env.COMPOSIO_API_KEY?.trim() || "";
 const globalForComposio = globalThis as unknown as {
   composioClientPromise?: Promise<ComposioClient | null>;
 };
@@ -9,7 +8,7 @@ let loggedMissingComposioApiKey = false;
 export type { ComposioTool };
 
 export interface OpenAITool {
-  type: "function";
+  type: 'function';
   function: {
     name: string;
     description?: string;
@@ -18,20 +17,21 @@ export interface OpenAITool {
 }
 
 export function composioToolsToOpenAI(tools: ComposioTool[]): OpenAITool[] {
-  return tools.map((t) => ({
-    type: "function" as const,
+  return tools.map(t => ({
+    type: 'function' as const,
     function: {
       name: t.slug,
-      description: t.description || "",
+      description: t.description || '',
       parameters: t.inputParameters,
     },
   }));
 }
 
 export async function getComposioClient(): Promise<ComposioClient | null> {
+  const apiKey = process.env.COMPOSIO_API_KEY?.trim() || '';
   if (!apiKey) {
     if (!loggedMissingComposioApiKey) {
-      console.warn("COMPOSIO_API_KEY is not set in environment variables");
+      console.warn('COMPOSIO_API_KEY is not set in environment variables');
       loggedMissingComposioApiKey = true;
     }
     return null;
@@ -40,10 +40,10 @@ export async function getComposioClient(): Promise<ComposioClient | null> {
   if (!globalForComposio.composioClientPromise) {
     globalForComposio.composioClientPromise = (async () => {
       try {
-        const { Composio } = await import("@composio/core");
+        const { Composio } = await import('@composio/core');
         return new Composio({ apiKey }) as ComposioClient;
       } catch (error) {
-        console.error("Failed to initialize Composio client", error);
+        console.error('Failed to initialize Composio client', error);
         return null;
       }
     })();
@@ -60,141 +60,141 @@ const TOOLKIT_SLUG_PATTERN = /^[a-z0-9][a-z0-9_-]*$/;
 // Toolkits NOT in this map get all tools (capped at 15).
 const CURATED_TOOLKIT_TOOLS: Record<string, string[]> = {
   gmail: [
-    "GMAIL_FETCH_EMAILS",
-    "GMAIL_FETCH_MESSAGE_BY_MESSAGE_ID",
-    "GMAIL_FETCH_MESSAGE_BY_THREAD_ID",
-    "GMAIL_CREATE_EMAIL_DRAFT",
-    "GMAIL_SEND_EMAIL",
-    "GMAIL_REPLY_TO_THREAD",
-    "GMAIL_FORWARD_MESSAGE",
-    "GMAIL_GET_PROFILE",
-    "GMAIL_ADD_LABEL_TO_EMAIL",
-    "GMAIL_GET_ATTACHMENT",
+    'GMAIL_FETCH_EMAILS',
+    'GMAIL_FETCH_MESSAGE_BY_MESSAGE_ID',
+    'GMAIL_FETCH_MESSAGE_BY_THREAD_ID',
+    'GMAIL_CREATE_EMAIL_DRAFT',
+    'GMAIL_SEND_EMAIL',
+    'GMAIL_REPLY_TO_THREAD',
+    'GMAIL_FORWARD_MESSAGE',
+    'GMAIL_GET_PROFILE',
+    'GMAIL_ADD_LABEL_TO_EMAIL',
+    'GMAIL_GET_ATTACHMENT',
   ],
   googlecalendar: [
-    "GOOGLECALENDAR_FIND_EVENT",
-    "GOOGLECALENDAR_LIST_CALENDARS",
-    "GOOGLECALENDAR_GET_CALENDAR",
-    "GOOGLECALENDAR_CREATE_EVENT",
-    "GOOGLECALENDAR_UPDATE_EVENT",
-    "GOOGLECALENDAR_DELETE_EVENT",
-    "GOOGLECALENDAR_FIND_FREE_SLOTS",
-    "GOOGLECALENDAR_QUICK_ADD_EVENT",
+    'GOOGLECALENDAR_FIND_EVENT',
+    'GOOGLECALENDAR_LIST_CALENDARS',
+    'GOOGLECALENDAR_GET_CALENDAR',
+    'GOOGLECALENDAR_CREATE_EVENT',
+    'GOOGLECALENDAR_UPDATE_EVENT',
+    'GOOGLECALENDAR_DELETE_EVENT',
+    'GOOGLECALENDAR_FIND_FREE_SLOTS',
+    'GOOGLECALENDAR_QUICK_ADD_EVENT',
   ],
   github: [
-    "GITHUB_LIST_PULL_REQUESTS",
-    "GITHUB_GET_A_PULL_REQUEST",
-    "GITHUB_CREATE_A_PULL_REQUEST",
-    "GITHUB_LIST_REPOSITORIES_FOR_THE_AUTHENTICATED_USER",
-    "GITHUB_GET_A_REPOSITORY",
-    "GITHUB_CREATE_AN_ISSUE",
-    "GITHUB_LIST_REPOSITORY_ISSUES",
-    "GITHUB_GET_AN_ISSUE",
-    "GITHUB_CREATE_AN_ISSUE_COMMENT",
-    "GITHUB_SEARCH_CODE",
-    "GITHUB_SEARCH_ISSUES_AND_PULL_REQUESTS",
-    "GITHUB_LIST_COMMITS",
-    "GITHUB_GET_A_BRANCH",
-    "GITHUB_LIST_BRANCHES",
-    "GITHUB_CREATE_A_FORK",
-    "GITHUB_GET_COMMITS_OF_A_PULL_REQUEST",
-    "GITHUB_LIST_ORGANIZATIONS_FOR_THE_AUTHENTICATED_USER",
+    'GITHUB_LIST_PULL_REQUESTS',
+    'GITHUB_GET_A_PULL_REQUEST',
+    'GITHUB_CREATE_A_PULL_REQUEST',
+    'GITHUB_LIST_REPOSITORIES_FOR_THE_AUTHENTICATED_USER',
+    'GITHUB_GET_A_REPOSITORY',
+    'GITHUB_CREATE_AN_ISSUE',
+    'GITHUB_LIST_REPOSITORY_ISSUES',
+    'GITHUB_GET_AN_ISSUE',
+    'GITHUB_CREATE_AN_ISSUE_COMMENT',
+    'GITHUB_SEARCH_CODE',
+    'GITHUB_SEARCH_ISSUES_AND_PULL_REQUESTS',
+    'GITHUB_LIST_COMMITS',
+    'GITHUB_GET_A_BRANCH',
+    'GITHUB_LIST_BRANCHES',
+    'GITHUB_CREATE_A_FORK',
+    'GITHUB_GET_COMMITS_OF_A_PULL_REQUEST',
+    'GITHUB_LIST_ORGANIZATIONS_FOR_THE_AUTHENTICATED_USER',
   ],
   slack: [
-    "SLACK_SENDS_A_MESSAGE_TO_A_SLACK_CHANNEL",
-    "SLACK_LIST_ALL_CHANNELS",
-    "SLACK_LIST_ALL_USERS",
-    "SLACK_FIND_CHANNELS",
-    "SLACK_FIND_USERS",
-    "SLACK_OPEN_DM",
-    "SLACK_LIST_CONVERSATIONS",
-    "SLACK_LIST_STARRED_ITEMS",
-    "SLACK_ADD_REACTION",
-    "SLACK_SEARCH_FOR_MESSAGES",
+    'SLACK_SENDS_A_MESSAGE_TO_A_SLACK_CHANNEL',
+    'SLACK_LIST_ALL_CHANNELS',
+    'SLACK_LIST_ALL_USERS',
+    'SLACK_FIND_CHANNELS',
+    'SLACK_FIND_USERS',
+    'SLACK_OPEN_DM',
+    'SLACK_LIST_CONVERSATIONS',
+    'SLACK_LIST_STARRED_ITEMS',
+    'SLACK_ADD_REACTION',
+    'SLACK_SEARCH_FOR_MESSAGES',
   ],
   notion: [
-    "NOTION_SEARCH_NOTION_PAGE",
-    "NOTION_CREATE_NOTION_PAGE",
-    "NOTION_RETRIEVE_PAGE",
-    "NOTION_UPDATE_PAGE",
-    "NOTION_QUERY_DATABASE",
-    "NOTION_INSERT_ROW_DATABASE",
-    "NOTION_FETCH_ALL_BLOCK_CONTENTS",
-    "NOTION_ADD_PAGE_CONTENT",
-    "NOTION_LIST_DATABASES",
-    "NOTION_LIST_USERS",
+    'NOTION_SEARCH_NOTION_PAGE',
+    'NOTION_CREATE_NOTION_PAGE',
+    'NOTION_RETRIEVE_PAGE',
+    'NOTION_UPDATE_PAGE',
+    'NOTION_QUERY_DATABASE',
+    'NOTION_INSERT_ROW_DATABASE',
+    'NOTION_FETCH_ALL_BLOCK_CONTENTS',
+    'NOTION_ADD_PAGE_CONTENT',
+    'NOTION_LIST_DATABASES',
+    'NOTION_LIST_USERS',
   ],
   coinmarketcap: [
-    "COINMARKETCAP_CRYPTOCURRENCY_LISTINGS_LATEST",
-    "COINMARKETCAP_CRYPTOCURRENCY_QUOTES_LATEST",
-    "COINMARKETCAP_GET_CRYPTOCURRENCY_INFO",
-    "COINMARKETCAP_GLOBAL_METRICS_QUOTES_LATEST",
-    "COINMARKETCAP_CMC_EXCHANGE_LISTINGS_HISTORICAL",
-    "COINMARKETCAP_TOOLS_PRICE_CONVERSION",
-    "COINMARKETCAP_GET_KEY_INFO",
+    'COINMARKETCAP_CRYPTOCURRENCY_LISTINGS_LATEST',
+    'COINMARKETCAP_CRYPTOCURRENCY_QUOTES_LATEST',
+    'COINMARKETCAP_GET_CRYPTOCURRENCY_INFO',
+    'COINMARKETCAP_GLOBAL_METRICS_QUOTES_LATEST',
+    'COINMARKETCAP_CMC_EXCHANGE_LISTINGS_HISTORICAL',
+    'COINMARKETCAP_TOOLS_PRICE_CONVERSION',
+    'COINMARKETCAP_GET_KEY_INFO',
   ],
   telegram: [
-    "TELEGRAM_SEND_MESSAGE",
-    "TELEGRAM_GET_ME",
-    "TELEGRAM_LIST_CHATS",
-    "TELEGRAM_GET_CHAT",
-    "TELEGRAM_EDIT_MESSAGE_TEXT",
+    'TELEGRAM_SEND_MESSAGE',
+    'TELEGRAM_GET_ME',
+    'TELEGRAM_LIST_CHATS',
+    'TELEGRAM_GET_CHAT',
+    'TELEGRAM_EDIT_MESSAGE_TEXT',
   ],
   youtube: [
-    "YOUTUBE_SEARCH_VIDEOS",
-    "YOUTUBE_LIST_CHANNEL_VIDEOS",
-    "YOUTUBE_GET_VIDEO_DETAILS",
-    "YOUTUBE_LIST_MY_VIDEOS",
-    "YOUTUBE_LIST_PLAYLISTS",
+    'YOUTUBE_SEARCH_VIDEOS',
+    'YOUTUBE_LIST_CHANNEL_VIDEOS',
+    'YOUTUBE_GET_VIDEO_DETAILS',
+    'YOUTUBE_LIST_MY_VIDEOS',
+    'YOUTUBE_LIST_PLAYLISTS',
   ],
   openweather: [
-    "OPENWEATHER_GET_CURRENT_WEATHER_DATA",
-    "OPENWEATHER_GET_5_DAY_3_HOUR_FORECAST_DATA",
-    "OPENWEATHER_GET_WEATHER_MAPS",
-    "OPENWEATHER_GET_AIR_POLLUTION_DATA",
+    'OPENWEATHER_GET_CURRENT_WEATHER_DATA',
+    'OPENWEATHER_GET_5_DAY_3_HOUR_FORECAST_DATA',
+    'OPENWEATHER_GET_WEATHER_MAPS',
+    'OPENWEATHER_GET_AIR_POLLUTION_DATA',
   ],
   googlesheets: [
-    "GOOGLESHEETS_GET_SPREADSHEET",
-    "GOOGLESHEETS_BATCH_GET_VALUES",
-    "GOOGLESHEETS_GET_VALUES",
-    "GOOGLESHEETS_UPDATE_VALUES",
-    "GOOGLESHEETS_BATCH_UPDATE_VALUES",
-    "GOOGLESHEETS_APPEND_VALUES",
-    "GOOGLESHEETS_CLEAR_VALUES",
-    "GOOGLESHEETS_CREATE_SPREADSHEET",
-    "GOOGLESHEETS_ADD_SHEET",
-    "GOOGLESHEETS_DELETE_SHEET",
+    'GOOGLESHEETS_GET_SPREADSHEET',
+    'GOOGLESHEETS_BATCH_GET_VALUES',
+    'GOOGLESHEETS_GET_VALUES',
+    'GOOGLESHEETS_UPDATE_VALUES',
+    'GOOGLESHEETS_BATCH_UPDATE_VALUES',
+    'GOOGLESHEETS_APPEND_VALUES',
+    'GOOGLESHEETS_CLEAR_VALUES',
+    'GOOGLESHEETS_CREATE_SPREADSHEET',
+    'GOOGLESHEETS_ADD_SHEET',
+    'GOOGLESHEETS_DELETE_SHEET',
   ],
   firehose: [
-    "FIREHOSE_LIST_TAPS",
-    "FIREHOSE_CREATE_TAP",
-    "FIREHOSE_GET_TAP",
-    "FIREHOSE_REVOKE_TAP",
-    "FIREHOSE_LIST_RULES",
-    "FIREHOSE_CREATE_RULE",
-    "FIREHOSE_UPDATE_RULE",
-    "FIREHOSE_DELETE_RULE",
-    "FIREHOSE_GET_STREAM",
+    'FIREHOSE_LIST_TAPS',
+    'FIREHOSE_CREATE_TAP',
+    'FIREHOSE_GET_TAP',
+    'FIREHOSE_REVOKE_TAP',
+    'FIREHOSE_LIST_RULES',
+    'FIREHOSE_CREATE_RULE',
+    'FIREHOSE_UPDATE_RULE',
+    'FIREHOSE_DELETE_RULE',
+    'FIREHOSE_GET_STREAM',
   ],
 };
 
 const LEGACY_TOOLKIT_ALIASES: Record<string, string> = {
-  github_api: "github",
-  slack_api: "slack",
-  notion_api: "notion",
-  google_calendar: "googlecalendar",
-  google_sheets: "googlesheets",
-  prompmate_api: "prompmate",
-  promptmate_api: "prompmate",
-  promptmate: "prompmate",
-  coinmarketcap_api: "coinmarketcap",
-  cmc_api: "coinmarketcap",
-  cmc: "coinmarketcap",
-  supabase_api: "supabase",
-  vercel_api: "vercel",
-  telegram_api: "telegram",
-  youtube: "youtube-vrqivy",
-  openweather_api: "openweather",
+  github_api: 'github',
+  slack_api: 'slack',
+  notion_api: 'notion',
+  google_calendar: 'googlecalendar',
+  google_sheets: 'googlesheets',
+  prompmate_api: 'prompmate',
+  promptmate_api: 'prompmate',
+  promptmate: 'prompmate',
+  coinmarketcap_api: 'coinmarketcap',
+  cmc_api: 'coinmarketcap',
+  cmc: 'coinmarketcap',
+  supabase_api: 'supabase',
+  vercel_api: 'vercel',
+  telegram_api: 'telegram',
+  youtube: 'youtube-vrqivy',
+  openweather_api: 'openweather',
 };
 
 interface ParsedAgentToolConfig {
@@ -203,18 +203,26 @@ interface ParsedAgentToolConfig {
   fallbackTools: string[];
 }
 
-export function resolveComposioUserId(userId: string): string {
+export function resolveComposioUserId(userId: string, agentSlug?: string): string {
   const override = process.env.COMPOSIO_ENTITY_ID?.trim();
   if (override) return override;
+
   const normalizedUserId = userId?.trim();
   if (!normalizedUserId) {
-    throw new Error("Missing authenticated user id for Composio user mapping");
+    throw new Error('Missing authenticated user id for Composio user mapping');
   }
+
+  if (agentSlug) {
+    // Sanitize slug for entity ID compatibility
+    const cleanSlug = agentSlug.toLowerCase().replace(/[^a-z0-9]/g, '_');
+    return `${normalizedUserId}_${cleanSlug}`;
+  }
+
   return normalizedUserId;
 }
 
 function isRecord(value: unknown): value is Record<string, unknown> {
-  return typeof value === "object" && value !== null;
+  return typeof value === 'object' && value !== null;
 }
 
 function unique(values: string[]): string[] {
@@ -225,8 +233,8 @@ function normalizeStringList(value: unknown): string[] {
   if (!Array.isArray(value)) return [];
   return unique(
     value
-      .filter((item): item is string => typeof item === "string")
-      .map((item) => item.trim())
+      .filter((item): item is string => typeof item === 'string')
+      .map(item => item.trim())
       .filter(Boolean)
   );
 }
@@ -239,9 +247,7 @@ function normalizeToolkitHint(value: string): string | null {
   return TOOLKIT_SLUG_PATTERN.test(mapped) ? mapped : null;
 }
 
-function parseAgentToolConfig(
-  rawConfig: string | null | undefined
-): ParsedAgentToolConfig {
+export function parseAgentToolConfig(rawConfig: string | null | undefined): ParsedAgentToolConfig {
   if (!rawConfig) {
     return { explicitTools: [], toolkitHints: [], fallbackTools: [] };
   }
@@ -255,7 +261,7 @@ function parseAgentToolConfig(
 
   if (Array.isArray(parsed)) {
     const values = normalizeStringList(parsed);
-    const explicitTools = values.filter((value) => TOOL_SLUG_PATTERN.test(value));
+    const explicitTools = values.filter(value => TOOL_SLUG_PATTERN.test(value));
     const toolkitHints = values
       .map(normalizeToolkitHint)
       .filter((value): value is string => Boolean(value));
@@ -284,7 +290,7 @@ function parseAgentToolConfig(
   };
 }
 
-function dedupeTools(tools: ComposioTool[]): ComposioTool[] {
+export function dedupeTools(tools: ComposioTool[]): ComposioTool[] {
   const seen = new Set<string>();
   const deduped: ComposioTool[] = [];
 
@@ -299,27 +305,28 @@ function dedupeTools(tools: ComposioTool[]): ComposioTool[] {
 }
 
 type ComposioToolQuery =
-  | { kind: "tools"; tools: string[] }
-  | { kind: "toolkits"; toolkits: string[] };
+  | { kind: 'tools'; tools: string[] }
+  | { kind: 'toolkits'; toolkits: string[] };
 
-async function fetchToolsByQuery(
+export async function fetchToolsByQuery(
   composioClient: ComposioClient,
   query: ComposioToolQuery
 ): Promise<ComposioTool[]> {
   try {
-    const tools = query.kind === "tools"
-      ? await composioClient.tools.getRawComposioTools({ tools: query.tools })
-      : await composioClient.tools.getRawComposioTools({
-        toolkits: query.toolkits,
-      });
+    const tools =
+      query.kind === 'tools'
+        ? await composioClient.tools.getRawComposioTools({ tools: query.tools })
+        : await composioClient.tools.getRawComposioTools({
+            toolkits: query.toolkits,
+          });
     return tools;
   } catch (error) {
-    console.warn("[Composio] Tool query failed:", query, error);
+    console.warn('[Composio] Tool query failed:', query, error);
     return [];
   }
 }
 
-async function fetchToolBySlug(
+export async function fetchToolBySlug(
   composioClient: ComposioClient,
   slug: string
 ): Promise<ComposioTool | null> {
@@ -333,11 +340,12 @@ async function fetchToolBySlug(
 
 export async function getAgentToolsFromConfig(
   rawConfig: string | null | undefined,
-  userId: string
+  userId: string,
+  agentSlug?: string
 ): Promise<ComposioTool[]> {
   const composioClient = await getComposioClient();
   if (!composioClient) return [];
-  const resolvedUserId = resolveComposioUserId(userId);
+  const resolvedUserId = resolveComposioUserId(userId, agentSlug);
 
   const parsed = parseAgentToolConfig(rawConfig);
   if (
@@ -353,7 +361,7 @@ export async function getAgentToolsFromConfig(
   if (parsed.explicitTools.length > 0) {
     collectedTools.push(
       ...(await fetchToolsByQuery(composioClient, {
-        kind: "tools",
+        kind: 'tools',
         tools: parsed.explicitTools,
       }))
     );
@@ -364,20 +372,24 @@ export async function getAgentToolsFromConfig(
     const toolkitResults = await Promise.all(
       parsed.toolkitHints.map(toolkit =>
         fetchToolsByQuery(composioClient, {
-          kind: "toolkits",
+          kind: 'toolkits',
           toolkits: [toolkit],
         }).then(tools => {
           const allowlist = CURATED_TOOLKIT_TOOLS[toolkit];
           let filtered: ComposioTool[];
           if (allowlist) {
             const allowSet = new Set(allowlist);
-            filtered = tools.filter((t) => {
+            filtered = tools.filter(t => {
               return allowSet.has(t.slug);
             });
-            console.log(`[Composio] Toolkit "${toolkit}": ${tools.length} total, ${filtered.length} curated (allowlist: ${allowlist.length})`);
+            console.log(
+              `[Composio] Toolkit "${toolkit}": ${tools.length} total, ${filtered.length} curated (allowlist: ${allowlist.length})`
+            );
           } else {
             filtered = tools.slice(0, FALLBACK_LIMIT);
-            console.log(`[Composio] Toolkit "${toolkit}": ${tools.length} total, capped to ${filtered.length}`);
+            console.log(
+              `[Composio] Toolkit "${toolkit}": ${tools.length} total, capped to ${filtered.length}`
+            );
           }
           return filtered;
         })
@@ -390,10 +402,7 @@ export async function getAgentToolsFromConfig(
 
   if (collectedTools.length === 0) {
     for (const fallbackTool of parsed.fallbackTools) {
-      const tool = await fetchToolBySlug(
-        composioClient,
-        fallbackTool
-      );
+      const tool = await fetchToolBySlug(composioClient, fallbackTool);
       if (tool) collectedTools.push(tool);
     }
   }
@@ -401,9 +410,7 @@ export async function getAgentToolsFromConfig(
   const finalTools = dedupeTools(collectedTools);
   console.log(`[Composio] Collected ${finalTools.length} tools for user ${resolvedUserId}`);
   if (finalTools.length > 0) {
-    const prefixes = new Set(
-      finalTools.map(t => t.slug.split('_')[0])
-    );
+    const prefixes = new Set(finalTools.map(t => t.slug.split('_')[0]));
     console.log(`[Composio] Tools found for prefixes: ${Array.from(prefixes).join(', ')}`);
   }
   return finalTools;
@@ -411,41 +418,41 @@ export async function getAgentToolsFromConfig(
 
 export async function executeOpenAIToolCall(
   userId: string,
-  toolCall: { type?: string; function?: { name: string; arguments: string } } | { name: string; arguments: string | Record<string, unknown> },
-  runtimeUrl?: string
+  toolCall:
+    | { type?: string; function?: { name: string; arguments: string } }
+    | { name: string; arguments: string | Record<string, unknown> },
+  runtimeUrl?: string,
+  agentSlug?: string
 ): Promise<string> {
-  const composioClient = await getComposioClient();
-  if (!composioClient) {
-    return JSON.stringify({ error: "COMPOSIO_API_KEY is not configured." });
-  }
-  const resolvedUserId = resolveComposioUserId(userId);
+  const resolvedUserId = resolveComposioUserId(userId, agentSlug);
 
   let toolName: string;
   let toolArgs: Record<string, unknown>;
 
   if ('function' in toolCall && toolCall.function) {
-    if (toolCall.type !== "function") {
-      return JSON.stringify({ error: "Only function tool calls are supported." });
+    if (toolCall.type !== 'function') {
+      return JSON.stringify({ error: 'Only function tool calls are supported.' });
     }
     const normalized = normalizeToolCallArgumentsJson(toolCall.function.arguments);
     toolName = toolCall.function.name;
     toolArgs = JSON.parse(normalized);
   } else if ('name' in toolCall) {
     toolName = toolCall.name;
-    toolArgs = typeof (toolCall as any).arguments === "string"
-      ? JSON.parse((toolCall as any).arguments)
-      : ((toolCall as any).arguments || {});
+    toolArgs =
+      typeof (toolCall as any).arguments === 'string'
+        ? JSON.parse((toolCall as any).arguments)
+        : (toolCall as any).arguments || {};
   } else {
-    return JSON.stringify({ error: "Invalid tool call format" });
+    return JSON.stringify({ error: 'Invalid tool call format' });
   }
 
   // ── DEDICATED RUNTIME ROUTING ──────────────────────────────────────────
   if (runtimeUrl) {
     try {
-      const endpoint = new URL("/api/tools/execute", runtimeUrl).toString();
+      const endpoint = new URL('/api/tools/execute', runtimeUrl).toString();
       const response = await fetch(endpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           userId: resolvedUserId,
           toolName,
@@ -464,11 +471,17 @@ export async function executeOpenAIToolCall(
     }
   }
 
-  // Fallback to Composio SDK execution
+  // Fallback to Composio SDK execution — only needs the client here
+  const composioClient = await getComposioClient();
+  if (!composioClient) {
+    return JSON.stringify({ error: 'COMPOSIO_API_KEY is not configured.' });
+  }
   try {
     console.log(`[Composio] Executing tool: ${toolName} for entity: ${resolvedUserId}`);
     console.log(`[Composio] Args: ${JSON.stringify(toolArgs)}`);
-    console.log(`[Composio] COMPOSIO_ENTITY_ID env: ${process.env.COMPOSIO_ENTITY_ID ? 'SET' : 'NOT SET'}`);
+    console.log(
+      `[Composio] COMPOSIO_ENTITY_ID env: ${process.env.COMPOSIO_ENTITY_ID ? 'SET' : 'NOT SET'}`
+    );
 
     const result = await composioClient.tools.execute(toolName, {
       userId: resolvedUserId,
@@ -480,7 +493,7 @@ export async function executeOpenAIToolCall(
     return JSON.stringify(result);
   } catch (error) {
     const err = error as any;
-    const message = error instanceof Error ? error.message : "Tool execution failed";
+    const message = error instanceof Error ? error.message : 'Tool execution failed';
     const stack = err?.stack || '';
     console.error(`[Composio] Tool execution error for ${toolName}:`, message, stack);
     return JSON.stringify({
@@ -491,27 +504,27 @@ export async function executeOpenAIToolCall(
   }
 }
 
-function normalizeToolCallArgumentsJson(rawArgs: unknown): string {
-  if (typeof rawArgs !== "string") return "{}";
+export function normalizeToolCallArgumentsJson(rawArgs: unknown): string {
+  if (typeof rawArgs !== 'string') return '{}';
 
   const trimmed = rawArgs.trim();
-  if (!trimmed) return "{}";
+  if (!trimmed) return '{}';
 
   const lowered = trimmed.toLowerCase();
   if (
-    lowered === "undefined" ||
-    lowered === "null" ||
-    lowered === "\"undefined\"" ||
-    lowered === "\"null\""
+    lowered === 'undefined' ||
+    lowered === 'null' ||
+    lowered === '"undefined"' ||
+    lowered === '"null"'
   ) {
-    return "{}";
+    return '{}';
   }
 
   try {
     const parsed = JSON.parse(trimmed);
-    if (!isRecord(parsed) || Array.isArray(parsed)) return "{}";
+    if (!isRecord(parsed) || Array.isArray(parsed)) return '{}';
     return JSON.stringify(parsed);
   } catch {
-    return "{}";
+    return '{}';
   }
 }

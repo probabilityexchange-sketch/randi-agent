@@ -72,3 +72,4 @@ next-env.d.ts
 awscliv2.zip
 verified_deposits.txt
 evals/.env
+.gstack/

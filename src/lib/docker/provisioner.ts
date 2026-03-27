@@ -4,7 +4,7 @@ import { generatePassword } from "@/lib/utils/crypto";
 import { generateSubdomain } from "@/lib/utils/subdomain";
 import { prisma } from "@/lib/db/prisma";
 import { createHash } from "crypto";
-import { getComputeBridge } from "@/lib/compute/bridge-client";
+import { getBestBridgeNode } from "@/lib/compute/bridge-client";
 
 const DOCKER_NETWORK = process.env.DOCKER_NETWORK || "traefik-net";
 
@@ -151,8 +151,9 @@ export async function provisionContainer(
   tier: string = "FREE",
   snapshotUrl?: string
 ): Promise<ProvisionResult> {
-  const bridge = getComputeBridge();
+  const bridge = await getBestBridgeNode();
   if (bridge) {
+    console.log(`[Compute] Provisioning on bridge node: ${bridge.getNodeId() || bridge.getBaseUrl()}`);
     return bridge.provision(userId, agentSlug, username, tier, snapshotUrl);
   }
 

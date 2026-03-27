@@ -1,10 +1,12 @@
 import { NextResponse } from 'next/server';
+import { requireAuth, handleAuthError } from '@/lib/auth/middleware';
 import { AgentCardService } from '@/lib/agentcard';
 
 export const runtime = 'nodejs';
 
 export async function POST(request: Request) {
   try {
+    await requireAuth();
     const { amountCents, description } = await request.json();
 
     // Validate required parameters
@@ -24,9 +26,6 @@ export async function POST(request: Request) {
     return NextResponse.json(result);
   } catch (error) {
     console.error('AgentCard create error:', error);
-    return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Unknown error' },
-      { status: 500 }
-    );
+    return handleAuthError(error);
   }
 }

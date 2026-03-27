@@ -6,10 +6,10 @@ export async function POST(req: NextRequest) {
         const body = await req.json();
         const { userId, agentId, sessionId } = body;
 
-        // Verify internal secret if present (optional but recommended for back-to-back API calls)
+        // Require internal secret — fail closed if env var is not configured
         const secret = req.headers.get("x-internal-auth");
-        if (process.env.INTERNAL_API_SECRET && secret !== process.env.INTERNAL_API_SECRET) {
-            return NextResponse.json({ error: "Unauthorized internal call" }, { status: 401 });
+        if (!process.env.INTERNAL_API_SECRET || secret !== process.env.INTERNAL_API_SECRET) {
+            return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
         }
 
         // --- PROVISIONER ABSTRACTION BOUNDARY ---

@@ -1,6 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
-import { requireAuth, handleAuthError } from "@/lib/auth/middleware";
-import { prisma } from "@/lib/db/prisma";
+import { NextRequest, NextResponse } from 'next/server';
+import { requireAuth, handleAuthError } from '@/lib/auth/middleware';
+import { prisma } from '@/lib/db/prisma';
 
 /**
  * GET /api/fleet/metrics
@@ -12,10 +12,14 @@ import { prisma } from "@/lib/db/prisma";
  */
 export async function GET(req: NextRequest) {
   try {
-    const nodeId = req.nextUrl.searchParams.get("nodeId");
-    const since = req.nextUrl.searchParams.get("since");
-    const limitParam = req.nextUrl.searchParams.get("limit");
-    const limit = limitParam ? Math.min(parseInt(limitParam), 1000) : 100; // Cap at 1000
+    await requireAuth();
+
+    const nodeId = req.nextUrl.searchParams.get('nodeId');
+    const since = req.nextUrl.searchParams.get('since');
+    const limitParam = req.nextUrl.searchParams.get('limit');
+
+    const parsedLimit = limitParam ? parseInt(limitParam, 10) : 100;
+    const limit = isNaN(parsedLimit) || parsedLimit <= 0 ? 100 : Math.min(parsedLimit, 1000);
 
     const where: {
       nodeId?: string;
@@ -27,13 +31,17 @@ export async function GET(req: NextRequest) {
     }
 
     if (since) {
-      where.reportedAt = { gte: new Date(since) };
+      const sinceDate = new Date(since);
+      if (isNaN(sinceDate.getTime())) {
+        return NextResponse.json({ error: 'Invalid since parameter' }, { status: 400 });
+      }
+      where.reportedAt = { gte: sinceDate };
     }
 
     // Get historical stats ordered by reportedAt asc for charting
     const stats = await prisma.fleetStats.findMany({
       where,
-      orderBy: { reportedAt: "asc" },
+      orderBy: { reportedAt: 'asc' },
       take: limit,
     });
 
@@ -55,10 +63,7 @@ export async function GET(req: NextRequest) {
       count: formattedStats.length,
     });
   } catch (err) {
-    console.error("Failed to fetch fleet metrics:", err);
-    return NextResponse.json(
-      { error: "Failed to fetch fleet metrics" },
-      { status: 500 }
-    );
+    console.error('Failed to fetch fleet metrics:', err);
+    return handleAuthError(err);
   }
 }

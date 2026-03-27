@@ -44,6 +44,7 @@ Randi adopts a **security-first** approach to agentic workflows:
 - 💳 **Credit-Backed Usage**: Token-gated access with automated burn mechanics and verified on-chain deposits.
 - ⛓️ **Web3 Native**: Built-in support for Solana wallet connections and early x402 payment support.
 - 🤖 **Telegram Integration**: Control your agents and receive real-time updates via personal Telegram bots.
+- 🖥️ **Fleet Dashboard**: Real-time visibility into your entire bridge node fleet at `/fleet` — agent health, container counts, and status at a glance.
 
 ---
 

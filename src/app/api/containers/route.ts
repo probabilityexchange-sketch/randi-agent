@@ -7,6 +7,7 @@ import { provisionContainer, ProvisioningError } from "@/lib/docker/provisioner"
 import { cleanupExpiredContainers } from "@/lib/docker/cleanup";
 import { checkRateLimit, RATE_LIMITS } from "@/lib/utils/rate-limit";
 import { ensureUserHasUsername } from "@/lib/utils/username";
+import { getBestBridgeNode } from "@/lib/compute/bridge-client";
 import {
   buildStorageKey,
   hasSnapshot,
@@ -219,6 +220,18 @@ export async function POST(request: NextRequest) {
       let snapshotUrl: string | undefined;
       if (await hasSnapshot(storageKey)) {
         snapshotUrl = (await getSnapshotDownloadUrl(storageKey)) ?? undefined;
+        
+        // --- HOLE 1: PRE-WARMING ---
+        if (snapshotUrl) {
+          const bridge = await getBestBridgeNode();
+          if (bridge) {
+            console.log(`[Compute] Pre-warming bridge node ${bridge.getNodeId()} with snapshot...`);
+            // Fire and forget (don't await to avoid blocking)
+            bridge.prewarm(snapshotUrl, storageKey).catch(() => {});
+          }
+        }
+        // ---------------------------
+        
         console.log(`[Storage] Found snapshot for ${provisionData.agentSlug}, will restore.`);
       }
 

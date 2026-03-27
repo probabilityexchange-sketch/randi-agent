@@ -406,7 +406,9 @@ export const ModelName = {
   CryptoAuditLog: 'CryptoAuditLog',
   StorageVolume: 'StorageVolume',
   ResearchExperiment: 'ResearchExperiment',
-  FleetStats: 'FleetStats'
+  FleetStats: 'FleetStats',
+  BridgeNode: 'BridgeNode',
+  CleanupLock: 'CleanupLock'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -422,7 +424,7 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
     omit: GlobalOmitOptions
   }
   meta: {
-    modelProps: "user" | "session" | "container" | "chatSession" | "agentRuntime" | "chatMessage" | "tokenTransaction" | "agentConfig" | "agentRental" | "userAgentPreference" | "toolApproval" | "workflow" | "workflowRun" | "workflowSchedule" | "policyDecision" | "approvalRequest" | "policyAuditLog" | "cryptoGuardrailConfig" | "cryptoDestinationAllowlistEntry" | "cryptoAuditLog" | "storageVolume" | "researchExperiment" | "fleetStats"
+    modelProps: "user" | "session" | "container" | "chatSession" | "agentRuntime" | "chatMessage" | "tokenTransaction" | "agentConfig" | "agentRental" | "userAgentPreference" | "toolApproval" | "workflow" | "workflowRun" | "workflowSchedule" | "policyDecision" | "approvalRequest" | "policyAuditLog" | "cryptoGuardrailConfig" | "cryptoDestinationAllowlistEntry" | "cryptoAuditLog" | "storageVolume" | "researchExperiment" | "fleetStats" | "bridgeNode" | "cleanupLock"
     txIsolationLevel: TransactionIsolationLevel
   }
   model: {
@@ -2128,6 +2130,154 @@ export type TypeMap<ExtArgs extends runtime.Types.Extensions.InternalArgs = runt
         }
       }
     }
+    BridgeNode: {
+      payload: Prisma.$BridgeNodePayload<ExtArgs>
+      fields: Prisma.BridgeNodeFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.BridgeNodeFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BridgeNodePayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.BridgeNodeFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BridgeNodePayload>
+        }
+        findFirst: {
+          args: Prisma.BridgeNodeFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BridgeNodePayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.BridgeNodeFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BridgeNodePayload>
+        }
+        findMany: {
+          args: Prisma.BridgeNodeFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BridgeNodePayload>[]
+        }
+        create: {
+          args: Prisma.BridgeNodeCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BridgeNodePayload>
+        }
+        createMany: {
+          args: Prisma.BridgeNodeCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.BridgeNodeCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BridgeNodePayload>[]
+        }
+        delete: {
+          args: Prisma.BridgeNodeDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BridgeNodePayload>
+        }
+        update: {
+          args: Prisma.BridgeNodeUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BridgeNodePayload>
+        }
+        deleteMany: {
+          args: Prisma.BridgeNodeDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.BridgeNodeUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.BridgeNodeUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BridgeNodePayload>[]
+        }
+        upsert: {
+          args: Prisma.BridgeNodeUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$BridgeNodePayload>
+        }
+        aggregate: {
+          args: Prisma.BridgeNodeAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateBridgeNode>
+        }
+        groupBy: {
+          args: Prisma.BridgeNodeGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BridgeNodeGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.BridgeNodeCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.BridgeNodeCountAggregateOutputType> | number
+        }
+      }
+    }
+    CleanupLock: {
+      payload: Prisma.$CleanupLockPayload<ExtArgs>
+      fields: Prisma.CleanupLockFieldRefs
+      operations: {
+        findUnique: {
+          args: Prisma.CleanupLockFindUniqueArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CleanupLockPayload> | null
+        }
+        findUniqueOrThrow: {
+          args: Prisma.CleanupLockFindUniqueOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CleanupLockPayload>
+        }
+        findFirst: {
+          args: Prisma.CleanupLockFindFirstArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CleanupLockPayload> | null
+        }
+        findFirstOrThrow: {
+          args: Prisma.CleanupLockFindFirstOrThrowArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CleanupLockPayload>
+        }
+        findMany: {
+          args: Prisma.CleanupLockFindManyArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CleanupLockPayload>[]
+        }
+        create: {
+          args: Prisma.CleanupLockCreateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CleanupLockPayload>
+        }
+        createMany: {
+          args: Prisma.CleanupLockCreateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        createManyAndReturn: {
+          args: Prisma.CleanupLockCreateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CleanupLockPayload>[]
+        }
+        delete: {
+          args: Prisma.CleanupLockDeleteArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CleanupLockPayload>
+        }
+        update: {
+          args: Prisma.CleanupLockUpdateArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CleanupLockPayload>
+        }
+        deleteMany: {
+          args: Prisma.CleanupLockDeleteManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateMany: {
+          args: Prisma.CleanupLockUpdateManyArgs<ExtArgs>
+          result: BatchPayload
+        }
+        updateManyAndReturn: {
+          args: Prisma.CleanupLockUpdateManyAndReturnArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CleanupLockPayload>[]
+        }
+        upsert: {
+          args: Prisma.CleanupLockUpsertArgs<ExtArgs>
+          result: runtime.Types.Utils.PayloadToResult<Prisma.$CleanupLockPayload>
+        }
+        aggregate: {
+          args: Prisma.CleanupLockAggregateArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.AggregateCleanupLock>
+        }
+        groupBy: {
+          args: Prisma.CleanupLockGroupByArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CleanupLockGroupByOutputType>[]
+        }
+        count: {
+          args: Prisma.CleanupLockCountArgs<ExtArgs>
+          result: runtime.Types.Utils.Optional<Prisma.CleanupLockCountAggregateOutputType> | number
+        }
+      }
+    }
   }
 } & {
   other: {
@@ -2599,6 +2749,30 @@ export const FleetStatsScalarFieldEnum = {
 export type FleetStatsScalarFieldEnum = (typeof FleetStatsScalarFieldEnum)[keyof typeof FleetStatsScalarFieldEnum]
 
 
+export const BridgeNodeScalarFieldEnum = {
+  id: 'id',
+  nodeId: 'nodeId',
+  url: 'url',
+  region: 'region',
+  apiKey: 'apiKey',
+  status: 'status',
+  maxContainers: 'maxContainers',
+  lastHealthcheckAt: 'lastHealthcheckAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BridgeNodeScalarFieldEnum = (typeof BridgeNodeScalarFieldEnum)[keyof typeof BridgeNodeScalarFieldEnum]
+
+
+export const CleanupLockScalarFieldEnum = {
+  id: 'id',
+  lockedAt: 'lockedAt'
+} as const
+
+export type CleanupLockScalarFieldEnum = (typeof CleanupLockScalarFieldEnum)[keyof typeof CleanupLockScalarFieldEnum]
+
+
 export const SortOrder = {
   asc: 'asc',
   desc: 'desc'
@@ -2823,6 +2997,8 @@ export type GlobalOmitConfig = {
   storageVolume?: Prisma.StorageVolumeOmit
   researchExperiment?: Prisma.ResearchExperimentOmit
   fleetStats?: Prisma.FleetStatsOmit
+  bridgeNode?: Prisma.BridgeNodeOmit
+  cleanupLock?: Prisma.CleanupLockOmit
 }
 
 /* Types for Logging */

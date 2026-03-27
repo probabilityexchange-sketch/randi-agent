@@ -11,12 +11,46 @@ import { ApprovalCard, type ApprovalDecision } from "./ApprovalCard";
 import { WorkflowPlanCard } from "../workflows/WorkflowPlanCard";
 import { WorkflowRunCard } from "../workflows/WorkflowRunCard";
 import { WorkflowScheduleCard } from "../workflows/WorkflowScheduleCard";
+import { ConsolidatedProgressCard, type SpecialistProgressItem, type SpecialistProgressStatus } from "./ConsolidatedProgressCard";
 
 interface MessageBubbleProps {
     message: Message & { parts?: any[] };
     isStreaming?: boolean;
     onApprovalDecision?: (approvalId: string, decision: ApprovalDecision) => void;
     onWorkflowAction?: (workflowId: string, action: string, data?: any) => void;
+}
+
+function SpecialistFleetCard({ result }: { result: any }) {
+    // If result is a string, try to parse it
+    let data = result;
+    if (typeof result === 'string') {
+        try {
+            data = JSON.parse(result);
+        } catch {
+            return null;
+        }
+    }
+
+    if (!data || !Array.isArray(data.results)) {
+        return null;
+    }
+
+    const specialists: SpecialistProgressItem[] = data.results.map((r: any) => ({
+        slug: r.specialistSlug,
+        role: r.role,
+        task: r.delegatedTask,
+        status: r.status as SpecialistProgressStatus,
+        output: r.output,
+    }));
+
+    return (
+        <div className="my-3">
+            <ConsolidatedProgressCard
+                specialists={specialists}
+                overallStatus={data.status as SpecialistProgressStatus}
+            />
+        </div>
+    );
 }
 
 function ToolInvocationCard({ 
@@ -27,6 +61,11 @@ function ToolInvocationCard({
     onWorkflowAction?: (workflowId: string, action: string, data?: any) => void;
 }) {
     const { toolName, toolCallId, state, args, result } = toolInvocation;
+
+    // Special rendering for Specialist Fleet (Parallel Specialists)
+    if (toolName === 'conduct_specialists' && state === 'result' && result) {
+        return <SpecialistFleetCard result={result} />;
+    }
 
     // Special rendering for Workflow tools
     if (state === 'result' && result) {

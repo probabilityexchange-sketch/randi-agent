@@ -73,7 +73,9 @@ export const ModelName = {
   CryptoAuditLog: 'CryptoAuditLog',
   StorageVolume: 'StorageVolume',
   ResearchExperiment: 'ResearchExperiment',
-  FleetStats: 'FleetStats'
+  FleetStats: 'FleetStats',
+  BridgeNode: 'BridgeNode',
+  CleanupLock: 'CleanupLock'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -522,6 +524,30 @@ export const FleetStatsScalarFieldEnum = {
 } as const
 
 export type FleetStatsScalarFieldEnum = (typeof FleetStatsScalarFieldEnum)[keyof typeof FleetStatsScalarFieldEnum]
+
+
+export const BridgeNodeScalarFieldEnum = {
+  id: 'id',
+  nodeId: 'nodeId',
+  url: 'url',
+  region: 'region',
+  apiKey: 'apiKey',
+  status: 'status',
+  maxContainers: 'maxContainers',
+  lastHealthcheckAt: 'lastHealthcheckAt',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+} as const
+
+export type BridgeNodeScalarFieldEnum = (typeof BridgeNodeScalarFieldEnum)[keyof typeof BridgeNodeScalarFieldEnum]
+
+
+export const CleanupLockScalarFieldEnum = {
+  id: 'id',
+  lockedAt: 'lockedAt'
+} as const
+
+export type CleanupLockScalarFieldEnum = (typeof CleanupLockScalarFieldEnum)[keyof typeof CleanupLockScalarFieldEnum]
 
 
 export const SortOrder = {

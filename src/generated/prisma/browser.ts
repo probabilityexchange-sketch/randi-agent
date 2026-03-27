@@ -132,3 +132,13 @@ export type ResearchExperiment = Prisma.ResearchExperimentModel
  * 
  */
 export type FleetStats = Prisma.FleetStatsModel
+/**
+ * Model BridgeNode
+ * 
+ */
+export type BridgeNode = Prisma.BridgeNodeModel
+/**
+ * Model CleanupLock
+ * 
+ */
+export type CleanupLock = Prisma.CleanupLockModel

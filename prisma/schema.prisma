@@ -539,3 +539,26 @@ model FleetStats {
   @@index([nodeId])
   @@index([reportedAt])
 }
+
+model BridgeNode {
+  id            String   @id @default(cuid())
+  nodeId        String   @unique             // Unique node identifier (e.g., "ohio-bridge-1")
+  url           String                       // Base URL of the bridge node (e.g., "https://bridge-ohio.example.com")
+  region        String                       // Geographic region (e.g., "us-east-2")
+  apiKey        String                       // Bridge API key for this node
+  status        String   @default("ACTIVE")  // ACTIVE, INACTIVE, DEGRADED
+  maxContainers Int     @default(50)        // Container capacity limit
+  lastHealthcheckAt DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([status])
+  @@index([region])
+}
+
+model CleanupLock {
+  id        String   @id @default("cleanup-lock")
+  lockedAt  DateTime @default(now())
+
+  @@index([lockedAt])
+}

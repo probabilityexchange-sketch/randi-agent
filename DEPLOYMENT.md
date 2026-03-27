@@ -81,7 +81,8 @@ Verify the happy-path flow in order:
 4. Purchase intent verify works (`POST /api/purchase-intents/{id}/verify`).
 5. Credits balance reflects expected ledger updates (`GET /api/credits/balance`).
 6. Credits UI can complete end-to-end flow.
-7. No sustained 5xx for auth/credits/purchase-intent routes.
+7. Fleet metrics endpoint requires auth (`GET /api/fleet/metrics` should return 401 for unauthenticated requests, 200 after login).
+8. No sustained 5xx for auth/credits/purchase-intent routes.
 
 ### Focused Smoke Test: Agent Configuration + Devnet Purchase
 
@@ -168,6 +169,7 @@ Add these to your Vercel project:
 Recommended production-only additions:
 - `TREASURY_SECRET_KEY`: Required if you want the protocol batch burn job to execute on-chain.
 - `CRON_SECRET`: Required to authorize `/api/cron/scan` in production.
+- `ADMIN_SECRET`: Required to access the bridge node admin API (`/api/nodes`). Without this, all node registry requests return 403.
 - `COMPOSIO_AUTH_CONFIG_GMAIL`: Shared Gmail auth config if you are not using per-user auth.
 - `COMPOSIO_AUTH_CONFIG_GOOGLECALENDAR`: Shared Google Calendar auth config if you are not using per-user auth.
 

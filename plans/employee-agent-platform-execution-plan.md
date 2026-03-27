@@ -157,7 +157,22 @@ Within 90 days, the product should:
 
 ### WP9. UX Simplification Pass (✅ ACCEPTED)
 - Outcome: the product feels simpler and more intuitive than OpenClaw.
-- Status: Implemented in `src/components/workflows/` and updated chat surfaces.
+- Design Specs:
+  - **Consolidated Progress Card:** Chat-native component showing parallel specialist status with step-by-step streaming feedback.
+  - **State Matrix:** Use `cyber-green` for completion, `warning-amber` for blocked/partial, and `danger-red` for failed tasks.
+  - **Mobile Layout:** Adaptive "Employee Feed" view emphasizing vertical progress.
+- Status: Initial logic implemented; UI components being drafted per `DESIGN.md`.
+
+## GSTACK REVIEW REPORT
+
+| Review | Trigger | Why | Runs | Status | Findings |
+|--------|---------|-----|------|--------|----------|
+| CEO Review | `/plan-ceo-review` | Scope & strategy | 0 | — | — |
+| Codex Review | `/codex review` | Independent 2nd opinion | 0 | — | — |
+| Eng Review | `/plan-eng-review` | Architecture & tests (required) | 0 | — | — |
+| Design Review | `/plan-design-review` | UI/UX gaps | 1 | CLEAR | score: 4/10 → 9/10, 6 decisions |
+
+**VERDICT:** DESIGN CLEARED — ready to implement UI components.
 
 ## Recommended Order of Execution
 1. WP1 Chat-to-Workflow Compiler
