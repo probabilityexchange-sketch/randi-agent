@@ -88,6 +88,14 @@ export function useAuth() {
     ) as { address: string } | undefined;
   }, [user]);
 
+  // Stable wallet address string — used to gate the sync so we never fire
+  // syncSession with wallet: undefined before Privy finishes creating the
+  // embedded wallet (which can trail authenticated=true by 100-500 ms).
+  const walletAddress = useMemo(
+    () => primaryWallet?.address || user?.wallet?.address || null,
+    [primaryWallet?.address, user?.wallet?.address]
+  );
+
   const syncSession = useCallback(async (): Promise<boolean> => {
     const accessToken = await getAccessToken();
     if (!accessToken) throw new Error('Missing Privy access token');
@@ -233,7 +241,11 @@ export function useAuth() {
 
   // Sync Loop Effect
   useEffect(() => {
-    if (!ready || !authenticated || sessionSynced || localIsLoggingOut || isLoggingOutGlobal)
+    // walletAddress guard: Privy may set authenticated=true before the embedded
+    // wallet is ready (email login). Waiting for a non-null wallet address ensures
+    // syncSession always sends a valid wallet, avoiding a guaranteed first-attempt
+    // failure followed by a 3s retry delay.
+    if (!ready || !authenticated || !walletAddress || sessionSynced || localIsLoggingOut || isLoggingOutGlobal)
       return;
 
     let cancelled = false;
@@ -283,7 +295,7 @@ export function useAuth() {
       cancelled = true;
       if (retryTimerRef.current) window.clearTimeout(retryTimerRef.current);
     };
-  }, [ready, authenticated, ensureServerSession, syncRetryTick, sessionSynced, localIsLoggingOut]);
+  }, [ready, authenticated, walletAddress, ensureServerSession, syncRetryTick, sessionSynced, localIsLoggingOut]);
 
   // Reset when unauthenticated
   useEffect(() => {
