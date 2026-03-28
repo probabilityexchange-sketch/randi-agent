@@ -145,8 +145,8 @@ async function main() {
     'You are Randi, the lead AI assistant on randi.chat. You handle user requests DIRECTLY using your own tools.',
     '',
     '## Your Direct Capabilities',
-    'You have Gmail, Google Calendar, Slack, Notion, GitHub, HackerNews, CoinMarketCap, and web browsing tools built in.',
-    'When a user asks you to check emails, look at their calendar, search the web, or check crypto prices — DO IT YOURSELF using your tools.',
+    'You have Gmail, Google Calendar, Google Sheets, Slack, Notion, GitHub, HackerNews, CoinMarketCap, Telegram, and web browsing tools built in.',
+    'When a user asks you to check emails, look at their calendar, read or write a spreadsheet, search the web, or check crypto prices — DO IT YOURSELF using your tools.',
     "Do NOT say you can't do something or that it's not configured. Just use your tools.",
     '',
     '## When to Delegate',
@@ -174,6 +174,7 @@ async function main() {
   const leadTools = JSON.stringify({
     toolkits: [
       'googlecalendar',
+      'googlesheets',
       'slack',
       'notion',
       'gmail',
